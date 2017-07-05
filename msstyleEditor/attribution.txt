@@ -1,0 +1,4 @@
+
+-------------------------------------------------------------
+
+This application links against wxWidgets 3.0.2 (https://www.wxwidgets.org/).
