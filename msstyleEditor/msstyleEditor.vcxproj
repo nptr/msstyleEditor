@@ -85,6 +85,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="CustomTreeItemData.cpp" />
+    <ClCompile Include="SearchDialog.cpp" />
     <ClCompile Include="UiHelper.cpp" />
     <ClCompile Include="VisualStyle.cpp" />
   </ItemGroup>
@@ -96,6 +97,8 @@
     <ClInclude Include="MainWindow.h" />
     <ClInclude Include="CustomTreeItemData.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="SearchDialog.h" />
+    <ClInclude Include="SearchDialogListener.h" />
     <ClInclude Include="UiHelper.h" />
     <ClInclude Include="VisualStyle.h" />
     <ClInclude Include="VisualStyleEnumMaps.h" />

@@ -4,11 +4,15 @@
 
 #include "CustomFileDropTarget.h"
 #include "CustomTreeItemData.h"
+#include "SearchDialog.h"
 #include "UiHelper.h"
 #include <wx\mstream.h>
 #include <wx\wfstream.h>
 #include <wx\wupdlock.h>
 #include <fstream>
+#include <algorithm>
+#include <string>
+#include <cctype>
 
 using namespace msstyle;
 
@@ -89,6 +93,7 @@ MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, c
 	Connect(ID_COLLAPSE_TREE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnCollapseClicked));
 	Connect(ID_EXPAND_TREE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnExpandClicked));
 	Connect(ID_THEMEFOLDER, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnOpenThemeFolder));
+	Connect(ID_FIND, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnFindHotkeyPressed));
 
 	Connect(wxEVT_COMMAND_TREE_SEL_CHANGED, wxTreeEventHandler(MainWindow::OnClassViewTreeSelChanged), NULL, this);
 	propView->Connect(wxEVT_PG_CHANGING, wxPropertyGridEventHandler(MainWindow::OnPropertyGridChanging), NULL, this);
@@ -101,6 +106,11 @@ MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, c
 	wxFrame::SetIcon(wxICON(APPICON));
 
 	this->SetDropTarget(new CustomFileDropTarget(*this));
+
+	wxAcceleratorEntry entries[1];
+	entries[0].Set(wxAcceleratorEntryFlags::wxACCEL_CTRL, wxKeyCode::WXK_CONTROL_F, ID_FIND);
+	wxAcceleratorTable table(1, entries);
+	SetAcceleratorTable(table);
 }
 
 
@@ -344,6 +354,133 @@ void MainWindow::OnOpenThemeFolder(wxCommandEvent& event)
 {
 	wxExecute("explorer C:\\Windows\\Resources\\Themes\\", wxEXEC_ASYNC, NULL);
 }
+
+void MainWindow::OnFindHotkeyPressed(wxCommandEvent& event)
+{
+	if (searchDlg == nullptr)
+	{
+		searchDlg = new SearchDialog(this);
+		searchDlg->SetSearchHandler((ISearchDialogListener*)this);
+	}
+
+	if (!searchDlg->IsShown())
+		searchDlg->Show();
+}
+
+void MainWindow::OnFindNext(const std::string& toFind)
+{
+	if (currentStyle == nullptr)
+		return;
+
+	if (toFind.length() == 0)
+		return;
+
+	wxTreeItemId startItem = classView->GetSelection();
+	if (!startItem.IsOk())
+	{
+		startItem = classView->GetRootItem();
+		if (!startItem.IsOk())
+			return;
+	}
+
+	wxTreeItemId item = FindNext(toFind, startItem);
+	if (item.IsOk())
+		classView->SelectItem(item);
+	else statusBar->SetStatusText(wxT("No more match for \"") + toFind + wxT("\" after this point!"));
+}
+
+
+bool ContainsStringInvariant(const std::string& text, const std::string& toFind)
+{
+	auto& it = std::search(text.begin(), text.end(),
+		toFind.begin(), toFind.end(),
+		[](char c1, char c2) -> bool
+	{
+		return std::toupper(c1) == std::toupper(c2);
+	});
+
+	return (it != text.end());
+}
+
+bool Contains(const std::string& str, wxTreeItemData* treeItemData)
+{
+	if (treeItemData == nullptr)
+		return false;
+
+	// Class Node
+	PropClassTreeItemData* classData = dynamic_cast<PropClassTreeItemData*>(treeItemData);
+	if (classData != nullptr)
+	{
+		return ContainsStringInvariant(classData->GetClass()->className, str);
+	}
+
+	// Part Node
+	PartTreeItemData* partData = dynamic_cast<PartTreeItemData*>(treeItemData);
+	if (partData != nullptr)
+	{
+		return ContainsStringInvariant(partData->GetMsStylePart()->partName, str);
+	}
+
+	// Image Node
+	PropTreeItemData* propData = dynamic_cast<PropTreeItemData*>(treeItemData);
+	if (propData != nullptr)
+	{
+		const char* name = VisualStyle::FindPropName(propData->GetMSStyleProp()->nameID);
+		if (name == nullptr)
+			return false;
+		else return ContainsStringInvariant(std::string(name), str);
+	}
+
+	return false;
+}
+
+wxTreeItemId MainWindow::FindNext(const std::string& str, wxTreeItemId node)
+{
+	wxTreeItemIdValue cookie;
+	wxTreeItemId originalNode = node;
+	while (node.IsOk())
+	{
+		// see whether the node contains "str" somewhere.
+		// skip the first node to not get stuck.
+		if (node != originalNode)
+		{
+			wxTreeItemData* data = classView->GetItemData(node);
+			if (Contains(str, data))
+				return node;
+		}
+
+
+		// find nodes: depth
+		wxTreeItemId nextNode = classView->GetFirstChild(node, cookie);
+		if (!nextNode.IsOk())
+		{
+			// find nodes: breadth
+			nextNode = classView->GetNextSibling(node);
+			if (!nextNode.IsOk())
+			{
+				// back out and try finding a node in the breadth
+				wxTreeItemId previous = node;
+				nextNode = classView->GetItemParent(node);
+				while (nextNode.IsOk() && nextNode != classView->GetRootItem() && !classView->GetNextSibling(nextNode).IsOk())
+				{
+					nextNode = classView->GetItemParent(nextNode);
+				}
+
+				if (nextNode == classView->GetRootItem())
+					return wxTreeItemId();
+
+				if (nextNode.IsOk()) // parent ok, so we have a sibling
+					nextNode = classView->GetNextSibling(nextNode);
+				//else parent was not ok, so we hit the root node -> no nodes left anymore -> search done
+			}
+		}
+
+		node = nextNode;
+	}
+
+	return wxTreeItemId();
+}
+
 
 //////////////////////////////////////////////////////////////////////////
 // OTHER LOGIC

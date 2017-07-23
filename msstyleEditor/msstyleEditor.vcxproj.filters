@@ -41,6 +41,9 @@
     <ClCompile Include="UiHelper.cpp">
       <Filter>GUI</Filter>
     </ClCompile>
+    <ClCompile Include="SearchDialog.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CustomTreeItemData.h">
@@ -81,6 +84,12 @@
     </ClInclude>
     <ClInclude Include="VisualStylePropMaps.h">
       <Filter>VisualStyle</Filter>
+    </ClInclude>
+    <ClInclude Include="SearchDialog.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="SearchDialogListener.h">
+      <Filter>GUI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
