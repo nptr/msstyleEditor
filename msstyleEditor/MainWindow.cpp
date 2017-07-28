@@ -93,7 +93,7 @@ MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, c
 	Connect(ID_COLLAPSE_TREE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnCollapseClicked));
 	Connect(ID_EXPAND_TREE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnExpandClicked));
 	Connect(ID_THEMEFOLDER, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnOpenThemeFolder));
-	Connect(ID_FIND, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnFindHotkeyPressed));
+	Connect(ID_FIND, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnOpenSearchDlg));
 
 	Connect(wxEVT_COMMAND_TREE_SEL_CHANGED, wxTreeEventHandler(MainWindow::OnClassViewTreeSelChanged), NULL, this);
 	propView->Connect(wxEVT_PG_CHANGING, wxPropertyGridEventHandler(MainWindow::OnPropertyGridChanging), NULL, this);
@@ -134,7 +134,7 @@ void MainWindow::OnFileSaveMenuClicked(wxCommandEvent& event)
 	if (saveFileDialog.ShowModal() == wxID_CANCEL)
 		return;
 
-	wchar_t newPath[1024];
+	wchar_t newPath[256]; // max path lenght for pretty much every FS
 	lstrcpyW(newPath, (wchar_t*)saveFileDialog.GetPath().wc_str());
 
 	try
@@ -355,7 +355,7 @@ void MainWindow::OnOpenThemeFolder(wxCommandEvent& event)
 	wxExecute("explorer C:\\Windows\\Resources\\Themes\\", wxEXEC_ASYNC, NULL);
 }
 
-void MainWindow::OnFindHotkeyPressed(wxCommandEvent& event)
+void MainWindow::OnOpenSearchDlg(wxCommandEvent& event)
 {
 	if (searchDlg == nullptr)
 	{
@@ -367,12 +367,12 @@ void MainWindow::OnFindHotkeyPressed(wxCommandEvent& event)
 		searchDlg->Show();
 }
 
-void MainWindow::OnFindNext(const std::string& toFind)
+void MainWindow::OnFindNext(const SearchProperties& search)
 {
 	if (currentStyle == nullptr)
 		return;
 
-	if (toFind.length() == 0)
+	if (search.value.length() == 0)
 		return;
 
 	wxTreeItemId startItem = classView->GetSelection();
@@ -383,10 +383,10 @@ void MainWindow::OnFindNext(const std::string& toFind)
 			return;
 	}
 
-	wxTreeItemId item = FindNext(toFind, startItem);
+	wxTreeItemId item = FindNext(search, startItem);
 	if (item.IsOk())
 		classView->SelectItem(item);
-	else statusBar->SetStatusText(wxT("No more match for \"") + toFind + wxT("\" after this point!"));
+	else statusBar->SetStatusText(wxT("No more match for \"") + search.value + wxT("\" after this point!"));
 }
 
 
@@ -402,7 +402,104 @@ bool ContainsStringInvariant(const std::string& text, const std::string& toFind)
 	return (it != text.end());
 }
 
-bool Contains(const std::string& str, wxTreeItemData* treeItemData)
+bool ContainsProperty(const SearchProperties& search, wxTreeItemData* treeItemData)
+{
+	if (treeItemData == nullptr)
+		return false;
+
+	// If its a part node, check its properties
+	PartTreeItemData* partData = dynamic_cast<PartTreeItemData*>(treeItemData);
+	if (partData == nullptr)
+		return false;
+
+	MsStylePart* part = partData->GetMsStylePart();
+	
+	for (auto& stateIt = part->states.begin(); stateIt != part->states.end(); ++stateIt)
+	{
+		for (auto& propIt : stateIt->second->properties)
+		{
+			// if its a property of the desired type, do a comparison
+			if (propIt->typeID != search.type)
+				continue;
+
+			// comparison
+			switch (propIt->typeID)
+			{
+				case IDENTIFIER::POSITION:
+				{
+					char propPos[32];
+					sprintf(propPos, "%d,%d",
+						propIt->variants.positiontype.x,
+						propIt->variants.positiontype.y);
+
+					std::string tmp = search.value;
+					tmp.erase(std::remove_if(tmp.begin(), tmp.end(), std::isspace), tmp.end());
+
+					if (ContainsStringInvariant(std::string(propPos), tmp))
+						return true;
+				} break;
+				case IDENTIFIER::COLOR:
+				{
+					char propColor[32];
+					sprintf(propColor, "%d,%d,%d",
+						propIt->variants.colortype.r,
+						propIt->variants.colortype.g,
+						propIt->variants.colortype.b);
+
+					std::string tmp = search.value;
+					tmp.erase(std::remove_if(tmp.begin(), tmp.end(), std::isspace), tmp.end());
+
+					if (ContainsStringInvariant(std::string(propColor), tmp))
+						return true;
+				} break;
+				case IDENTIFIER::MARGINS:
+				{
+					char propMargin[32];
+					sprintf(propMargin, "%d,%d,%d,%d",
+						propIt->variants.margintype.left,
+						propIt->variants.margintype.top,
+						propIt->variants.margintype.right,
+						propIt->variants.margintype.bottom);
+
+					std::string tmp = search.value;
+					tmp.erase(std::remove_if(tmp.begin(), tmp.end(), std::isspace), tmp.end());
+
+					if (ContainsStringInvariant(std::string(propMargin), tmp))
+						return true;
+				} break;
+				case IDENTIFIER::RECT:
+				{
+					char propRect[32];
+					sprintf(propRect, "%d,%d,%d,%d",
+						propIt->variants.recttype.left,
+						propIt->variants.recttype.top,
+						propIt->variants.recttype.right,
+						propIt->variants.recttype.bottom);
+
+					std::string tmp = search.value;
+					tmp.erase(std::remove_if(tmp.begin(), tmp.end(), std::isspace), tmp.end());
+
+					if (ContainsStringInvariant(std::string(propRect), tmp))
+						return true;
+				} break;
+				case IDENTIFIER::SIZE:
+				{
+					try
+					{
+						int size = std::stoi(search.value);
+						if (size == propIt->variants.sizetype.size)
+							return true;
+					}
+					catch (...) {}
+				} break;
+			}
+		}
+	}
+
+	return false;
+}
+
+bool ContainsName(const std::string& str, wxTreeItemData* treeItemData)
 {
 	if (treeItemData == nullptr)
 		return false;
@@ -434,7 +531,7 @@ bool Contains(const std::string& str, wxTreeItemData* treeItemData)
 	return false;
 }
 
-wxTreeItemId MainWindow::FindNext(const std::string& str, wxTreeItemId node)
+wxTreeItemId MainWindow::FindNext(const SearchProperties& search, wxTreeItemId node)
 {
 	wxTreeItemIdValue cookie;
 	wxTreeItemId originalNode = node;
@@ -445,8 +542,21 @@ wxTreeItemId MainWindow::FindNext(const std::string& str, wxTreeItemId node)
 		if (node != originalNode)
 		{
 			wxTreeItemData* data = classView->GetItemData(node);
-			if (Contains(str, data))
-				return node;
+			switch (search.mode)
+			{
+				case SearchProperties::MODE_NAME:
+				{
+					if (ContainsName(search.value, data))
+						return node;
+				} break;
+				case SearchProperties::MODE_PROPERTY:
+				{
+					if (ContainsProperty(search, data))
+						return node;
+				} break;
+				default:
+					break;
+			}
 		}
 
 

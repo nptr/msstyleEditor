@@ -58,9 +58,9 @@ protected:
 	void OnExpandClicked(wxCommandEvent& event);
 	void OnResourceDlgClicked(wxCommandEvent& event);
 	void OnOpenThemeFolder(wxCommandEvent& event);
-	void OnFindHotkeyPressed(wxCommandEvent& event);
+	void OnOpenSearchDlg(wxCommandEvent& event);
 
-	wxTreeItemId FindNext(const std::string& str, wxTreeItemId node);
+	wxTreeItemId FindNext(const SearchProperties& props, wxTreeItemId node);
 
 	void FillClassView(const std::unordered_map<int, msstyle::MsStyleClass*>* classes);
 	void FillPropertyView(msstyle::MsStylePart& part);
@@ -73,7 +73,7 @@ public:
 	MainWindow(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(800, 600), long style = wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL);
 	~MainWindow();
 
-	void OnFindNext(const std::string& toFind);
+	void OnFindNext(const SearchProperties& search);
 
 	void OpenStyle(const wxString& file);
 	void CloseStyle();
