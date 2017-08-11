@@ -23,7 +23,6 @@ protected:
 	wxChoice* searchType;
 	wxChoice* typeBox;
 	wxSearchCtrl* searchBar;
-	wxButton* btFindNext;
 	ISearchDialogListener* handler;
 
 	SearchProperties search;

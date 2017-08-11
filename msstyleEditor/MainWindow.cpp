@@ -367,6 +367,7 @@ void MainWindow::OnOpenSearchDlg(wxCommandEvent& event)
 		searchDlg->Show();
 }
 
+bool endReached = false;
 void MainWindow::OnFindNext(const SearchProperties& search)
 {
 	if (currentStyle == nullptr)
@@ -376,8 +377,9 @@ void MainWindow::OnFindNext(const SearchProperties& search)
 		return;
 
 	wxTreeItemId startItem = classView->GetSelection();
-	if (!startItem.IsOk())
+	if (!startItem.IsOk() || endReached)
 	{
+		endReached = false;
 		startItem = classView->GetRootItem();
 		if (!startItem.IsOk())
 			return;
@@ -386,7 +388,14 @@ void MainWindow::OnFindNext(const SearchProperties& search)
 	wxTreeItemId item = FindNext(search, startItem);
 	if (item.IsOk())
 		classView->SelectItem(item);
-	else statusBar->SetStatusText(wxT("No more match for \"") + search.value + wxT("\" after this point!"));
+	else
+	{
+		wxMessageBox(wxT("No further match for \"")
+			+ search.value
+			+ wxT("\" !\n")
+			+ wxT("Search will begin from top again."));
+		endReached = true;
+	}
 }
 
 

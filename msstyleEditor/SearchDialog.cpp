@@ -11,7 +11,7 @@ SearchDialog::SearchDialog(wxWindow* parent, wxWindowID id, const wxString& titl
 	wxBoxSizer* bSizer10;
 	bSizer10 = new wxBoxSizer(wxHORIZONTAL);
 
-	wxString searchTypeChoices[] = { wxT("Class/Part"), wxT("Property") };
+	wxString searchTypeChoices[] = { wxT("Class or Part"), wxT("Property") };
 	int searchTypeNChoices = sizeof(searchTypeChoices) / sizeof(wxString);
 	searchType = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, searchTypeNChoices, searchTypeChoices, 0);
 	searchType->SetSelection(0);
@@ -21,30 +21,25 @@ SearchDialog::SearchDialog(wxWindow* parent, wxWindowID id, const wxString& titl
 	typeBox = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, typeBoxChoices, 0);
 	typeBox->SetSelection(0);
 	bSizer10->Add(typeBox, 1, wxALL | wxALIGN_CENTER_VERTICAL, 5);
-
 	bSizer9->Add(bSizer10, 1, wxEXPAND, 5);
 
 	wxBoxSizer* bSizer11;
 	bSizer11 = new wxBoxSizer(wxHORIZONTAL);
 
-	searchBar = new wxSearchCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0);
+	searchBar = new wxSearchCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
 #ifndef __WXMAC__
 	searchBar->ShowSearchButton(true);
 #endif
 	searchBar->ShowCancelButton(false);
-	bSizer11->Add(searchBar, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
 
-	btFindNext = new wxButton(this, wxID_ANY, wxT(">"), wxDefaultPosition, wxDefaultSize, 0);
-	btFindNext->SetMaxSize(wxSize(25, -1));
-
-	bSizer11->Add(btFindNext, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
+	bSizer11->Add(searchBar, 1, wxALL | wxALIGN_CENTER_VERTICAL, 5);
 	bSizer9->Add(bSizer11, 1, wxEXPAND, 5);
 
-	btFindNext->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SearchDialog::OnNextButtonClicked), NULL, this);
-	searchBar->Connect(wxEVT_SEARCHCTRL_SEARCH_BTN, wxCommandEventHandler(SearchDialog::OnNextButtonClicked), NULL, this);
-	searchBar->Connect(wxEVT_TEXT_ENTER, wxCommandEventHandler(SearchDialog::OnNextButtonClicked), NULL, this);
+
 	searchType->Connect(wxEVT_CHOICE, wxCommandEventHandler(SearchDialog::OnSearchModeChanged), NULL, this);
 	typeBox->Connect(wxEVT_CHOICE, wxCommandEventHandler(SearchDialog::OnSearchTypeChanged), NULL, this);
+	searchBar->Connect(wxEVT_SEARCHCTRL_SEARCH_BTN, wxCommandEventHandler(SearchDialog::OnNextButtonClicked), NULL, this);
+	searchBar->Connect(wxEVT_TEXT_ENTER, wxCommandEventHandler(SearchDialog::OnNextButtonClicked), NULL, this);
 	typeBox->Enable(false);
 	typeBox->Append("COLOR",	(void*)msstyle::IDENTIFIER::COLOR);
 	typeBox->Append("MARGINS",	(void*)msstyle::IDENTIFIER::MARGINS);
@@ -58,9 +53,6 @@ SearchDialog::SearchDialog(wxWindow* parent, wxWindowID id, const wxString& titl
 
 	this->Centre(wxBOTH);
 
-	// toggle focus, otherwise the enter-handler
-	// will not be called
-	btFindNext->SetFocus();
 	searchBar->SetFocus();
 }
 

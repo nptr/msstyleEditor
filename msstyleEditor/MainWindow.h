@@ -60,6 +60,7 @@ protected:
 	void OnOpenThemeFolder(wxCommandEvent& event);
 	void OnOpenSearchDlg(wxCommandEvent& event);
 
+	
 	wxTreeItemId FindNext(const SearchProperties& props, wxTreeItemId node);
 
 	void FillClassView(const std::unordered_map<int, msstyle::MsStyleClass*>* classes);
