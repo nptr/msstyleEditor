@@ -4,11 +4,15 @@
 
 #include "CustomFileDropTarget.h"
 #include "CustomTreeItemData.h"
+#include "SearchDialog.h"
 #include "UiHelper.h"
 #include <wx\mstream.h>
 #include <wx\wfstream.h>
 #include <wx\wupdlock.h>
 #include <fstream>
+#include <algorithm>
+#include <string>
+#include <cctype>
 
 using namespace msstyle;
 
@@ -89,6 +93,7 @@ MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, c
 	Connect(ID_COLLAPSE_TREE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnCollapseClicked));
 	Connect(ID_EXPAND_TREE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnExpandClicked));
 	Connect(ID_THEMEFOLDER, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnOpenThemeFolder));
+	Connect(ID_FIND, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnOpenSearchDlg));
 
 	Connect(wxEVT_COMMAND_TREE_SEL_CHANGED, wxTreeEventHandler(MainWindow::OnClassViewTreeSelChanged), NULL, this);
 	propView->Connect(wxEVT_PG_CHANGING, wxPropertyGridEventHandler(MainWindow::OnPropertyGridChanging), NULL, this);
@@ -101,6 +106,11 @@ MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, c
 	wxFrame::SetIcon(wxICON(APPICON));
 
 	this->SetDropTarget(new CustomFileDropTarget(*this));
+
+	wxAcceleratorEntry entries[1];
+	entries[0].Set(wxAcceleratorEntryFlags::wxACCEL_CTRL, wxKeyCode::WXK_CONTROL_F, ID_FIND);
+	wxAcceleratorTable table(1, entries);
+	SetAcceleratorTable(table);
 }
 
 
@@ -124,7 +134,7 @@ void MainWindow::OnFileSaveMenuClicked(wxCommandEvent& event)
 	if (saveFileDialog.ShowModal() == wxID_CANCEL)
 		return;
 
-	wchar_t newPath[1024];
+	wchar_t newPath[256]; // max path lenght for pretty much every FS
 	lstrcpyW(newPath, (wchar_t*)saveFileDialog.GetPath().wc_str());
 
 	try
@@ -344,6 +354,252 @@ void MainWindow::OnOpenThemeFolder(wxCommandEvent& event)
 {
 	wxExecute("explorer C:\\Windows\\Resources\\Themes\\", wxEXEC_ASYNC, NULL);
 }
+
+void MainWindow::OnOpenSearchDlg(wxCommandEvent& event)
+{
+	if (searchDlg == nullptr)
+	{
+		searchDlg = new SearchDialog(this);
+		searchDlg->SetSearchHandler((ISearchDialogListener*)this);
+	}
+
+	if (!searchDlg->IsShown())
+		searchDlg->Show();
+}
+
+bool endReached = false;
+void MainWindow::OnFindNext(const SearchProperties& search)
+{
+	if (currentStyle == nullptr)
+		return;
+
+	if (search.value.length() == 0)
+		return;
+
+	wxTreeItemId startItem = classView->GetSelection();
+	if (!startItem.IsOk() || endReached)
+	{
+		endReached = false;
+		startItem = classView->GetRootItem();
+		if (!startItem.IsOk())
+			return;
+	}
+
+	wxTreeItemId item = FindNext(search, startItem);
+	if (item.IsOk())
+		classView->SelectItem(item);
+	else
+	{
+		wxMessageBox(wxT("No further match for \"")
+			+ search.value
+			+ wxT("\" !\n")
+			+ wxT("Search will begin from top again."));
+		endReached = true;
+	}
+}
+
+
+bool ContainsStringInvariant(const std::string& text, const std::string& toFind)
+{
+	auto& it = std::search(text.begin(), text.end(),
+		toFind.begin(), toFind.end(),
+		[](char c1, char c2) -> bool
+	{
+		return std::toupper(c1) == std::toupper(c2);
+	});
+
+	return (it != text.end());
+}
+
+bool ContainsProperty(const SearchProperties& search, wxTreeItemData* treeItemData)
+{
+	if (treeItemData == nullptr)
+		return false;
+
+	// If its a part node, check its properties
+	PartTreeItemData* partData = dynamic_cast<PartTreeItemData*>(treeItemData);
+	if (partData == nullptr)
+		return false;
+
+	MsStylePart* part = partData->GetMsStylePart();
+	
+	for (auto& stateIt = part->states.begin(); stateIt != part->states.end(); ++stateIt)
+	{
+		for (auto& propIt : stateIt->second->properties)
+		{
+			// if its a property of the desired type, do a comparison
+			if (propIt->typeID != search.type)
+				continue;
+
+			// comparison
+			switch (propIt->typeID)
+			{
+				case IDENTIFIER::POSITION:
+				{
+					char propPos[32];
+					sprintf(propPos, "%d,%d",
+						propIt->variants.positiontype.x,
+						propIt->variants.positiontype.y);
+
+					std::string tmp = search.value;
+					tmp.erase(std::remove_if(tmp.begin(), tmp.end(), std::isspace), tmp.end());
+
+					if (ContainsStringInvariant(std::string(propPos), tmp))
+						return true;
+				} break;
+				case IDENTIFIER::COLOR:
+				{
+					char propColor[32];
+					sprintf(propColor, "%d,%d,%d",
+						propIt->variants.colortype.r,
+						propIt->variants.colortype.g,
+						propIt->variants.colortype.b);
+
+					std::string tmp = search.value;
+					tmp.erase(std::remove_if(tmp.begin(), tmp.end(), std::isspace), tmp.end());
+
+					if (ContainsStringInvariant(std::string(propColor), tmp))
+						return true;
+				} break;
+				case IDENTIFIER::MARGINS:
+				{
+					char propMargin[32];
+					sprintf(propMargin, "%d,%d,%d,%d",
+						propIt->variants.margintype.left,
+						propIt->variants.margintype.top,
+						propIt->variants.margintype.right,
+						propIt->variants.margintype.bottom);
+
+					std::string tmp = search.value;
+					tmp.erase(std::remove_if(tmp.begin(), tmp.end(), std::isspace), tmp.end());
+
+					if (ContainsStringInvariant(std::string(propMargin), tmp))
+						return true;
+				} break;
+				case IDENTIFIER::RECT:
+				{
+					char propRect[32];
+					sprintf(propRect, "%d,%d,%d,%d",
+						propIt->variants.recttype.left,
+						propIt->variants.recttype.top,
+						propIt->variants.recttype.right,
+						propIt->variants.recttype.bottom);
+
+					std::string tmp = search.value;
+					tmp.erase(std::remove_if(tmp.begin(), tmp.end(), std::isspace), tmp.end());
+
+					if (ContainsStringInvariant(std::string(propRect), tmp))
+						return true;
+				} break;
+				case IDENTIFIER::SIZE:
+				{
+					try
+					{
+						int size = std::stoi(search.value);
+						if (size == propIt->variants.sizetype.size)
+							return true;
+					}
+					catch (...) {}
+				} break;
+			}
+		}
+	}
+
+	return false;
+}
+
+bool ContainsName(const std::string& str, wxTreeItemData* treeItemData)
+{
+	if (treeItemData == nullptr)
+		return false;
+
+	// Class Node
+	PropClassTreeItemData* classData = dynamic_cast<PropClassTreeItemData*>(treeItemData);
+	if (classData != nullptr)
+	{
+		return ContainsStringInvariant(classData->GetClass()->className, str);
+	}
+
+	// Part Node
+	PartTreeItemData* partData = dynamic_cast<PartTreeItemData*>(treeItemData);
+	if (partData != nullptr)
+	{
+		return ContainsStringInvariant(partData->GetMsStylePart()->partName, str);
+	}
+
+	// Image Node
+	PropTreeItemData* propData = dynamic_cast<PropTreeItemData*>(treeItemData);
+	if (propData != nullptr)
+	{
+		const char* name = VisualStyle::FindPropName(propData->GetMSStyleProp()->nameID);
+		if (name == nullptr)
+			return false;
+		else return ContainsStringInvariant(std::string(name), str);
+	}
+
+	return false;
+}
+
+wxTreeItemId MainWindow::FindNext(const SearchProperties& search, wxTreeItemId node)
+{
+	wxTreeItemIdValue cookie;
+	wxTreeItemId originalNode = node;
+	while (node.IsOk())
+	{
+		// see whether the node contains "str" somewhere.
+		// skip the first node to not get stuck.
+		if (node != originalNode)
+		{
+			wxTreeItemData* data = classView->GetItemData(node);
+			switch (search.mode)
+			{
+				case SearchProperties::MODE_NAME:
+				{
+					if (ContainsName(search.value, data))
+						return node;
+				} break;
+				case SearchProperties::MODE_PROPERTY:
+				{
+					if (ContainsProperty(search, data))
+						return node;
+				} break;
+				default:
+					break;
+			}
+		}
+
+
+		// find nodes: depth
+		wxTreeItemId nextNode = classView->GetFirstChild(node, cookie);
+		if (!nextNode.IsOk())
+		{
+			// find nodes: breadth
+			nextNode = classView->GetNextSibling(node);
+			if (!nextNode.IsOk())
+			{
+				// back out and try finding a node in the breadth
+				wxTreeItemId previous = node;
+				nextNode = classView->GetItemParent(node);
+				while (nextNode.IsOk() && nextNode != classView->GetRootItem() && !classView->GetNextSibling(nextNode).IsOk())
+				{
+					nextNode = classView->GetItemParent(nextNode);
+				}
+
+				if (nextNode == classView->GetRootItem())
+					return wxTreeItemId();
+
+				if (nextNode.IsOk()) // parent ok, so we have a sibling
+					nextNode = classView->GetNextSibling(nextNode);
+				//else parent was not ok, so we hit the root node -> no nodes left anymore -> search done
+			}
+		}
+
+		node = nextNode;
+	}
+
+	return wxTreeItemId();
+}
+
 
 //////////////////////////////////////////////////////////////////////////
 // OTHER LOGIC
