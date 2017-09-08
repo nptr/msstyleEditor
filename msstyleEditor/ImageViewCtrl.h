@@ -14,6 +14,7 @@ public:
 
 protected:
 	wxBitmap bitmap;
+	//wxSize cellSize;
 
 	void OnMouse(wxMouseEvent &event);
 	void OnPaint(wxPaintEvent &event);

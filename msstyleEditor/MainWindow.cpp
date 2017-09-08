@@ -37,7 +37,7 @@ MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, c
 	bSizer3 = new wxBoxSizer(wxHORIZONTAL);
 
 	imgView = new ImageViewCtrl(this, wxID_ANY, wxDefaultPosition, wxSize(-1, -1), 0);
-	imgView->SetBackgroundColour(wxSystemSettings::GetColour(wxSystemColour::wxSYS_COLOUR_BACKGROUND));
+	imgView->SetBackgroundColour(wxColour(0xEFEFEF));
 	bSizer3->Add(imgView, 1, wxEXPAND, 5);
 
 	propView = new wxPropertyGrid(this, wxID_ANY, wxDefaultPosition, wxSize(300, -1), wxPG_DEFAULT_STYLE | wxTAB_TRAVERSAL | wxNO_BORDER);
