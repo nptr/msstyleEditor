@@ -17,6 +17,7 @@
 using namespace msstyle;
 
 
+
 MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style) : wxFrame(parent, id, title, pos, size, style)
 {	
 	this->SetSizeHints(wxSize(900, 600), wxDefaultSize);
@@ -36,9 +37,8 @@ MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, c
 	wxBoxSizer* bSizer3;
 	bSizer3 = new wxBoxSizer(wxHORIZONTAL);
 
-	imgView = new ImageViewCtrl(this, wxID_ANY, wxDefaultPosition, wxSize(-1, -1), 0);
-	imgView->SetBackgroundColour(wxSystemSettings::GetColour(wxSystemColour::wxSYS_COLOUR_BACKGROUND));
-	bSizer3->Add(imgView, 1, wxEXPAND, 5);
+	imageView = new ImageViewCtrl(this, wxID_ANY, wxDefaultPosition, wxSize(-1, -1), 0);
+	bSizer3->Add(imageView, 1, wxEXPAND, 5);
 
 	propView = new wxPropertyGrid(this, wxID_ANY, wxDefaultPosition, wxSize(300, -1), wxPG_DEFAULT_STYLE | wxTAB_TRAVERSAL | wxNO_BORDER);
 	propView->SetMinSize(wxSize(300, -1));
@@ -50,7 +50,7 @@ MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, c
 	this->SetSizer(bSizer2);
 	this->Layout();
 
-	mainmenu = new wxMenuBar(0);
+	mainmenu = new wxMenuBar();
 	aboutMenu = new wxMenu();
 	fileMenu = new wxMenu();
 	imageMenu = new wxMenu();
@@ -81,9 +81,15 @@ MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, c
 
 	this->SetMenuBar(mainmenu);
 
-	statusBar = this->CreateStatusBar(1, wxST_SIZEGRIP, wxID_ANY);
+	statusBar = this->CreateStatusBar(1);
 
-	// Setup Eventhanndler
+	imageViewMenu = new wxMenu();
+	imageViewMenu->AppendRadioItem(ID_BG_WHITE, wxT("White"));
+	imageViewMenu->AppendRadioItem(ID_BG_GREY, wxT("Light Grey"))->Check();
+	imageViewMenu->AppendRadioItem(ID_BG_BLACK, wxT("Black"));
+	imageViewMenu->AppendRadioItem(ID_BG_CHESS, wxT("Chessboard"));
+
+	// Menu Event Handler
 	Connect(ID_FOPEN, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnFileOpenMenuClicked));
 	Connect(ID_FSAVE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnFileSaveMenuClicked));
 	Connect(ID_IEXPORT, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnImageExportClicked));
@@ -95,6 +101,14 @@ MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, c
 	Connect(ID_THEMEFOLDER, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnOpenThemeFolder));
 	Connect(ID_FIND, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnOpenSearchDlg));
 
+	// Image View Context Menu
+	imageView->Connect(wxEVT_CONTEXT_MENU, wxContextMenuEventHandler(MainWindow::OnImageViewContextMenuTriggered), NULL, this);
+	Connect(ID_BG_WHITE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnImageViewBgWhite));
+	Connect(ID_BG_GREY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnImageViewBgGrey));
+	Connect(ID_BG_BLACK, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnImageViewBgBlack));
+	Connect(ID_BG_CHESS, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnImageViewBgChess));
+
+	// Treeview & Property Grid
 	Connect(wxEVT_COMMAND_TREE_SEL_CHANGED, wxTreeEventHandler(MainWindow::OnClassViewTreeSelChanged), NULL, this);
 	propView->Connect(wxEVT_PG_CHANGING, wxPropertyGridEventHandler(MainWindow::OnPropertyGridChanging), NULL, this);
 
@@ -156,7 +170,7 @@ void MainWindow::OnClassViewTreeSelChanged(wxTreeEvent& event)
 	auto treeItemData = classView->GetItemData(treeItemID);
 	
 	selectedImageProp = nullptr;
-	imgView->RemoveImage();
+	imageView->RemoveImage();
 
 	// Class Node
 	PropClassTreeItemData* classData = dynamic_cast<PropClassTreeItemData*>(treeItemData);
@@ -303,6 +317,30 @@ void MainWindow::OnImageReplaceClicked(wxCommandEvent& event)
 	currentStyle->UpdateImageResource(selectedImageProp, openFileDialog.GetPath().wc_str());
 }
 
+void MainWindow::OnImageViewContextMenuTriggered(wxContextMenuEvent& event)
+{
+	imageView->PopupMenu(imageViewMenu, imageView->ScreenToClient(event.GetPosition()));
+}
+
+void MainWindow::OnImageViewBgWhite(wxCommandEvent& event)
+{
+	imageView->SetBackgroundStyle(ImageViewCtrl::BackgroundStyle::White);
+}
+
+void MainWindow::OnImageViewBgGrey(wxCommandEvent& event)
+{
+	imageView->SetBackgroundStyle(ImageViewCtrl::BackgroundStyle::LightGrey);
+}
+
+void MainWindow::OnImageViewBgBlack(wxCommandEvent& event)
+{
+	imageView->SetBackgroundStyle(ImageViewCtrl::BackgroundStyle::Black);
+}
+
+void MainWindow::OnImageViewBgChess(wxCommandEvent& event)
+{
+	imageView->SetBackgroundStyle(ImageViewCtrl::BackgroundStyle::Chessboard);
+}
 
 void MainWindow::OnHelpClicked(wxCommandEvent& event)
 {
@@ -626,7 +664,7 @@ void MainWindow::CloseStyle()
 	{
 		// remove everything that could still point to the style data
 		propView->Clear();
-		imgView->RemoveImage();
+		imageView->RemoveImage();
 		classView->Freeze();
 		classView->DeleteAllItems();
 		classView->Thaw();
@@ -699,7 +737,7 @@ void MainWindow::ShowImageFromResource(const MsStyleProperty* prop)
 	wxMemoryInputStream stream = wxMemoryInputStream(selectedImage.data, selectedImage.size);
 
 	wxImage img(stream, wxBITMAP_TYPE_PNG);
-	imgView->SetImage(img);
+	imageView->SetImage(img);
 }
 
 void MainWindow::ShowImageFromFile(wxString& imgPath)
@@ -707,7 +745,7 @@ void MainWindow::ShowImageFromFile(wxString& imgPath)
 	wxFileInputStream stream(imgPath);
 
 	wxImage img(stream, wxBITMAP_TYPE_PNG);
-	imgView->SetImage(img);
+	imageView->SetImage(img);
 }
 
 
