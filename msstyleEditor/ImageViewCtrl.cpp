@@ -55,9 +55,6 @@ void ImageViewCtrl::OnMouse(wxMouseEvent &event)
 
 void ImageViewCtrl::OnPaint(wxPaintEvent &event)
 {
-	if (!bitmap.IsOk())
-		return;
-
 	wxPaintDC dc(this);
 	PrepareDC(dc);
 
@@ -95,6 +92,8 @@ void ImageViewCtrl::OnPaint(wxPaintEvent &event)
 		dc.DrawRectangle(this->GetClientRect());
 	}
 
+	if (!bitmap.IsOk())
+		return;
 
 	wxSize bmpSize = bitmap.GetSize();
 	if (bmpSize.GetWidth() + bmpSize.GetHeight() == 0)
