@@ -25,6 +25,10 @@ private:
 	const int ID_COLLAPSE_TREE = 451;
 	const int ID_RESOURCEDLG = 452;
 	const int ID_THEMEFOLDER = 453;
+	const int ID_BG_WHITE = 454;
+	const int ID_BG_GREY = 455;
+	const int ID_BG_BLACK = 456;
+	const int ID_BG_CHESS = 457;
 
 	const int ID_FIND = 460;
 
@@ -35,15 +39,15 @@ private:
 
 protected:
 	wxTreeCtrl* classView;
-	wxStaticBitmap* imageView;
+	ImageViewCtrl* imageView;
 	wxPropertyGrid* propView;
+	wxMenu* imageViewMenu;
 	wxMenuBar* mainmenu;
 	wxMenu* fileMenu;
 	wxMenu* aboutMenu;
 	wxMenu* imageMenu;
 	wxMenu* viewMenu;
 	wxStatusBar* statusBar;
-	ImageViewCtrl* imgView;
 	SearchDialog* searchDlg;
 
 	void OnFileOpenMenuClicked(wxCommandEvent& event);
@@ -59,7 +63,11 @@ protected:
 	void OnResourceDlgClicked(wxCommandEvent& event);
 	void OnOpenThemeFolder(wxCommandEvent& event);
 	void OnOpenSearchDlg(wxCommandEvent& event);
-
+	void OnImageViewContextMenuTriggered(wxContextMenuEvent& event);
+	void OnImageViewBgWhite(wxCommandEvent& event);
+	void OnImageViewBgGrey(wxCommandEvent& event);
+	void OnImageViewBgBlack(wxCommandEvent& event);
+	void OnImageViewBgChess(wxCommandEvent& event);
 	
 	wxTreeItemId FindNext(const SearchProperties& props, wxTreeItemId node);
 
