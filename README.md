@@ -44,8 +44,8 @@ is required, but it might already be installed on your system.
 ![Ui of the msstyleEditor](https://user-images.githubusercontent.com/5485569/29291552-3eb8c2ba-8144-11e7-8e12-ead476ed3e00.png)
 
 In the treeview on the left, the classes, parts and images are listed. On selection
-of an image, it is shown in the middle area. Export and replace of the selected 
-image can be done via the menubar.
+of an image, it is shown in the middle area. With a right-click on the image view a way to change
+the background is provided. Export and replace of the selected image can be done via the menubar.
 
 On selection of a part, its properties are shown on the right side, grouped by 
 their states. This is also the place where the properties can be edited.
