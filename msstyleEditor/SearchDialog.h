@@ -33,7 +33,7 @@ protected:
 public:
 	void SetSearchHandler(ISearchDialogListener* handler);
 
-	SearchDialog(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Find"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(199, 97), long style = wxDEFAULT_DIALOG_STYLE);
+	SearchDialog(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Find"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(215, 105), long style = wxDEFAULT_DIALOG_STYLE);
 	~SearchDialog();
 
 };

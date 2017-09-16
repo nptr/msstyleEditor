@@ -14,6 +14,8 @@
 #include <string>
 #include <cctype>
 
+#include <shlobj.h> // SHGetKnownFolderPath()
+
 using namespace msstyle;
 
 
@@ -390,7 +392,14 @@ void MainWindow::OnExpandClicked(wxCommandEvent& event)
 
 void MainWindow::OnOpenThemeFolder(wxCommandEvent& event)
 {
-	wxExecute("explorer C:\\Windows\\Resources\\Themes\\", wxEXEC_ASYNC, NULL);
+	wchar_t* windowsFolder = nullptr;
+	if (SHGetKnownFolderPath(FOLDERID_Windows, KF_FLAG_DEFAULT, NULL, &windowsFolder) == S_OK)
+	{
+		wxString cmd = wxString::Format("explorer %s\\Resources\\Themes\\", windowsFolder);
+		CoTaskMemFree(windowsFolder);
+		wxExecute(cmd, wxEXEC_ASYNC, NULL);
+	}
+	else wxExecute("explorer C:\\Windows\\Resources\\Themes\\", wxEXEC_ASYNC, NULL);
 }
 
 void MainWindow::OnOpenSearchDlg(wxCommandEvent& event)
