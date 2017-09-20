@@ -226,15 +226,17 @@ namespace msstyle
 		styleData->propertyResource.data = tmpMem;
 		styleData->propertyResource.size = variantRes.size;
 
-		char* variantData = tmpMem;
-		int estPropertyCount = variantRes.size / 8;
-
+		int found = 0;
 		MsStyleProperty* tmpProp;
-		for (int i = 0; i < estPropertyCount; ++i)
+		char* limit = tmpMem + variantRes.size;
+		for (char* variantData = tmpMem; variantData < limit-4; variantData += 4)
 		{
 			// Check whether we found a valid property at this address
 			tmpProp = (MsStyleProperty*)variantData;
-			if (tmpProp->nameID != 0 && tmpProp->typeID >= 200 && tmpProp->typeID <= 217 && tmpProp->classID <= 8002)
+			if (tmpProp->nameID != 0 && 
+				tmpProp->typeID >= 200 && 
+				tmpProp->typeID <= 217 && 
+				tmpProp->classID <= 8002)
 			{
 				// Check whether the ID corresponds to a known class
 				MsStyleClass* cls;
@@ -248,7 +250,6 @@ namespace msstyle
 						cls = new MsStyleClass();
 						cls->classID = tmpProp->classID;
 						cls->className = WStringToUTF8(classNames[tmpProp->classID]);
-						
 						styleData->classes[tmpProp->classID] = cls;
 					}
 					else continue; // next prop
@@ -312,10 +313,8 @@ namespace msstyle
 
 				// Add the prop to the state
 				state->properties.push_back(tmpProp);
+				found++;
 			}
-
-			// next block
-			variantData += 8;
 		}
 	}
 
