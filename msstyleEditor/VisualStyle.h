@@ -175,12 +175,15 @@ namespace msstyle
 
 		// Returns the class list and its children
 		const std::unordered_map<int32_t, MsStyleClass*>* GetClasses() const;
+		int GetPropertyCount() const;
+		const void* GetPropertyBaseAddress() const;
 
 		// Returns the specified resource (read-only)
 		EmbRessource GetResource(const char* resName, const char* resType) const;
 
 		// Tries to lookup the name to the given property id
 		static const char* FindPropName(int propertyID);
+		static bool IsPropertyValid(const MsStyleProperty&  prop);
 
 		// Update routines for all supported properties
 		void UpdateImageProperty(const MsStyleProperty* prop, int imageID);
@@ -197,6 +200,8 @@ namespace msstyle
 
 		const wchar_t* IsReplacementImageQueued(const MsStyleProperty* prop) const;
 	private:
+		int propsFound;
+
 		void LoadClassMap(std::vector<wchar_t*>& outClassNames);
 		void LoadProperties(const std::vector<wchar_t*>& classNames);
 

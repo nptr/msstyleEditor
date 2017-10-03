@@ -80,6 +80,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AboutDialog.cpp" />
+    <ClCompile Include="Exporter.cpp" />
     <ClCompile Include="HelpDialog.cpp" />
     <ClCompile Include="ImageViewCtrl.cpp" />
     <ClCompile Include="main.cpp" />
@@ -92,6 +93,7 @@
   <ItemGroup>
     <ClInclude Include="AboutDialog.h" />
     <ClInclude Include="CustomFileDropTarget.h" />
+    <ClInclude Include="Exporter.h" />
     <ClInclude Include="HelpDialog.h" />
     <ClInclude Include="ImageViewCtrl.h" />
     <ClInclude Include="MainWindow.h" />

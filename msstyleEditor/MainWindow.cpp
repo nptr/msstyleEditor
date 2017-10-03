@@ -16,6 +16,8 @@
 
 #include <shlobj.h> // SHGetKnownFolderPath()
 
+#include "Exporter.h"
+
 using namespace msstyle;
 
 
@@ -61,7 +63,12 @@ MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, c
 	fileMenu->Append(ID_FOPEN, wxT("&Open"));
 	fileMenu->Append(ID_FSAVE, wxT("&Save"));
 	fileMenu->Enable(ID_FSAVE, false);
-	
+	fileMenu->AppendSeparator();
+
+	wxMenu* exportSubMenu = new wxMenu();
+	exportSubMenu->Append(ID_EXPORT_TREE, wxT("Logical Structure"));
+	fileMenu->AppendSubMenu(exportSubMenu, wxT("Export ..."));
+
 	imageMenu->Append(ID_IEXPORT, wxT("&Export"));
 	imageMenu->Append(ID_IREPLACE, wxT("&Replace"));
 	imageMenu->Enable(ID_IEXPORT, false);
@@ -94,6 +101,8 @@ MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, c
 	// Menu Event Handler
 	Connect(ID_FOPEN, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnFileOpenMenuClicked));
 	Connect(ID_FSAVE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnFileSaveMenuClicked));
+	Connect(ID_EXPORT_TREE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnExportLogicalStructure));
+
 	Connect(ID_IEXPORT, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnImageExportClicked));
 	Connect(ID_IREPLACE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnImageReplaceClicked));
 	Connect(ID_ABOUT, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnAboutClicked));
@@ -164,6 +173,25 @@ void MainWindow::OnFileSaveMenuClicked(wxCommandEvent& event)
 
 
 	statusBar->SetStatusText("Style saved successfully!");
+}
+
+void MainWindow::OnExportLogicalStructure(wxCommandEvent& event)
+{
+	if (currentStyle == nullptr)
+		return;
+
+	try
+	{
+		wxFileDialog saveFileDialog(this, _("Export Style Info"), "", "", "Style Info (*.txt)|*.txt", wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+		if (saveFileDialog.ShowModal() == wxID_CANCEL)
+			return;
+
+		Exporter::ExportLogicalStructure(saveFileDialog.GetPath().ToStdString(), *currentStyle);
+	}
+	catch (std::runtime_error ex)
+	{
+		wxMessageBox(ex.what(), wxT("Error exporting"));
+	}
 }
 
 void MainWindow::OnClassViewTreeSelChanged(wxTreeEvent& event)

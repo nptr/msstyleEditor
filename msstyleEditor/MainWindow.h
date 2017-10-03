@@ -29,6 +29,7 @@ private:
 	const int ID_BG_GREY = 455;
 	const int ID_BG_BLACK = 456;
 	const int ID_BG_CHESS = 457;
+	const int ID_EXPORT_TREE = 458;
 
 	const int ID_FIND = 460;
 
@@ -68,7 +69,8 @@ protected:
 	void OnImageViewBgGrey(wxCommandEvent& event);
 	void OnImageViewBgBlack(wxCommandEvent& event);
 	void OnImageViewBgChess(wxCommandEvent& event);
-	
+	void OnExportLogicalStructure(wxCommandEvent& event);
+
 	wxTreeItemId FindNext(const SearchProperties& props, wxTreeItemId node);
 
 	void FillClassView(const std::unordered_map<int, msstyle::MsStyleClass*>* classes);

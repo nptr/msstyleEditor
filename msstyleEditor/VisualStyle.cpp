@@ -63,6 +63,7 @@ namespace msstyle
 	#pragma endregion
 
 	VisualStyle::VisualStyle()
+		: propsFound(0)
 	{
 		
 	}
@@ -226,24 +227,25 @@ namespace msstyle
 		styleData->propertyResource.data = tmpMem;
 		styleData->propertyResource.size = variantRes.size;
 
-		int found = 0;
 		MsStyleProperty* tmpProp;
 		char* limit = tmpMem + variantRes.size;
 		for (char* variantData = tmpMem; variantData < limit-4; variantData += 4)
 		{
-			// Check whether we found a valid property at this address
+			// Check whether we likely found a valid property at this address
+			// This is not a deep validation and may deliver wrong results
 			tmpProp = (MsStyleProperty*)variantData;
-			if (tmpProp->nameID != 0 && 
-				tmpProp->typeID >= 200 && 
-				tmpProp->typeID <= 217 && 
-				tmpProp->classID <= 8002)
+			if (IsPropertyValid(*tmpProp))
 			{
-				// Check whether the ID corresponds to a known class
+				// Further check whether classID is valid
+				if (tmpProp->classID >= classNames.size())
+					continue;
+
+				// Check whether the properties classID corresponds to a known class already
 				MsStyleClass* cls;
 				const auto& result = styleData->classes.find(tmpProp->classID);
 				if (result == styleData->classes.end())
 				{
-					// Check whether the class exists; if not, create it and add it
+					// Check the properties nameID too before adding the class
 					const auto& result2 = msstyle::PROPERTY_MAP.find(tmpProp->nameID);
 					if (result2 != msstyle::PROPERTY_MAP.end())
 					{
@@ -310,11 +312,11 @@ namespace msstyle
 				}
 				else state = stateRes->second;
 
-
 				// Add the prop to the state
 				state->properties.push_back(tmpProp);
-				found++;
-			}
+				propsFound++;
+
+			} // if(IsPropertyValid(...))
 		}
 	}
 
@@ -332,6 +334,32 @@ namespace msstyle
 		res.data = LockResource(dataHandle);
 		res.size = SizeofResource(styleData->moduleHandle, resHandle);
 		return res;
+	}
+
+	bool VisualStyle::IsPropertyValid(const MsStyleProperty&  prop)
+	{
+		// Not a known type
+		if (prop.typeID < 200 || prop.typeID >= IDENTIFIER::COLORSCHEMES)
+			return false;
+
+		// Some color and font props use an type id as name id.
+		// They seem to contain valid data, so ill include them.
+		if (prop.nameID == IDENTIFIER::COLOR &&
+			prop.typeID == IDENTIFIER::COLOR)
+			return true;
+		if (prop.nameID == IDENTIFIER::FONT &&
+			prop.typeID == IDENTIFIER::FONT)
+			return true;
+
+		// Not sure where the line for valid name ids is.
+		if (prop.nameID < IDENTIFIER::COLORSCHEMES)
+			return false;
+
+		// Not a known class
+		if (prop.classID > 8002)
+			return false;
+
+		return true;
 	}
 
 
@@ -590,5 +618,15 @@ namespace msstyle
 	const wchar_t* VisualStyle::GetFileName() const
 	{
 		return styleData->filePath;
+	}
+
+	int VisualStyle::GetPropertyCount() const
+	{
+		return propsFound;
+	}
+
+	const void* VisualStyle::GetPropertyBaseAddress() const
+	{
+		return styleData->propertyResource.data;
 	}
 }

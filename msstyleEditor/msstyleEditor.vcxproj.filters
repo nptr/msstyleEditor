@@ -44,6 +44,9 @@
     <ClCompile Include="SearchDialog.cpp">
       <Filter>GUI</Filter>
     </ClCompile>
+    <ClCompile Include="Exporter.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CustomTreeItemData.h">
@@ -90,6 +93,9 @@
     </ClInclude>
     <ClInclude Include="SearchDialogListener.h">
       <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Exporter.h">
+      <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
