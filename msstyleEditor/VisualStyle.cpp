@@ -430,6 +430,11 @@ namespace msstyle
 			m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_TREEVIEW);
 			m.parts = PARTS_TREEVIEW;
 		}
+		else if (strstr(className, "DWMWindow"))
+		{
+			m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_DWMWINDOW_WIN7);
+			m.parts = PARTS_DWMWINDOW_WIN7;
+		}
 		else if (strstr(className, "Window"))
 		{
 			m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_WINDOW);
