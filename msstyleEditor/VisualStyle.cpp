@@ -204,6 +204,26 @@ namespace msstyle
 		int count = styleData->classmapResource.size / 2;			// "size" amount of chars, but "size / 2" wchars
 
 		SplitStringW(data, count, outClassNames);
+
+		// dirty style platform check
+		bool foundDWMTouch = false;
+		bool foundDWMPen = false;
+		bool foundW8Taskband = false;
+		for (auto& clsName : outClassNames)
+		{
+			if (!lstrcmpW(clsName, L"DWMTouch"))
+				foundDWMTouch = true;
+			if (!lstrcmpW(clsName, L"DWMPen"))
+				foundDWMPen = true;
+			if (!lstrcmpW(clsName, L"W8::TaskbandExtendedUI"))
+				foundW8Taskband = true;
+		}
+
+		if (foundW8Taskband)
+			stylePlatform = Platform::WIN81;
+		else if (foundDWMTouch || foundDWMPen)
+			stylePlatform = Platform::WIN10;
+		else stylePlatform = Platform::WIN7;
 	}
 
 
@@ -259,7 +279,7 @@ namespace msstyle
 				else cls = result->second;
 
 
-				const PartMap partInfo = FindPartMap(cls->className.c_str());
+				const PartMap partInfo = FindPartMap(cls->className.c_str(), stylePlatform);
 
 				// Lookup the part ID
 				MsStylePart* part;
@@ -371,7 +391,7 @@ namespace msstyle
 		else return "UNKNOWN";
 	}
 
-	const PartMap VisualStyle::FindPartMap(const char* className)
+	const PartMap VisualStyle::FindPartMap(const char* className, Platform platform)
 	{
 		PartMap m;
 
@@ -432,8 +452,26 @@ namespace msstyle
 		}
 		else if (strstr(className, "DWMWindow"))
 		{
-			m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_DWMWINDOW_WIN7);
-			m.parts = PARTS_DWMWINDOW_WIN7;
+			switch (platform)
+			{
+				case Platform::WIN7:
+				{
+					m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_DWMWINDOW_WIN7);
+					m.parts = PARTS_DWMWINDOW_WIN7;
+				} break;
+				case Platform::WIN8:
+				case Platform::WIN81:
+				{
+					m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_DWMWINDOW_WIN81);
+					m.parts = PARTS_DWMWINDOW_WIN81;
+				} break;
+				default:
+				{
+					m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_DWMWINDOW_WIN81);
+					m.parts = PARTS_DWMWINDOW_WIN81;
+				} break;
+			}
+
 		}
 		else if (strstr(className, "Window"))
 		{
@@ -633,5 +671,10 @@ namespace msstyle
 	const void* VisualStyle::GetPropertyBaseAddress() const
 	{
 		return styleData->propertyResource.data;
+	}
+
+	Platform VisualStyle::GetCompatiblePlatform() const
+	{
+		return stylePlatform;
 	}
 }

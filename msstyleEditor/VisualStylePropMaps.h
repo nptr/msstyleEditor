@@ -7,6 +7,7 @@
 //#include <Uxtheme.h>
 //#include <vsstyle.h>
 //#include <vssym32.h>
+// https://github.com/res2k/theme-explorer/blob/master/src/db.c
 
 // maps nicely
 // https://msdn.microsoft.com/de-de/library/system.windows.forms.visualstyles(v=vs.110).aspx

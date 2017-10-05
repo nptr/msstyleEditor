@@ -157,6 +157,14 @@ namespace msstyle
 		int size;
 	} EmbRessource;
 
+	enum Platform
+	{
+		WIN7,
+		WIN8,
+		WIN81,
+		WIN10
+	};
+
 	// Forward declaration of the internal data struct
 	struct MsStyleData;
 	struct PartMap;
@@ -172,6 +180,7 @@ namespace msstyle
 		void Save(const wchar_t* path);
 
 		const wchar_t* GetFileName() const;
+		Platform GetCompatiblePlatform() const;
 
 		// Returns the class list and its children
 		const std::unordered_map<int32_t, MsStyleClass*>* GetClasses() const;
@@ -206,8 +215,9 @@ namespace msstyle
 		void LoadProperties(const std::vector<wchar_t*>& classNames);
 
 		MsStyleData* styleData;
+		Platform stylePlatform;
 
-		static const PartMap FindPartMap(const char* className);
+		static const PartMap FindPartMap(const char* className, Platform platform);
 
 		std::unordered_map<const MsStyleProperty*, const wchar_t*> imageReplaceQueue;
 	};
