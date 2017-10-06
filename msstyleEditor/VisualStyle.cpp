@@ -559,6 +559,11 @@ namespace msstyle
 			m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_STARTPANEL);
 			m.parts = PARTS_STARTPANEL;
 		}
+		else if (strstr(className, "TaskBand2"))
+		{
+			m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_TASKBAND2);
+			m.parts = PARTS_TASKBAND2;
+		}
 		else if (strstr(className, "TaskBand"))
 		{
 			m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_TASKBAND);

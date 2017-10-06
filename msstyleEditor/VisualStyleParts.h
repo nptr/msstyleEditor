@@ -468,6 +468,25 @@ namespace msstyle
 		{ 3, "FLASHBUTTONGROUPMENU", 0, 0 },
 	};
 
+	static const NameMap PARTS_TASKBAND2[] =
+	{
+		{ 0, "Part 0", 0, 0 },
+		{ 1, "BARTOP", 0, 0 },
+		{ 2, "BARBOTTOM", 0, 0 },
+		{ 3, "BARRIGHT", 0, 0 },
+		{ 4, "BARLEFT", 0, 0 },
+		{ 5, "TASKITEM", 0, 0 },
+		{ 6, "TASKITEMLEFT", 0, 0 },
+		{ 7, "TASKITEMCENTER", 0, 0 },
+		{ 8, "TASKITEMRIGHT", 0, 0 },
+		{ 9, "PROGRESSITEM", 0, 0 },
+		{ 10, "PROGRESSITEMINDETERMINATE", 0, 0 },
+		{ 11, "PROGRESSITEMERROR", 0, 0 },
+		{ 12, "PROGRESSITEMPAUSED", 0, 0 },
+		{ 13, "TASKITEMGROUP", 0, 0 },
+		{ 14, "TASKITEMGROUPSELECTED", 0, 0 },
+	};
+
 	static const NameMap PARTS_TEXTSTYLE[] =
 	{
 		{ 0, "Part 0", 0, 0 },
