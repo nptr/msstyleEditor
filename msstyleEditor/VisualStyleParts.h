@@ -1,6 +1,6 @@
 #pragma once
 
-#include "VisualStyleStateMaps.h"
+#include "VisualStyleStates.h"
 
 #define AL(arr) (sizeof(arr) / sizeof(arr[0]))
 
@@ -327,7 +327,7 @@ namespace msstyle
 		{ 9, "EDITBORDER_HVSCROLL", STATES_EDITTEXT_GENERAL, AL(STATES_EDITTEXT_GENERAL) }
 	};
 
-	static const NameMap PARTS_TASKDIALOG[] = // TODO: EXPANDOBUTTONSTATES
+	static const NameMap PARTS_TASKDIALOG[] = 
 	{
 		{ 0, "Part 0", 0, 0 },
 		{ 1, "PRIMARYPANEL", 0, 0 },
@@ -342,7 +342,7 @@ namespace msstyle
 		{ 10, "BUTTONSECTION", 0, 0 },
 		{ 11, "BUTTONWRAPPER", 0, 0 },
 		{ 12, "EXPANDOTEXT", 0, 0 },
-		{ 13, "EXPANDOBUTTON", 0, 0 },
+		{ 13, "EXPANDOBUTTON", STATES_TASKDLG_EXPANDOBUTTON, AL(STATES_TASKDLG_EXPANDOBUTTON) },
 		{ 14, "VERIFICATIONTEXT", 0, 0 },
 		{ 15, "FOOTNOTEPANE", 0, 0 },
 		{ 16, "FOOTNOTEAREA", 0, 0 },

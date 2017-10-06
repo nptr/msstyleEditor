@@ -103,10 +103,10 @@
     <ClInclude Include="SearchDialogListener.h" />
     <ClInclude Include="UiHelper.h" />
     <ClInclude Include="VisualStyle.h" />
-    <ClInclude Include="VisualStyleEnumMaps.h" />
-    <ClInclude Include="VisualStylePropMaps.h" />
-    <ClInclude Include="VisualStylePartMaps.h" />
-    <ClInclude Include="VisualStyleStateMaps.h" />
+    <ClInclude Include="VisualStyleEnums.h" />
+    <ClInclude Include="VisualStyleProps.h" />
+    <ClInclude Include="VisualStyleParts.h" />
+    <ClInclude Include="VisualStyleStates.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="msstyleEditor.rc" />

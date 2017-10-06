@@ -32,7 +32,27 @@ void Exporter::ExportLogicalStructure(const std::string& path, const msstyle::Vi
 	txt.append("File: "); txt.append(WStringToUTF8(style.GetFileName()));
 	sprintf(buffer, "\nProperties: %d", style.GetPropertyCount());
 	txt.append(buffer);
-	txt.append("\n\n");
+
+	switch (style.GetCompatiblePlatform())
+	{
+		case msstyle::WIN7:
+		{
+			txt.append("\nPlatform: Windows 7\n\n");
+		} break;
+		case msstyle::WIN8:
+		case msstyle::WIN81:
+		{
+			txt.append("\nPlatform: Windows 8 / 8.1\n\n");
+		} break;
+		case msstyle::WIN10:
+		{
+			txt.append("\nPlatform: Windows 10\n\n");
+		} break;
+		default:
+		{
+			txt.append("\nPlatform: This should never happen.\n\n");
+		} break;
+	}
 
 	txt.append("BEGIN STRUCTURE"); txt.append("\n");
 
@@ -55,7 +75,7 @@ void Exporter::ExportLogicalStructure(const std::string& path, const msstyle::Vi
 
 				for (auto& propIt : stateIt.second->properties)
 				{
-					sprintf(buffer, "\t\t\tProp @ 0x%.6x, %s (%s)"	, &propIt->nameID - style.GetPropertyBaseAddress()
+					sprintf(buffer, "\t\t\tProp @ 0x%.6x, %s (%s)"	, &propIt->nameID - (int32_t*)style.GetPropertyBaseAddress()
 																	, msstyle::VisualStyle::FindPropName(propIt->nameID)
 																	, msstyle::VisualStyle::FindPropName(propIt->typeID));
 					txt.append(buffer);

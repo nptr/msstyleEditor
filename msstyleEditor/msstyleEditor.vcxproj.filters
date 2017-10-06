@@ -76,18 +76,6 @@
     <ClInclude Include="UiHelper.h">
       <Filter>GUI</Filter>
     </ClInclude>
-    <ClInclude Include="VisualStylePartMaps.h">
-      <Filter>VisualStyle</Filter>
-    </ClInclude>
-    <ClInclude Include="VisualStyleEnumMaps.h">
-      <Filter>VisualStyle</Filter>
-    </ClInclude>
-    <ClInclude Include="VisualStyleStateMaps.h">
-      <Filter>VisualStyle</Filter>
-    </ClInclude>
-    <ClInclude Include="VisualStylePropMaps.h">
-      <Filter>VisualStyle</Filter>
-    </ClInclude>
     <ClInclude Include="SearchDialog.h">
       <Filter>GUI</Filter>
     </ClInclude>
@@ -96,6 +84,18 @@
     </ClInclude>
     <ClInclude Include="Exporter.h">
       <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="VisualStyleStates.h">
+      <Filter>VisualStyle</Filter>
+    </ClInclude>
+    <ClInclude Include="VisualStyleProps.h">
+      <Filter>VisualStyle</Filter>
+    </ClInclude>
+    <ClInclude Include="VisualStyleParts.h">
+      <Filter>VisualStyle</Filter>
+    </ClInclude>
+    <ClInclude Include="VisualStyleEnums.h">
+      <Filter>VisualStyle</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

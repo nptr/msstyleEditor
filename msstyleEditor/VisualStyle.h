@@ -1,6 +1,6 @@
 #pragma once
 
-#include "VisualStylePropMaps.h"
+#include "VisualStyleProps.h"
 
 #include <stdint.h>
 #include <unordered_map>

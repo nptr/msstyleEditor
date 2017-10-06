@@ -578,7 +578,7 @@ namespace msstyle
 		{ 5, "FOCUSED" },
 	};
 
-	static const StateMap STATES_TASKDLG[] =
+	static const StateMap STATES_TASKDLG_EXPANDOBUTTON[] =
 	{
 		{ 0, "State Independent" },
 		{ 1, "NORMAL" },

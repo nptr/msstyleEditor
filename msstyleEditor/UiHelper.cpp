@@ -1,5 +1,5 @@
 #include "UiHelper.h"
-#include "VisualStyleEnumMaps.h"
+#include "VisualStyleEnums.h"
 
 using namespace msstyle;
 

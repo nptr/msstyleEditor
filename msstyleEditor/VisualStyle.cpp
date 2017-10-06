@@ -5,8 +5,8 @@
 #include <codecvt>
 #include <assert.h>
 
-#include "VisualStyleEnumMaps.h"
-#include "VisualStylePartMaps.h"
+#include "VisualStyleEnums.h"
+#include "VisualStyleParts.h"
 
 #define MSSTYLE_ARRAY_LENGTH(name) (sizeof(name) / sizeof(name[0]))
 
@@ -369,6 +369,12 @@ namespace msstyle
 			return true;
 		if (prop.nameID == IDENTIFIER::FONT &&
 			prop.typeID == IDENTIFIER::FONT)
+			return true;
+		if (prop.nameID == IDENTIFIER::DISKSTREAM &&
+			prop.typeID == IDENTIFIER::DISKSTREAM)
+			return true;
+		if (prop.nameID == IDENTIFIER::STREAM &&
+			prop.typeID == IDENTIFIER::STREAM)
 			return true;
 
 		// Not sure where the line for valid name ids is.
