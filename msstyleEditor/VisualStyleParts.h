@@ -595,4 +595,20 @@ namespace msstyle
 		{ 18, "TOPMATCH", 0, 0 },
 		{ 19, "LOGOFFSPLITBUTTONDROPDOWN", 0, 0 },
 	};
+
+	static const NameMap PARTS_MONTHCAL[] =
+	{
+		{ 0, "Part 0", 0, 0 },
+		{ 1, "BACKGROUND", 0, 0 },
+		{ 2, "BORDERS", 0, 0 },
+		{ 3, "GRIDBACKGROUND", 0, 0 },
+		{ 4, "COLHEADERSPLITTER", 0, 0 },
+		{ 5, "GRIDCELLBACKGROUND", 0, 0 },
+		{ 6, "GRIDCELL", 0, 0 },
+		{ 7, "GRIDCELLUPPER", 0, 0 },
+		{ 8, "TRAILINGGRIDCELL", 0, 0 },
+		{ 9, "TRAILINGGRIDCELLUPPER", 0, 0 },
+		{ 10, "NAVNEXT", 0, 0 },
+		{ 11, "NAVPREV", 0, 0 },
+	};
 }

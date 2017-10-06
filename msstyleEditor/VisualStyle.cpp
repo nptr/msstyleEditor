@@ -539,6 +539,16 @@ namespace msstyle
 			m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_SCROLLBAR);
 			m.parts = PARTS_SCROLLBAR;
 		}
+		else if (strstr(className, "TaskBand2"))
+		{
+			m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_TASKBAND2);
+			m.parts = PARTS_TASKBAND2;
+		}
+		else if (strstr(className, "TaskBand"))
+		{
+			m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_TASKBAND);
+			m.parts = PARTS_TASKBAND;
+		}
 		else if (strstr(className, "Flyout"))
 		{
 			m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_FLYOUT);
@@ -559,15 +569,10 @@ namespace msstyle
 			m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_STARTPANEL);
 			m.parts = PARTS_STARTPANEL;
 		}
-		else if (strstr(className, "TaskBand2"))
+		else if (strstr(className, "MonthCal"))
 		{
-			m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_TASKBAND2);
-			m.parts = PARTS_TASKBAND2;
-		}
-		else if (strstr(className, "TaskBand"))
-		{
-			m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_TASKBAND);
-			m.parts = PARTS_TASKBAND;
+			m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_MONTHCAL);
+			m.parts = PARTS_MONTHCAL;
 		}
 		else
 		{
