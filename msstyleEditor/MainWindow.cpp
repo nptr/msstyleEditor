@@ -201,6 +201,7 @@ void MainWindow::OnClassViewTreeSelChanged(wxTreeEvent& event)
 	
 	selectedImageProp = nullptr;
 	imageView->RemoveImage();
+	statusBar->SetStatusText(wxEmptyString);
 
 	// Class Node
 	PropClassTreeItemData* classData = dynamic_cast<PropClassTreeItemData*>(treeItemData);
@@ -213,7 +214,9 @@ void MainWindow::OnClassViewTreeSelChanged(wxTreeEvent& event)
 	PartTreeItemData* partData = dynamic_cast<PartTreeItemData*>(treeItemData);
 	if (partData != nullptr)
 	{
-		FillPropertyView(*partData->GetMsStylePart());
+		MsStylePart* part = partData->GetMsStylePart();
+		statusBar->SetStatusText(wxString::Format("Part ID: %d", part->partID));
+		FillPropertyView(*part);
 		return;
 	}
 
@@ -227,12 +230,12 @@ void MainWindow::OnClassViewTreeSelChanged(wxTreeEvent& event)
 		if (file != nullptr)
 		{
 			ShowImageFromFile(wxString(file));
-			statusBar->SetStatusText(wxString("Image ID: ") << propData->GetMSStyleProp()->variants.imagetype.imageID << "*");
+			statusBar->SetStatusText(wxString::Format("Image ID: %d*", propData->GetMSStyleProp()->variants.imagetype.imageID));
 		}
 		else
 		{
 			ShowImageFromResource(propData->GetMSStyleProp());
-			statusBar->SetStatusText(wxString("Image ID: ") << propData->GetMSStyleProp()->variants.imagetype.imageID);
+			statusBar->SetStatusText(wxString::Format("Image ID: %d", propData->GetMSStyleProp()->variants.imagetype.imageID));
 		}
 
 		return;

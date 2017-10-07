@@ -564,6 +564,11 @@ namespace msstyle
 			m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_DATEPICKER);
 			m.parts = PARTS_DATEPICKER;
 		}
+		else if (strstr(className, "StartPanelPriv"))
+		{
+			m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_STARTPANELPRIV);
+			m.parts = PARTS_STARTPANELPRIV;
+		}
 		else if (strstr(className, "StartPanel"))
 		{
 			m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_STARTPANEL);
