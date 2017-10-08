@@ -260,6 +260,7 @@ namespace msstyle
 		{ 71, "FRAMEBOTTOM_SELECTED", VS_STATE(STATES_WINDOW_FRAME_GEN) },
 	};
 
+	// Incomplete and maybe incorrect list of parts for Win 8.1
 	static const NameMap PARTS_DWMWINDOW_WIN81[] =
 	{
 		{ 0, "Common Properties", VS_STATE_NONE },

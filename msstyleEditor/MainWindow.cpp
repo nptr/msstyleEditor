@@ -66,7 +66,7 @@ MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, c
 	fileMenu->AppendSeparator();
 
 	wxMenu* exportSubMenu = new wxMenu();
-	exportSubMenu->Append(ID_EXPORT_TREE, wxT("Logical Structure"));
+	exportSubMenu->Append(ID_EXPORT_TREE, wxT("Style Info"));
 	fileMenu->AppendSubMenu(exportSubMenu, wxT("Export ..."));
 
 	imageMenu->Append(ID_IEXPORT, wxT("&Export"));
@@ -121,7 +121,11 @@ MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, c
 
 	// Treeview & Property Grid
 	Connect(wxEVT_COMMAND_TREE_SEL_CHANGED, wxTreeEventHandler(MainWindow::OnClassViewTreeSelChanged), NULL, this);
-	propView->Connect(wxEVT_PG_CHANGING, wxPropertyGridEventHandler(MainWindow::OnPropertyGridChanging), NULL, this);
+	propView->Connect(wxEVT_PG_CHANGING, wxPropertyGridEventHandler(MainWindow::OnPropertyGridChanging), NULL, this);	
+	propView->SetCaptionBackgroundColour(wxColour(0xE0E0E0));
+	propView->SetCaptionTextColour(wxColour(0x202020)); // BGR
+	propView->SetBackgroundColour(*wxWHITE);
+	propView->SetMarginColour(*wxWHITE);
 
 	// Make sure selected image struct is 0
 	selectedImage = { 0 };

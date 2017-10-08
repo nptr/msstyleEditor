@@ -205,7 +205,7 @@ namespace msstyle
 
 		SplitStringW(data, count, outClassNames);
 
-		// dirty style platform check
+		// dirty style-platform check
 		bool foundDWMTouch = false;
 		bool foundDWMPen = false;
 		bool foundW8Taskband = false;
@@ -319,7 +319,7 @@ namespace msstyle
 					else
 					{
 						if (tmpProp->stateID == 0)
-							state->stateName = "State Independent";
+							state->stateName = "Common";
 						else
 						{
 							char txt[16];
@@ -465,8 +465,11 @@ namespace msstyle
 					m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_DWMWINDOW_WIN7);
 					m.parts = PARTS_DWMWINDOW_WIN7;
 				} break;
+				// TODO: discover and use dedicated partlists
+				// for the respective platforms..
 				case Platform::WIN8:
 				case Platform::WIN81:
+				case Platform::WIN10:
 				{
 					m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_DWMWINDOW_WIN81);
 					m.parts = PARTS_DWMWINDOW_WIN81;
