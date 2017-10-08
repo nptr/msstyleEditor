@@ -1,6 +1,7 @@
 #pragma once
 
 #include "VisualStyleProps.h"
+#include "VisualStyleEnums.h"
 
 #include <stdint.h>
 #include <unordered_map>
@@ -192,7 +193,10 @@ namespace msstyle
 
 		// Tries to lookup the name to the given property id
 		static const char* FindPropName(int propertyID);
-		static bool IsPropertyValid(const MsStyleProperty&  prop);
+		static bool IsPropertyValid(const MsStyleProperty& prop);
+		static std::string GetPropertyValueAsString(const MsStyleProperty& prop);
+		static EnumMap* GetEnumMapFromNameID(int32_t nameID, int32_t* out_size);
+		static const char* GetEnumAsString(int32_t nameId, int32_t enumValue);
 
 		// Update routines for all supported properties
 		void UpdateImageProperty(const MsStyleProperty* prop, int imageID);

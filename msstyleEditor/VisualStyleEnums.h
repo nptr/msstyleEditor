@@ -17,6 +17,12 @@ namespace msstyle
 		{ 2, "NONE" }
 	};
 
+	static const EnumMap ENUM_IMAGELAYOUT[] =
+	{
+		{ 0, "VERTICAL" },
+		{ 1, "HORIZONTAL" }
+	};
+
 	static const EnumMap ENUM_BORDERTYPE[] =
 	{
 		{ 0, "RECT" },
@@ -40,11 +46,35 @@ namespace msstyle
 		{ 2, "TILE" }
 	};
 
-	static const EnumMap ENUM_ALIGNMENT[] =
+	static const EnumMap ENUM_ALIGNMENT_H[] =
 	{
 		{ 0, "LEFT" },
 		{ 1, "RIGHT" },
 		{ 2, "CENTER" }
+	};
+
+	static const EnumMap ENUM_ALIGNMENT_V[] =
+	{
+		{ 0, "TOP" },
+		{ 1, "CENTER" },
+		{ 2, "BOTTOM" }
+	};
+
+	static const EnumMap ENUM_OFFSET[] =
+	{
+		{ 0, "TOPLEFT" },
+		{ 1, "TOPRIGHT" },
+		{ 2, "TOPMIDDLE" },
+		{ 3, "BOTTOMLEFT" },
+		{ 4, "BOTTOMRIGHT" },
+		{ 5, "BOTTOMMIDDLE" },
+		{ 6, "MIDDLERIGHT" },
+		{ 7, "LEFTOFCAPTION" },
+		{ 8, "RIGHTOFCAPTION" },
+		{ 9, "LEFTOFLASTBUTTON" },
+		{ 10, "RIGHTOFLASTBUTTON" },
+		{ 11, "ABOVELASTBUTTON" },
+		{ 12, "BELOWLASTBUTTON" }
 	};
 
 	static const EnumMap ENUM_ICONEFFECT[] =
@@ -63,12 +93,6 @@ namespace msstyle
 		{ 2, "CONTINUOUS" }
 	};
 
-	static const EnumMap ENUM_IMAGELAYOUT[] =
-	{
-		{ 0, "VERTICAL" },
-		{ 1, "HORIZONTAL" }
-	};
-
 	static const EnumMap ENUM_GLYPHTYPE[] =
 	{
 		{ 0, "NONE" },
@@ -76,20 +100,24 @@ namespace msstyle
 		{ 2, "FONTGLYPH" }
 	};
 
-	static const EnumMap ENUM_OFFSET[] =
+	static const EnumMap ENUM_IMAGESELECT[] =
 	{
-		{ 0, "TOPLEFT" },
-		{ 1, "TOPRIGHT" },
-		{ 2, "TOPMIDDLE" },
-		{ 3, "BOTTOMLEFT" },
-		{ 4, "BOTTOMRIGHT" },
-		{ 5, "BOTTOMMIDDLE" },
-		{ 6, "MIDDLERIGHT" },
-		{ 7, "LEFTOFCAPTION" },
-		{ 8, "RIGHTOFCAPTION" },
-		{ 9, "LEFTOFLASTBUTTON" },
-		{ 10, "RIGHTOFLASTBUTTON" },
-		{ 11, "ABOVELASTBUTTON" },
-		{ 12, "BELOWLASTBUTTON" }
+		{ 0, "NONE" },
+		{ 1, "SIZE" },
+		{ 2, "DPI" }
+	};
+
+	static const EnumMap ENUM_TRUESIZESCALING[] =
+	{
+		{ 0, "NONE" },
+		{ 1, "SIZE" },
+		{ 2, "DPI" }
+	};
+
+	static const EnumMap ENUM_GLYPHFONTSCALING[] =
+	{
+		{ 0, "NONE" },
+		{ 1, "SIZE" },
+		{ 2, "DPI" }
 	};
 }

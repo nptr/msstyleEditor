@@ -75,9 +75,10 @@ void Exporter::ExportLogicalStructure(const std::string& path, const msstyle::Vi
 
 				for (auto& propIt : stateIt.second->properties)
 				{
-					sprintf(buffer, "\t\t\tProp @ 0x%.6x, %s (%s)"	, &propIt->nameID - (int32_t*)style.GetPropertyBaseAddress()
+					sprintf(buffer, "\t\t\tProp @ 0x%.6x, %s (%s) (%s)"	, &propIt->nameID - (int32_t*)style.GetPropertyBaseAddress()
 																	, msstyle::VisualStyle::FindPropName(propIt->nameID)
-																	, msstyle::VisualStyle::FindPropName(propIt->typeID));
+																	, msstyle::VisualStyle::FindPropName(propIt->typeID)
+																	, msstyle::VisualStyle::GetPropertyValueAsString(*propIt).c_str());
 					txt.append(buffer);
 					txt.append("\n");
 				}

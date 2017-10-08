@@ -591,6 +591,165 @@ namespace msstyle
 		return m;
 	}
 
+	EnumMap* VisualStyle::GetEnumMapFromNameID(int32_t nameID, int32_t* out_size)
+	{
+		EnumMap* out_map = nullptr;
+		if (nameID == IDENTIFIER::BGTYPE)
+		{
+			out_map = (EnumMap*)&msstyle::ENUM_BGTYPE;
+			*out_size = MSSTYLE_ARRAY_LENGTH(msstyle::ENUM_BGTYPE);
+		}
+		else if (nameID == IDENTIFIER::BORDERTYPE)
+		{
+			out_map = (EnumMap*)&msstyle::ENUM_BORDERTYPE;
+			*out_size = MSSTYLE_ARRAY_LENGTH(msstyle::ENUM_BORDERTYPE);
+		}
+		else if (nameID == IDENTIFIER::FILLTYPE)
+		{
+			out_map = (EnumMap*)&msstyle::ENUM_FILLTYPE;
+			*out_size = MSSTYLE_ARRAY_LENGTH(msstyle::ENUM_FILLTYPE);
+		}
+		else if (nameID == IDENTIFIER::SIZINGTYPE)
+		{
+			out_map = (EnumMap*)&msstyle::ENUM_SIZINGTYPE;
+			*out_size = MSSTYLE_ARRAY_LENGTH(msstyle::ENUM_SIZINGTYPE);
+		}
+		else if (nameID == IDENTIFIER::HALIGN)
+		{
+			out_map = (EnumMap*)&msstyle::ENUM_ALIGNMENT_H;
+			*out_size = MSSTYLE_ARRAY_LENGTH(msstyle::ENUM_ALIGNMENT_H);
+		}
+		else if (nameID == IDENTIFIER::CONTENTALIGNMENT)
+		{
+			out_map = (EnumMap*)&msstyle::ENUM_ALIGNMENT_H; // same as the real contentalignment..
+			*out_size = MSSTYLE_ARRAY_LENGTH(msstyle::ENUM_ALIGNMENT_H);
+		}
+		else if (nameID == IDENTIFIER::VALIGN)
+		{
+			out_map = (EnumMap*)&msstyle::ENUM_ALIGNMENT_V;
+			*out_size = MSSTYLE_ARRAY_LENGTH(msstyle::ENUM_ALIGNMENT_V);
+		}
+		else if (nameID == IDENTIFIER::OFFSETTYPE)
+		{
+			out_map = (EnumMap*)&msstyle::ENUM_OFFSET;
+			*out_size = MSSTYLE_ARRAY_LENGTH(msstyle::ENUM_OFFSET);
+		}
+		else if (nameID == IDENTIFIER::IMAGELAYOUT)
+		{
+			out_map = (EnumMap*)&msstyle::ENUM_IMAGELAYOUT;
+			*out_size = MSSTYLE_ARRAY_LENGTH(msstyle::ENUM_IMAGELAYOUT);
+		}
+		else if (nameID == IDENTIFIER::ICONEFFECT)
+		{
+			out_map = (EnumMap*)&msstyle::ENUM_ICONEFFECT;
+			*out_size = MSSTYLE_ARRAY_LENGTH(msstyle::ENUM_ICONEFFECT);
+		}
+		else if (nameID == IDENTIFIER::GLYPHTYPE)
+		{
+			out_map = (EnumMap*)&msstyle::ENUM_GLYPHTYPE;
+			*out_size = MSSTYLE_ARRAY_LENGTH(msstyle::ENUM_GLYPHTYPE);
+		}
+		else if (nameID == IDENTIFIER::IMAGESELECTTYPE)
+		{
+			out_map = (EnumMap*)&msstyle::ENUM_IMAGESELECT;
+			*out_size = MSSTYLE_ARRAY_LENGTH(msstyle::ENUM_IMAGESELECT);
+		}
+		else if (nameID == IDENTIFIER::GLYPHFONTSIZINGTYPE)
+		{
+			out_map = (EnumMap*)&msstyle::ENUM_GLYPHFONTSCALING;
+			*out_size = MSSTYLE_ARRAY_LENGTH(msstyle::ENUM_GLYPHFONTSCALING);
+		}
+		else if (nameID == IDENTIFIER::TRUESIZESCALINGTYPE)
+		{
+			out_map = (EnumMap*)&msstyle::ENUM_TRUESIZESCALING;
+			*out_size = MSSTYLE_ARRAY_LENGTH(msstyle::ENUM_TRUESIZESCALING);
+		}
+		else
+		{
+			*out_size = 0;
+		}
+
+		return out_map;
+	}
+
+	const char* VisualStyle::GetEnumAsString(int32_t nameID, int32_t enumValue)
+	{
+		int32_t size = 0;
+		msstyle::EnumMap* enums = GetEnumMapFromNameID(nameID, &size);
+		
+		if (enums != nullptr && size > enumValue)
+		{
+			return enums[enumValue].value;
+		}
+		else return nullptr;
+	}
+
+	std::string VisualStyle::GetPropertyValueAsString(const MsStyleProperty& prop)
+	{
+		char textbuffer[64];
+		switch (prop.typeID)
+		{
+			case IDENTIFIER::ENUM:
+			{
+				const char* enumStr = GetEnumAsString(prop.nameID, prop.variants.enumtype.enumvalue);
+				if (enumStr != nullptr)
+					return std::string(enumStr);
+				else return std::string("UNKNOWN ENUM");
+			} break;
+			case IDENTIFIER::STRING:
+			{
+				return WStringToUTF8(&prop.variants.texttype.firstchar);
+			} break;
+			case IDENTIFIER::INT:
+			{
+				return std::to_string(prop.variants.inttype.value);
+			} break;
+			case IDENTIFIER::BOOL:
+			{
+				if (prop.variants.booltype.boolvalue > 0)
+					return std::string("true");
+				else return std::string("false");
+			} break;
+			case IDENTIFIER::COLOR:
+			{
+				sprintf(textbuffer, "%d, %d, %d", prop.variants.colortype.r, prop.variants.colortype.g, prop.variants.colortype.b);
+				return std::string(textbuffer);
+			} break;
+			case IDENTIFIER::MARGINS:
+			{
+				sprintf(textbuffer, "%d, %d, %d, %d", prop.variants.margintype.left, prop.variants.margintype.top, prop.variants.margintype.right, prop.variants.margintype.bottom);
+				return std::string(textbuffer);
+			} break;
+			case IDENTIFIER::FILENAME:
+			{
+				return std::to_string(prop.variants.imagetype.imageID);
+			} break;
+			case IDENTIFIER::SIZE:
+			{
+				return std::to_string(prop.variants.sizetype.size);
+			} break;
+			case IDENTIFIER::POSITION:
+			{
+				sprintf(textbuffer, "%d, %d", prop.variants.positiontype.x, prop.variants.positiontype.y);
+				return std::string(textbuffer);
+			} break;
+			case IDENTIFIER::RECT:
+			{
+				sprintf(textbuffer, "%d, %d, %d, %d", prop.variants.recttype.left, prop.variants.recttype.top, prop.variants.recttype.right, prop.variants.recttype.bottom);
+				return std::string(textbuffer);
+			} break;
+			case IDENTIFIER::FONT:
+			{
+				// todo: lookup resource id?
+				return std::to_string(prop.variants.fonttype.fontID);
+			} break;
+			default:
+			{
+				return "Unsupported";
+			}
+		}
+	}
+
 	
 	void VisualStyle::UpdateImageProperty(const MsStyleProperty* prop, int imageID)
 	{

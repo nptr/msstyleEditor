@@ -101,50 +101,11 @@ wxPGProperty* GetWXPropertyFromMsStyleProperty(MsStyleProperty& prop)
 wxPGChoices* GetEnumsFromMsStyleProperty(msstyle::MsStyleProperty& prop)
 {
 	wxPGChoices* choices = new wxPGChoices();
-	msstyle::EnumMap* enums;
 	int size;
+	msstyle::EnumMap* enums = VisualStyle::GetEnumMapFromNameID(prop.nameID, &size);
 
-	if (prop.nameID == IDENTIFIER::BGTYPE)
-	{
-		enums = (EnumMap*)&msstyle::ENUM_BGTYPE;
-		size = MSSTYLE_ARRAY_LENGTH(msstyle::ENUM_BGTYPE);
-	}
-	else if (prop.nameID == IDENTIFIER::BORDERTYPE)
-	{
-		enums = (EnumMap*)&msstyle::ENUM_BORDERTYPE;
-		size = MSSTYLE_ARRAY_LENGTH(msstyle::ENUM_BORDERTYPE);
-	}
-	else if (prop.nameID == IDENTIFIER::FILLTYPE)
-	{
-		enums = (EnumMap*)&msstyle::ENUM_FILLTYPE;
-		size = MSSTYLE_ARRAY_LENGTH(msstyle::ENUM_FILLTYPE);
-	}
-	else if (prop.nameID == IDENTIFIER::SIZINGTYPE)
-	{
-		enums = (EnumMap*)&msstyle::ENUM_SIZINGTYPE;
-		size = MSSTYLE_ARRAY_LENGTH(msstyle::ENUM_SIZINGTYPE);
-	}
-	else if (prop.nameID == IDENTIFIER::CONTENTALIGNMENT)
-	{
-		enums = (EnumMap*)&msstyle::ENUM_ALIGNMENT;
-		size = MSSTYLE_ARRAY_LENGTH(msstyle::ENUM_ALIGNMENT);
-	}
-	else if (prop.nameID == IDENTIFIER::IMAGELAYOUT)
-	{
-		enums = (EnumMap*)&msstyle::ENUM_IMAGELAYOUT;
-		size = MSSTYLE_ARRAY_LENGTH(msstyle::ENUM_IMAGELAYOUT);
-	}
-	else if (prop.nameID == IDENTIFIER::ICONEFFECT)
-	{
-		enums = (EnumMap*)&msstyle::ENUM_ICONEFFECT;
-		size = MSSTYLE_ARRAY_LENGTH(msstyle::ENUM_ICONEFFECT);
-	}
-	else if (prop.nameID == IDENTIFIER::GLYPHTYPE)
-	{
-		enums = (EnumMap*)&msstyle::ENUM_GLYPHTYPE;
-		size = MSSTYLE_ARRAY_LENGTH(msstyle::ENUM_GLYPHTYPE);
-	}
-	else return nullptr;
+	if (enums == nullptr || size == 0)
+		return nullptr;
 
 	for (int i = 0; i < size; ++i){
 		choices->Add(enums[i].value, enums[i].key);
