@@ -18,30 +18,40 @@ images, but it currently cannot create or delete entries or create styles from s
 *Only PNGs are supported!
 
 ## Compatibility:
-Successfully tested with Visual Styles for Windows 7, 8, 8.1 and 10.
+Basic compatibility with Visual Styles for Windows 7, 8, 8.1 and 10, meaning that open, modify and save works.
+Take note that a few part names are not labeled since their purpose is unknown and
+documented nowhere. Also some parts might be labeled wrong in Win10 because of changes in the part enumeration (eg. in DWMWindow), and my lack of data for it.
+
+
+
+Successfully tested with Visual Styles 
 If you encounter any problems, please feel free to report them.
 
 ## Installation:
 The application is a single, portable executeable. It requires no installation.
 
 In order to run the application, the [Microsoft Visual C++ Redistributable 2013](https://www.microsoft.com/en-US/download/details.aspx?id=40784)
-is required, but it might already be installed on your system.
+is required, but it may have been installed along with your OS already.
 
 ## Usage:
+
+A basic understanding of the logical structure of visual styles is helpful when using this program. Fortunately its quite simple as can be seen in the section below.
+
 #### Logical Structure of a Visual Style
 + Class 1 (e.g. Button, Window)
     + Part 1 (e.g. Pushbutton, Left Frame)
-    + Part 2
         + State 1 (e.g. Pressed, Disabled)
         +  State 2
             + Property 1 (e.g. BackgroundColor, Margins)
             + Property 2
 + Class 2
+    + Part 1
+    + Part 2
 + Class 3
 
-#### UI Description
+#### User Interface Description
 
-![Ui of the msstyleEditor](https://user-images.githubusercontent.com/5485569/29291552-3eb8c2ba-8144-11e7-8e12-ead476ed3e00.png)
+![Ui of the msstyleEditor](https://user-images.githubusercontent.com/5485569/33234570-7ff10f9a-d229-11e7-997a-cbce2f3f1770.png)
 
 In the treeview on the left, the classes, parts and images are listed. On selection
 of an image, it is shown in the middle area. With a right-click on the image view a way to change
