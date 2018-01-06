@@ -229,7 +229,7 @@ namespace msstyle
 
 	/**
 	* The loading works as follows: Open the VARIANT/NORMAL resource.
-	* In 8 byte steps, try to interpret the data as "MsStyleProperty".
+	* In 4 byte steps, try to interpret the data as "MsStyleProperty".
 	* If successful, create objects from the IDs that are located in the prop,
 	* and build a tree structure like this:
 	* MsStyleClass > MsStylePart > MsStyleState > MsStyleProperty

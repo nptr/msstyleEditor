@@ -39,8 +39,9 @@ namespace msstyle
 	// CMAP:	The names are split up and indexed. The order has to be the same as in the resource,
 	//			otherwise the IDs in the property data (VARIANT) dont match.
 	//
-	// VARIANT:	Props are usually 40 bytes long, but not always. Traversing the data in 8 byte steps
-	//			and checking the blocks for validity seems to find every property
+	// VARIANT:	Props are usually 40 bytes long, but not always. Traversing the data in 4 byte steps
+	//			and checking the blocks for validity seems to find every property. 8 bytes looked sufficient
+	//			at first, but turned out to not find every property.
 	//
 
 

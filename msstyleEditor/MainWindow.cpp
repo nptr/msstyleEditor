@@ -17,16 +17,16 @@
 #include <shlobj.h> // SHGetKnownFolderPath()
 
 #include "Exporter.h"
+#include "UxthemeUndocumented.h"
 
 using namespace msstyle;
-
 
 
 MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style) : wxFrame(parent, id, title, pos, size, style)
 {	
 	this->SetSizeHints(wxSize(900, 600), wxDefaultSize);
 	this->SetBackgroundColour(wxSystemSettings::GetColour(wxSystemColour::wxSYS_COLOUR_LISTBOX));
-
+	
 	wxBoxSizer* bSizer2;
 	bSizer2 = new wxBoxSizer(wxHORIZONTAL);
 
@@ -57,17 +57,19 @@ MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, c
 	mainmenu = new wxMenuBar();
 	aboutMenu = new wxMenu();
 	fileMenu = new wxMenu();
+	themeMenu = new wxMenu();
 	imageMenu = new wxMenu();
 	viewMenu = new wxMenu();
 
 	fileMenu->Append(ID_FOPEN, wxT("&Open"));
 	fileMenu->Append(ID_FSAVE, wxT("&Save"));
 	fileMenu->Enable(ID_FSAVE, false);
-	fileMenu->AppendSeparator();
 
 	wxMenu* exportSubMenu = new wxMenu();
 	exportSubMenu->Append(ID_EXPORT_TREE, wxT("Style Info"));
-	fileMenu->AppendSubMenu(exportSubMenu, wxT("Export ..."));
+	themeMenu->AppendSubMenu(exportSubMenu, wxT("Export ..."));
+	themeMenu->Append(ID_THEME_APPLY, wxT("Apply"));
+	themeMenu->Enable(ID_THEME_APPLY, false);
 
 	imageMenu->Append(ID_IEXPORT, wxT("&Export"));
 	imageMenu->Append(ID_IREPLACE, wxT("&Replace"));
@@ -84,6 +86,7 @@ MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, c
 	viewMenu->Enable(ID_RESOURCEDLG, false);
 
 	mainmenu->Append(fileMenu, wxT("&File"));
+	mainmenu->Append(themeMenu, wxT("&Theme"));
 	mainmenu->Append(imageMenu, wxT("&Image"));
 	mainmenu->Append(viewMenu, wxT("&View"));
 	mainmenu->Append(aboutMenu, wxT("I&nfo"));
@@ -102,6 +105,7 @@ MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, c
 	Connect(ID_FOPEN, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnFileOpenMenuClicked));
 	Connect(ID_FSAVE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnFileSaveMenuClicked));
 	Connect(ID_EXPORT_TREE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnExportLogicalStructure));
+	Connect(ID_THEME_APPLY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnThemeApply));
 
 	Connect(ID_IEXPORT, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnImageExportClicked));
 	Connect(ID_IREPLACE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnImageReplaceClicked));
@@ -136,9 +140,10 @@ MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, c
 
 	this->SetDropTarget(new CustomFileDropTarget(*this));
 
-	wxAcceleratorEntry entries[1];
+	wxAcceleratorEntry entries[2];
 	entries[0].Set(wxAcceleratorEntryFlags::wxACCEL_CTRL, wxKeyCode::WXK_CONTROL_F, ID_FIND);
-	wxAcceleratorTable table(1, entries);
+	entries[1].Set(wxAcceleratorEntryFlags::wxACCEL_CTRL, wxKeyCode::WXK_CONTROL_S, ID_FSAVE);
+	wxAcceleratorTable table(2, entries);
 	SetAcceleratorTable(table);
 }
 
@@ -172,7 +177,7 @@ void MainWindow::OnFileSaveMenuClicked(wxCommandEvent& event)
 	}
 	catch (std::runtime_error err)
 	{
-		wxMessageBox(err.what(), "Error saving file!");
+		wxMessageBox(err.what(), "Error saving file!", wxICON_ERROR);
 	}
 
 
@@ -194,8 +199,21 @@ void MainWindow::OnExportLogicalStructure(wxCommandEvent& event)
 	}
 	catch (std::runtime_error ex)
 	{
-		wxMessageBox(ex.what(), wxT("Error exporting"));
+		wxMessageBox(ex.what(), wxT("Error exporting"), wxICON_ERROR);
 	}
+}
+
+void MainWindow::OnThemeApply(wxCommandEvent& event)
+{
+	if (currentStyle == nullptr)
+		return;
+
+	const wchar_t* file = currentStyle->GetFileName();
+	if (file == nullptr)
+		return;
+
+	if (msstyle::SetSystemTheme(file, L"NormalColor", L"NormalSize", 0) != S_OK)
+		wxMessageBox(wxT("Failed to apply the theme as the OS rejected it!"), wxT("msstyleEditor"), wxICON_ERROR);
 }
 
 void MainWindow::OnClassViewTreeSelChanged(wxTreeEvent& event)
@@ -381,7 +399,7 @@ void MainWindow::OnImageViewBgChess(wxCommandEvent& event)
 
 void MainWindow::OnHelpClicked(wxCommandEvent& event)
 {
-	HelpDialog helpDlg(this, wxID_ANY, wxT("Help"));
+	HelpDialog helpDlg(this, wxID_ANY, wxT("License"));
 	helpDlg.ShowModal();
 }
 
@@ -697,7 +715,9 @@ void MainWindow::OpenStyle(const wxString& file)
 	imageMenu->Enable(ID_IEXPORT, true);
 	imageMenu->Enable(ID_IREPLACE, true);
 	fileMenu->Enable(ID_FSAVE, true);
+	themeMenu->Enable(ID_THEME_APPLY, true);
 	viewMenu->Enable(ID_RESOURCEDLG, true);
+
 
 	this->SetTitle(wxString("msstyleEditor - ") + wxString(currentStyle->GetFileName()));
 }

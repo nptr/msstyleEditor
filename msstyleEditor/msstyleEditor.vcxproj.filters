@@ -97,6 +97,9 @@
     <ClInclude Include="VisualStyleEnums.h">
       <Filter>VisualStyle</Filter>
     </ClInclude>
+    <ClInclude Include="UxthemeUndocumented.h">
+      <Filter>VisualStyle</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="msstyleEditor.rc" />
