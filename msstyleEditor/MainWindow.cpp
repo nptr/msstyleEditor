@@ -212,6 +212,44 @@ void MainWindow::OnThemeApply(wxCommandEvent& event)
 	if (file == nullptr)
 		return;
 
+	bool needConfirmation = false;
+	OSVERSIONINFO version;
+	ZeroMemory(&version, sizeof(OSVERSIONINFO));
+	version.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+
+#pragma warning( disable : 4996 )
+	GetVersionEx(&version);
+
+	msstyle::Platform styleplatform = currentStyle->GetCompatiblePlatform();
+
+	if (version.dwMajorVersion == 6 &&
+		version.dwMinorVersion == 1 &&
+		styleplatform != msstyle::Platform::WIN7)
+	{
+		needConfirmation = true;
+	}
+
+	if (version.dwMajorVersion == 6 &&
+		version.dwMinorVersion >= 2 &&
+		styleplatform != msstyle::Platform::WIN8 &&
+		styleplatform != msstyle::Platform::WIN81)
+	{
+		needConfirmation = true;
+	}
+
+	if (version.dwMajorVersion == 10 &&
+		version.dwMinorVersion >= 0  &&
+		styleplatform != msstyle::Platform::WIN10)
+	{
+		needConfirmation = true;
+	}
+
+	if (needConfirmation)
+	{
+		if(wxMessageBox(wxT("It looks like the style was not made for this windows version. Try to apply it anyways?"), wxT("msstyleEditor"), wxYES_NO | wxICON_WARNING) == wxNO)
+			return;
+	}
+
 	if (msstyle::SetSystemTheme(file, L"NormalColor", L"NormalSize", 0) != S_OK)
 		wxMessageBox(wxT("Failed to apply the theme as the OS rejected it!"), wxT("msstyleEditor"), wxICON_ERROR);
 }

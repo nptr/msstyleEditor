@@ -19,14 +19,13 @@ AboutDialog::AboutDialog(wxWindow* parent, wxWindowID id, const wxString& title,
 
 	bSizer7->Add(m_staticText1, 0, wxALL | wxALIGN_CENTER_HORIZONTAL, 5);
 
-
 	bSizer4->Add(bSizer7, 0, wxEXPAND, 5);
 
-	m_staticText2 = new wxStaticText(this, wxID_ANY, wxT("Version 1.2.3.0"), wxDefaultPosition, wxDefaultSize, 0);
+	m_staticText2 = new wxStaticText(this, wxID_ANY, wxT("Version 1.2.3.1"), wxDefaultPosition, wxDefaultSize, 0);
 	m_staticText2->Wrap(-1);
 	bSizer4->Add(m_staticText2, 0, wxBOTTOM | wxLEFT, 5);
 
-	m_staticText3 = new wxStaticText(this, wxID_ANY, wxT("Copyright (C) 2015-2017 Jakob K."), wxDefaultPosition, wxDefaultSize, 0);
+	m_staticText3 = new wxStaticText(this, wxID_ANY, wxT("Copyright (C) 2015-2018 Jakob K."), wxDefaultPosition, wxDefaultSize, 0);
 	m_staticText3->Wrap(-1);
 	bSizer4->Add(m_staticText3, 0, wxBOTTOM | wxLEFT, 5);
 
