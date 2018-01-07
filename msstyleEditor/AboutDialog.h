@@ -29,7 +29,7 @@ protected:
 
 public:
 
-	AboutDialog(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(220, 150), long style = wxDEFAULT_DIALOG_STYLE);
+	AboutDialog(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(230, 150), long style = wxDEFAULT_DIALOG_STYLE);
 	~AboutDialog();
 
 };

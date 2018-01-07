@@ -399,6 +399,10 @@ namespace msstyle
 
 	const PartMap VisualStyle::FindPartMap(const char* className, Platform platform)
 	{
+		//
+		// TODO: Use base class map (BCMAP) instead of relying on the naming
+		//
+
 		PartMap m;
 
 		if (strstr(className, "Toolbar"))	// Toolbar is often inherited, so find it first. It also has to be matched before "Button", 
