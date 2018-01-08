@@ -119,9 +119,10 @@ namespace msstyle
 				int32_t x;
 				int32_t y;
 			}positiontype;
-			struct
+			struct // INTLIST struct (uxtheme.h)
 			{
-				char reserved[12];
+				char reserved[12]; 
+				int32_t numints;
 				int32_t firstint;
 			}intlist;
 			struct

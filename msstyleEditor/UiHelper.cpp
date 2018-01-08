@@ -91,6 +91,20 @@ wxPGProperty* GetWXPropertyFromMsStyleProperty(MsStyleProperty& prop)
 		p->SetClientData(&prop);
 		return p;
 	}
+	case IDENTIFIER::INTLIST:
+	{
+		if (prop.variants.intlist.numints >= 3)
+		{
+			sprintf(str, "%d, %d, %d, .. (%d)", prop.variants.intlist.numints
+				, *(&prop.variants.intlist.firstint + 0)
+				, *(&prop.variants.intlist.firstint + 1)
+				, *(&prop.variants.intlist.firstint + 2));
+		}
+		else sprintf(str, "Len: %d, Values omitted");
+		wxStringProperty* p = new wxStringProperty(propName, *wxPGProperty::sm_wxPG_LABEL, str);
+		p->SetClientData(&prop);
+		return p;
+	}
 	default:
 		wxStringProperty* p = new wxStringProperty(propName, *wxPGProperty::sm_wxPG_LABEL, "VALUE");
 		p->SetClientData(&prop);

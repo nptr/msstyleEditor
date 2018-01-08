@@ -747,6 +747,18 @@ namespace msstyle
 				// todo: lookup resource id?
 				return std::to_string(prop.variants.fonttype.fontID);
 			} break;
+			case IDENTIFIER::INTLIST:
+			{
+				if (prop.variants.intlist.numints >= 3)
+				{
+					sprintf(textbuffer, "Len: %d, Values: %d, %d, %d, ...", prop.variants.intlist.numints
+						, *(&prop.variants.intlist.firstint + 0)
+						, *(&prop.variants.intlist.firstint + 1)
+						, *(&prop.variants.intlist.firstint + 2));
+				}
+				else sprintf(textbuffer, "Len: %d, Values omitted");
+				return std::string(textbuffer);
+			} break;
 			default:
 			{
 				return "Unsupported";
