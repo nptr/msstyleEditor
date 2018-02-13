@@ -12,7 +12,7 @@
 #include <fstream>
 #include <algorithm>
 #include <string>
-#include <cctype>
+#include <cctype>	// std::isspace
 
 #include <shlobj.h> // SHGetKnownFolderPath()
 
@@ -289,7 +289,8 @@ void MainWindow::OnClassViewTreeSelChanged(wxTreeEvent& event)
 		const wchar_t* file = currentStyle->IsReplacementImageQueued(propData->GetMSStyleProp());
 		if (file != nullptr)
 		{
-			ShowImageFromFile(wxString(file));
+			wxString tmpFile(file);
+			ShowImageFromFile(tmpFile);
 			statusBar->SetStatusText(wxString::Format("Image ID: %d*", propData->GetMSStyleProp()->variants.imagetype.imageID));
 		}
 		else
@@ -525,7 +526,9 @@ void MainWindow::OnFindNext(const SearchProperties& search)
 
 	wxTreeItemId item = FindNext(search, startItem);
 	if (item.IsOk())
+	{
 		classView->SelectItem(item);
+	}
 	else
 	{
 		wxMessageBox(wxT("No further match for \"")
@@ -539,7 +542,7 @@ void MainWindow::OnFindNext(const SearchProperties& search)
 
 bool ContainsStringInvariant(const std::string& text, const std::string& toFind)
 {
-	auto& it = std::search(text.begin(), text.end(),
+	auto it = std::search(text.begin(), text.end(),
 		toFind.begin(), toFind.end(),
 		[](char c1, char c2) -> bool
 	{
@@ -561,7 +564,7 @@ bool ContainsProperty(const SearchProperties& search, wxTreeItemData* treeItemDa
 
 	MsStylePart* part = partData->GetMsStylePart();
 	
-	for (auto& stateIt = part->states.begin(); stateIt != part->states.end(); ++stateIt)
+	for (auto stateIt = part->states.begin(); stateIt != part->states.end(); ++stateIt)
 	{
 		for (auto& propIt : stateIt->second->properties)
 		{
@@ -836,7 +839,7 @@ void MainWindow::ShowImageFromResource(const MsStyleProperty* prop)
 		selectedImage = currentStyle->GetResource(MAKEINTRESOURCEA(prop->variants.imagetype.imageID), "STREAM");
 	else return;
 
-	wxMemoryInputStream stream = wxMemoryInputStream(selectedImage.data, selectedImage.size);
+	wxMemoryInputStream stream(selectedImage.data, selectedImage.size);
 
 	wxImage img(stream, wxBITMAP_TYPE_PNG);
 	imageView->SetImage(img);

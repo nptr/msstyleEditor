@@ -4,6 +4,7 @@
 #include <fstream>
 #include <codecvt>
 #include <assert.h>
+#include <locale> //wstring_convert
 
 #include "VisualStyleEnums.h"
 #include "VisualStyleParts.h"
@@ -41,7 +42,7 @@ namespace msstyle
 		
 		for (int i = 0; i < size; ++i, ++last)
 		{
-			if (data[i] == NULL)
+			if (data[i] == 0)
 			{
 				int entryLen = last - first;
 				if (entryLen > 1)
@@ -75,7 +76,7 @@ namespace msstyle
 			return;
 
 		delete[] styleData->filePath;
-		delete[] styleData->propertyResource.data; // delete all properties
+		delete[] (const char*)styleData->propertyResource.data; // delete all properties
 
 		// delete all classes
 		for (auto it = styleData->classes.begin(); it != styleData->classes.end(); ++it)
@@ -252,7 +253,7 @@ namespace msstyle
 		for (char* variantData = tmpMem; variantData < limit-4; variantData += 4)
 		{
 			// Check whether we likely found a valid property at this address
-			// This is not a deep validation and may deliver wrong results
+			// This is not an exhaustive validation and may yield wrong results
 			tmpProp = (MsStyleProperty*)variantData;
 			if (IsPropertyValid(*tmpProp))
 			{
@@ -391,7 +392,7 @@ namespace msstyle
 
 	const char* VisualStyle::FindPropName(int propertyID)
 	{
-		auto& ret = msstyle::PROPERTY_MAP.find(propertyID);
+		auto ret = msstyle::PROPERTY_MAP.find(propertyID);
 		if (ret != msstyle::PROPERTY_MAP.end())
 			return ret->second;
 		else return "UNKNOWN";
@@ -849,7 +850,7 @@ namespace msstyle
 
 	const wchar_t* VisualStyle::IsReplacementImageQueued(const MsStyleProperty* prop) const
 	{
-		auto& res = imageReplaceQueue.find(prop);
+		auto res = imageReplaceQueue.find(prop);
 		if (res != imageReplaceQueue.end())
 		{
 			return res->second;
