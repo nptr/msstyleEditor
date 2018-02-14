@@ -127,7 +127,8 @@ namespace msstyle
 			}intlist;
 			struct
 			{
-				char reserved[12];
+				char reserved[8];
+				int32_t sizeInBytes;
 				wchar_t firstchar;
 			}texttype;
 		}variants;
@@ -196,6 +197,7 @@ namespace msstyle
 		// Tries to lookup the name to the given property id
 		static const char* FindPropName(int propertyID);
 		static bool IsPropertyValid(const MsStyleProperty& prop);
+		static int GetPropertySize(const MsStyleProperty& prop);
 		static std::string GetPropertyValueAsString(const MsStyleProperty& prop);
 		static EnumMap* GetEnumMapFromNameID(int32_t nameID, int32_t* out_size);
 		static const char* GetEnumAsString(int32_t nameId, int32_t enumValue);
@@ -219,10 +221,14 @@ namespace msstyle
 
 		void LoadClassMap(std::vector<wchar_t*>& outClassNames);
 		void LoadProperties(const std::vector<wchar_t*>& classNames);
+		void LoadPropertiesEx(const std::vector<wchar_t*>& classNames);
 
 		MsStyleData* styleData;
 		Platform stylePlatform;
 
+		void SaveImages(void* resHandle);
+		void SaveClasses(void* resHandle);
+		void SaveProperties(void* resHandle);
 		static const PartMap FindPartMap(const char* className, Platform platform);
 
 		std::unordered_map<const MsStyleProperty*, const wchar_t*> imageReplaceQueue;

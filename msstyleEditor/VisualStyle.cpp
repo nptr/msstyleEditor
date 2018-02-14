@@ -120,37 +120,17 @@ namespace msstyle
 
 		std::vector<wchar_t*> classNames;
 		LoadClassMap(classNames);			// extract the list of class names
-		LoadProperties(classNames);			// load all probperties and build the style tree
+		LoadPropertiesEx(classNames);			// load all probperties and build the style tree
 	}
 
 
-	/**
-	* The save routine is very alpha at the moment. I am just changing the properties
-	* that were specified and patch the file. Building the style from ground up is not
-	* possible for me, since i dont fully understand the structure and layout of .msstyle files yet.
-	*/
-	void VisualStyle::Save(const wchar_t* path)
+	void VisualStyle::SaveImages(HANDLE resHandle)
 	{
-		// if source != destination
-		if (lstrcmpW(path, styleData->filePath))
-		{
-			// copy the source file and modify the new one
-			// since we cant create a file from scratch
-			std::ifstream src(styleData->filePath, std::ios::binary);
-			std::ofstream dst(path, std::ios::binary);
-			dst << src.rdbuf();
-		}
-
-		HANDLE updHandle = BeginUpdateResourceW(path, false);
-		if (updHandle == NULL)
-		{
-			throw std::runtime_error("Could not open the file for writing!");
-		}
-
 		for (auto& img : imageReplaceQueue)
 		{
 			// load new image data
-			std::ifstream newImg(img.second, std::ios::binary);
+			std::string doNotRelyOnCompilerExtensions = WStringToUTF8(img.second);
+			std::ifstream newImg(doNotRelyOnCompilerExtensions, std::ios::binary);
 			newImg.seekg(0, std::ios::end);
 			std::streampos size = newImg.tellg();
 			newImg.seekg(0, std::ios::beg);
@@ -169,7 +149,7 @@ namespace msstyle
 				resName = L"STREAM";
 			else continue;
 
-			if (!UpdateResourceW(updHandle, resName, MAKEINTRESOURCEW(img.first->variants.imagetype.imageID), MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL), imgBuffer, (DWORD)size))
+			if (!UpdateResourceW(resHandle, resName, MAKEINTRESOURCEW(img.first->variants.imagetype.imageID), MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL), imgBuffer, (DWORD)size))
 			{
 				throw std::runtime_error("Could not update IMAGE/STREAM resource!");
 				delete[] imgBuffer;
@@ -178,13 +158,82 @@ namespace msstyle
 
 			delete[] imgBuffer;
 		}
+	}
 
-		// replace properties
-		if (!UpdateResourceW(updHandle, L"VARIANT", L"NORMAL", 0, (LPVOID*)styleData->propertyResource.data, styleData->propertyResource.size))
+	void VisualStyle::SaveClasses(HANDLE resHandle)
+	{
+
+	}
+
+	void VisualStyle::SaveProperties(HANDLE resHandle)
+	{
+		// assume that twice the size common properties require is enough
+		int estimatedSize = GetPropertyCount() * 48 * 2;
+		char* data = new char[estimatedSize];
+		char* dataptr = data;
+
+		// for all classes
+		for (auto it = styleData->classes.begin(); it != styleData->classes.end(); ++it)
+		{
+			// for all parts
+			for (auto partIt = it->second->parts.begin(); partIt != it->second->parts.end(); ++partIt)
+			{
+				// for all states
+				for (auto stateIt = partIt->second->states.begin(); stateIt != partIt->second->states.end(); ++stateIt)
+				{
+					// for all properties
+					for (auto propIt = stateIt->second->properties.begin(); propIt != stateIt->second->properties.end(); ++propIt)
+					{
+						int propSize = GetPropertySize(*(*propIt));
+						memcpy(dataptr, &((*propIt)->nameID), propSize);
+						dataptr += propSize;
+
+						if (dataptr - data > estimatedSize)
+							throw std::runtime_error("I haven't allocated enough memory to save the file..sorry for that!");
+					}
+				}
+			}
+
+			// we would save the classnames in the CMAP resource
+			// but as long as we dont modify the classID of the
+			// properties, this shouldn't be necessary
+		}
+
+		if (!UpdateResourceW(resHandle, L"VARIANT", L"NORMAL", 0, (LPVOID*)data, dataptr-data))
 		{
 			throw std::runtime_error("Could not update properties!");
 			return;
 		}
+	}
+
+	/**
+	* The save routine is very alpha at the moment. I am just changing the properties
+	* that were specified and patch the file. Building the style from ground up is not
+	* possible for me, since i dont fully understand the structure and layout of .msstyle files yet.
+	*/
+	void VisualStyle::Save(const wchar_t* path)
+	{
+		// if source != destination
+		if (lstrcmpW(path, styleData->filePath))
+		{
+			// copy the source file and modify the new one
+			// since we cant create a file from scratch
+			std::string originalFile = WStringToUTF8(styleData->filePath);
+			std::ifstream src(originalFile, std::ios::binary);
+
+			std::string newFile = WStringToUTF8(path);
+			std::ofstream dst(newFile, std::ios::binary);
+			dst << src.rdbuf();
+		}
+
+		HANDLE updHandle = BeginUpdateResourceW(path, false);
+		if (updHandle == NULL)
+		{
+			throw std::runtime_error("Could not open the file for writing!");
+		}
+
+		SaveImages(updHandle);
+		SaveProperties(updHandle);
 
 		if (!EndUpdateResourceW(updHandle, false))
 		{
@@ -338,6 +387,141 @@ namespace msstyle
 				propsFound++;
 
 			} // if(IsPropertyValid(...))
+		}
+	}
+
+	void VisualStyle::LoadPropertiesEx(const std::vector<wchar_t*>& classNames)
+	{
+		EmbRessource variantRes = GetResource("NORMAL", "VARIANT");
+
+		// Copy, to make the memory writeable. Needed so i can edit it later on.
+		char* tmpMem = new char[variantRes.size];
+		memcpy(tmpMem, variantRes.data, variantRes.size);
+
+		// Store it
+		styleData->propertyResource.data = tmpMem;
+		styleData->propertyResource.size = variantRes.size;
+
+		MsStyleProperty* prevprop;
+		MsStyleProperty* tmpProp;
+		char* dataPtr = tmpMem;
+
+		while ((dataPtr - tmpMem) < variantRes.size)
+		{
+			tmpProp = (MsStyleProperty*)dataPtr;
+			if (IsPropertyValid(*tmpProp))
+			{
+				// See if we have created a "Style Class" object already for
+				// this classID that we can use. If not, create one.
+				MsStyleClass* cls;
+				const auto& result = styleData->classes.find(tmpProp->classID);
+				if (result == styleData->classes.end())
+				{
+					cls = new MsStyleClass();
+					cls->classID = tmpProp->classID;
+					if (tmpProp->classID < classNames.size())
+					{
+						cls->className = WStringToUTF8(classNames[tmpProp->classID]);
+					}
+					else
+					{
+						char txt[16];
+						sprintf(txt, "Class %d", tmpProp->classID);
+						cls->className = std::string(txt);
+					}
+
+					styleData->classes[tmpProp->classID] = cls;
+				}
+				else cls = result->second;
+
+
+				// See if we have created a "Style Part" object for this
+				// partID inside the current "Style Class". If not, create one.
+				MsStylePart* part;
+				const PartMap partInfo = FindPartMap(cls->className.c_str(), stylePlatform);
+				const auto& partRes = cls->parts.find(tmpProp->partID);
+				if (partRes == cls->parts.end())
+				{
+					part = new MsStylePart();
+					part->partID = tmpProp->partID;
+
+					if (tmpProp->partID < partInfo.numParts)
+					{
+						part->partName = partInfo.parts[tmpProp->partID].partName;
+					}
+					else
+					{
+						char txt[16];
+						sprintf(txt, "Part %d", tmpProp->partID);
+						part->partName = std::string(txt);
+					}
+
+					cls->parts[tmpProp->partID] = part;
+				}
+				else part = partRes->second;
+
+
+
+				// See if we have created a "Style State" object for this
+				// stateID inside the current "Style Part". If not, create one.
+				MsStyleState* state;
+				const auto& stateRes = cls->parts[tmpProp->partID]->states.find(tmpProp->stateID);
+				if (stateRes == cls->parts[tmpProp->partID]->states.end())
+				{
+					state = new MsStyleState();
+					state->stateID = tmpProp->stateID;
+
+					if (tmpProp->partID < partInfo.numParts &&
+						tmpProp->stateID < partInfo.parts[tmpProp->partID].numStates)
+					{
+						state->stateName = partInfo.parts[tmpProp->partID].states[tmpProp->stateID].stateName;
+					}
+					else
+					{
+						if (tmpProp->stateID == 0)
+						{
+							state->stateName = "Common";
+						}
+						else
+						{
+							char txt[16];
+							sprintf(txt, "State %d", tmpProp->stateID);
+							state->stateName = std::string(txt);
+						}
+					}
+
+					part->states[tmpProp->stateID] = state;
+				}
+				else state = stateRes->second;
+
+				// Now that we have the class > part > state 
+				// structure for this property, add it.
+				state->properties.push_back(tmpProp);
+				propsFound++;
+				prevprop = tmpProp;
+				// the sizes are known, so jump right to the next prop
+				dataPtr += GetPropertySize(*tmpProp);
+			}
+			else
+			{
+				// Look one integer back, just in case.
+				// Main focus is looking forward tho..
+				MsStyleProperty* findback = (MsStyleProperty*)(dataPtr - 4);
+				if (IsPropertyValid(*findback))
+				{
+					dataPtr -= 4;
+				}
+				else
+				{
+					MsStyleProperty* prop;
+
+					do
+					{
+						dataPtr += 4;
+						prop = (MsStyleProperty*)(dataPtr);
+					} while (!IsPropertyValid(*prop) && (dataPtr - tmpMem < variantRes.size));
+				}
+			}
 		}
 	}
 
@@ -687,6 +871,46 @@ namespace msstyle
 			return enums[enumValue].value;
 		}
 		else return nullptr;
+	}
+
+	int VisualStyle::GetPropertySize(const MsStyleProperty& prop)
+	{
+		switch (prop.typeID)
+		{
+		case IDENTIFIER::FILENAME:
+		case IDENTIFIER::DISKSTREAM:
+			return 32;
+		case IDENTIFIER::FONT:
+			return 32;
+		case IDENTIFIER::INT:
+			return 40;
+		case IDENTIFIER::SIZE:
+			return 40;
+		case IDENTIFIER::BOOL:
+			return 40;
+		case IDENTIFIER::COLOR:
+			return 40;
+		case IDENTIFIER::RECT:
+			return 48;
+		case IDENTIFIER::MARGINS:
+			return 48;
+		case IDENTIFIER::ENUM:
+			return 40;
+		case IDENTIFIER::POSITION:
+			return 40;
+		case IDENTIFIER::INTLIST:
+			// header, reserved, numints, intlist, nullterminator
+			return 20 + 12 + 4 + prop.variants.intlist.numints * sizeof(int32_t);
+		case IDENTIFIER::STRING:
+			// string length in bytes including the null terminator
+			return 20 + 8 + 4 + prop.variants.texttype.sizeInBytes;
+			// return 20 + 8 + 4 + (wcslen(&prop.variants.texttype.firstchar) + 1) * sizeof(wchar_t);
+		case 225: // Unknown or wrong prop, since Win7 ?
+		case 241: // Unknown or wrong prop, since Win10 ?
+			return 40;
+		default:
+			return 40;
+		}
 	}
 
 	std::string VisualStyle::GetPropertyValueAsString(const MsStyleProperty& prop)

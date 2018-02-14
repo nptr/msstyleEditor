@@ -804,7 +804,7 @@ void MainWindow::FillClassView(const std::unordered_map<int, MsStyleClass*>* cla
 					if (prop->typeID == IDENTIFIER::FILENAME || prop->typeID == IDENTIFIER::DISKSTREAM)
 					{
 						const char* propName = VisualStyle::FindPropName(prop->nameID); // propnames have to be looked up, but thats fast
-						classView->AppendItem(partNode, propName, -1, -1, dynamic_cast<wxTreeItemData*>(new PropTreeItemData(prop)));
+						classView->AppendItem(partNode, propName, -1, -1, static_cast<wxTreeItemData*>(new PropTreeItemData(prop)));
 					}
 				}
 			}
