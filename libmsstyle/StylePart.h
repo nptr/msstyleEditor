@@ -12,9 +12,10 @@ public:
 	StylePart();
 	~StylePart();
 
-	void AddState(const StyleState& state);
+	StyleState* AddState(const StyleState& state);
 	int GetStateCount();
 	const StyleState* GetState(int index);
+	StyleState* FindState(int stateId);
 
 	int32_t partID;
 	std::string partName;

@@ -11,6 +11,7 @@
 
 #define MSSTYLE_ARRAY_LENGTH(name) (sizeof(name) / sizeof(name[0]))
 
+
 namespace msstyle
 {
 	// used internally to keep track of the style

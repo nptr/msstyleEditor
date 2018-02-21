@@ -7,9 +7,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="libmsstyle.h" />
     <ClInclude Include="ResourceUtil.h" />
     <ClInclude Include="StyleClass.h" />
@@ -18,6 +15,10 @@
     <ClInclude Include="StyleState.h" />
     <ClInclude Include="VisualStyle.h" />
     <ClInclude Include="StringConvert.h" />
+    <ClInclude Include="VisualStyleEnums.h" />
+    <ClInclude Include="VisualStyleParts.h" />
+    <ClInclude Include="VisualStyleProps.h" />
+    <ClInclude Include="VisualStyleStates.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="libmsstyle.cpp" />

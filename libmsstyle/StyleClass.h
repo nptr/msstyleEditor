@@ -12,9 +12,11 @@ public:
 	StyleClass();
 	~StyleClass();
 
-	void AddPart(const StylePart& part);
+	StylePart* AddPart(const StylePart& part);
+
 	int GetPartCount();
 	const StylePart* GetPart(int index);
+	StylePart* FindPart(int partId);
 
 	int32_t classID;
 	std::string className;

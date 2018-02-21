@@ -13,7 +13,7 @@ public:
 	StyleState();
 	~StyleState();
 
-	void AddProperty(const StyleProperty& prop);
+	StyleProperty* AddProperty(StyleProperty* prop);
 
 	void RemoveProperty(int index);
 	int GetPropertyCount();
@@ -23,6 +23,6 @@ public:
 	std::string stateName;
 
 private:
-	std::vector<StyleProperty> m_properties;
+	std::vector<StyleProperty*> m_properties;
 };
 

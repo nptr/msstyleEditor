@@ -11,9 +11,10 @@ StyleState::~StyleState()
 }
 
 
-void StyleState::AddProperty(const StyleProperty& prop)
+StyleProperty* StyleState::AddProperty(StyleProperty* prop)
 {
 	m_properties.push_back(prop);
+	return m_properties[m_properties.size() - 1];
 }
 
 
@@ -31,5 +32,5 @@ int StyleState::GetPropertyCount()
 
 const StyleProperty* StyleState::GetProperty(int index)
 {
-	return &m_properties[index];
+	return m_properties[index];
 }

@@ -92,5 +92,16 @@ struct StyleProperty
 	bool IsPropertyValid();
 	int GetPropertySize();
 
+	void UpdateImageProperty(int imageID);
+	void UpdateIntegerProperty(int intVal);
+	void UpdateSizeProperty(int size);
+	void UpdateEnumProperty(int enumVal);
+	void UpdateBooleanProperty(bool boolVal);
+	void UpdateColorProperty(int r, int g, int b);
+	void UpdateRectangleProperty(int left, int top, int right, int bottom);
+	void UpdateMarginProperty(int left, int top, int right, int bottom);
+	void UpdatePositionProperty(int x, int y);
+	void UpdateFontProperty(int fontID);
+	void UpdateImageResource(const wchar_t* newFilePath);
 };
 
