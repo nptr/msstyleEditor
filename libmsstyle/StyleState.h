@@ -6,23 +6,27 @@
 #include <string>
 #include <stdint.h>
 
-
-class StyleState
+namespace libmsstyle
 {
-public:
-	StyleState();
-	~StyleState();
 
-	StyleProperty* AddProperty(StyleProperty* prop);
+	class StyleState
+	{
+	public:
+		StyleState();
+		~StyleState();
 
-	void RemoveProperty(int index);
-	int GetPropertyCount();
-	const StyleProperty* GetProperty(int index);
+		StyleProperty* AddProperty(StyleProperty* prop);
 
-	int32_t stateID;
-	std::string stateName;
+		void RemoveProperty(int index);
+		int GetPropertyCount();
+		const StyleProperty* GetProperty(int index);
 
-private:
-	std::vector<StyleProperty*> m_properties;
-};
+		int32_t stateID;
+		std::string stateName;
+
+	private:
+		std::vector<StyleProperty*> m_properties;
+	};
+
+}
 

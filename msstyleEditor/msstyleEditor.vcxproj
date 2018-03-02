@@ -85,7 +85,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <CompileAs>CompileAsCpp</CompileAs>
-      <AdditionalIncludeDirectories>..\..\libs\wxWidgets-3.0.2\include;..\..\libs\wxWidgets-3.0.2\include\msvc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);..\..\libs\wxWidgets-3.0.2\include;..\..\libs\wxWidgets-3.0.2\include\msvc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
@@ -94,6 +94,7 @@
       <AdditionalLibraryDirectories>..\..\libs\wxWidgets-3.0.2\lib\vc_x64_lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>
       </SubSystem>
+      <AdditionalDependencies>$(OutputPath)\libmsstyle.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -165,7 +166,6 @@
     <ClCompile Include="CustomTreeItemData.cpp" />
     <ClCompile Include="SearchDialog.cpp" />
     <ClCompile Include="UiHelper.cpp" />
-    <ClCompile Include="VisualStyle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AboutDialog.h" />
@@ -179,12 +179,6 @@
     <ClInclude Include="SearchDialog.h" />
     <ClInclude Include="SearchDialogListener.h" />
     <ClInclude Include="UiHelper.h" />
-    <ClInclude Include="UxthemeUndocumented.h" />
-    <ClInclude Include="VisualStyle.h" />
-    <ClInclude Include="VisualStyleEnums.h" />
-    <ClInclude Include="VisualStyleProps.h" />
-    <ClInclude Include="VisualStyleParts.h" />
-    <ClInclude Include="VisualStyleStates.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="msstyleEditor.rc" />

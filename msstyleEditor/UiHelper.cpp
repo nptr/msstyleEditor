@@ -1,9 +1,9 @@
 #include "UiHelper.h"
-#include "VisualStyleEnums.h"
+#include "libmsstyle/VisualStyleEnums.h"
 
-using namespace msstyle;
+using namespace libmsstyle;
 
-wxPGProperty* GetWXPropertyFromMsStyleProperty(MsStyleProperty& prop)
+wxPGProperty* GetWXPropertyFromMsStyleProperty(StyleProperty& prop)
 {
 	char* str = new char[32];
 	const char* propName = VisualStyle::FindPropName(prop.nameID);

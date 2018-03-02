@@ -6,21 +6,26 @@
 #include <unordered_map>
 #include <stdint.h>
 
-class StylePart
+namespace libmsstyle
 {
-public:
-	StylePart();
-	~StylePart();
 
-	StyleState* AddState(const StyleState& state);
-	int GetStateCount();
-	const StyleState* GetState(int index);
-	StyleState* FindState(int stateId);
+	class StylePart
+	{
+	public:
+		StylePart();
+		~StylePart();
 
-	int32_t partID;
-	std::string partName;
+		StyleState* AddState(const StyleState& state);
+		int GetStateCount();
+		const StyleState* GetState(int index);
+		StyleState* FindState(int stateId);
 
-private:
-	std::unordered_map<int32_t, StyleState> m_states;
-};
+		int32_t partID;
+		std::string partName;
+
+	private:
+		std::unordered_map<int32_t, StyleState> m_states;
+	};
+
+}
 

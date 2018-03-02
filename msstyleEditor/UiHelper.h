@@ -1,10 +1,10 @@
 #pragma once
 
-#include "VisualStyle.h"
+#include "libmsstyle/StyleProperty.h"
 
 #include <wx\wx.h>
 #include <wx\propgrid\property.h>
 #include <wx\propgrid\advprops.h>
 
-wxPGProperty* GetWXPropertyFromMsStyleProperty(msstyle::MsStyleProperty& prop);
-wxPGChoices* GetEnumsFromMsStyleProperty(msstyle::MsStyleProperty& prop);
+wxPGProperty* GetWXPropertyFromMsStyleProperty(libmsstyle::StyleProperty& prop);
+wxPGChoices* GetEnumsFromMsStyleProperty(libmsstyle::StyleProperty& prop);

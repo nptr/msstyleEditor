@@ -28,5 +28,9 @@
     <ClCompile Include="StyleProperty.cpp" />
     <ClCompile Include="StyleState.cpp" />
     <ClCompile Include="VisualStyle.cpp" />
+    <ClCompile Include="VisualStyleEnums.cpp" />
+    <ClCompile Include="VisualStyleParts.cpp" />
+    <ClCompile Include="VisualStyleProps.cpp" />
+    <ClCompile Include="VisualStyleStates.cpp" />
   </ItemGroup>
 </Project>

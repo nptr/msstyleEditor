@@ -12,9 +12,6 @@
     <Filter Include="GUI">
       <UniqueIdentifier>{39aa1719-5642-4892-9461-368b8f815c03}</UniqueIdentifier>
     </Filter>
-    <Filter Include="VisualStyle">
-      <UniqueIdentifier>{3f36e3c3-e34c-43cf-b5a2-36b8cf08fbbe}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -34,9 +31,6 @@
     </ClCompile>
     <ClCompile Include="MainWindow.cpp">
       <Filter>GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="VisualStyle.cpp">
-      <Filter>VisualStyle</Filter>
     </ClCompile>
     <ClCompile Include="UiHelper.cpp">
       <Filter>GUI</Filter>
@@ -70,9 +64,6 @@
     <ClInclude Include="HelpDialog.h">
       <Filter>GUI</Filter>
     </ClInclude>
-    <ClInclude Include="VisualStyle.h">
-      <Filter>VisualStyle</Filter>
-    </ClInclude>
     <ClInclude Include="UiHelper.h">
       <Filter>GUI</Filter>
     </ClInclude>
@@ -84,21 +75,6 @@
     </ClInclude>
     <ClInclude Include="Exporter.h">
       <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="VisualStyleStates.h">
-      <Filter>VisualStyle</Filter>
-    </ClInclude>
-    <ClInclude Include="VisualStyleProps.h">
-      <Filter>VisualStyle</Filter>
-    </ClInclude>
-    <ClInclude Include="VisualStyleParts.h">
-      <Filter>VisualStyle</Filter>
-    </ClInclude>
-    <ClInclude Include="VisualStyleEnums.h">
-      <Filter>VisualStyle</Filter>
-    </ClInclude>
-    <ClInclude Include="UxthemeUndocumented.h">
-      <Filter>VisualStyle</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

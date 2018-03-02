@@ -12,36 +12,41 @@
 #include <vector>
 #include <string>
 
-enum Platform
+namespace libmsstyle
 {
-	WIN7,
-	WIN8,
-	WIN81,
-	WIN10
-};
 
-class VisualStyle
-{
-public:
-	VisualStyle();
-	~VisualStyle();
+	enum Platform
+	{
+		WIN7,
+		WIN8,
+		WIN81,
+		WIN10
+	};
 
-	const StyleClass* GetClass(int index);
-	int GetClassCount();
+	class VisualStyle
+	{
+	public:
+		VisualStyle();
+		~VisualStyle();
 
-	void Load(const std::string& path);
-	void Save(const std::string& path);
+		const StyleClass* GetClass(int index);
+		int GetClassCount();
+
+		void Load(const std::string& path);
+		void Save(const std::string& path);
 
 
-private:
-	void LoadClassmap(Resource classResource);
-	void LoadProperties(Resource propResource);
-	Platform DeterminePlatform();
+	private:
+		void LoadClassmap(Resource classResource);
+		void LoadProperties(Resource propResource);
+		Platform DeterminePlatform();
 
-	ModuleHandle m_moduleHandle;
-	Platform m_stylePlatform;
+		ModuleHandle m_moduleHandle;
+		Platform m_stylePlatform;
 
-	std::string m_stylePath;
-	std::unordered_map<int32_t, StyleClass> m_classes;
-};
+		std::string m_stylePath;
+		std::unordered_map<int32_t, StyleClass> m_classes;
+	};
+
+}
 
