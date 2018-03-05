@@ -5,7 +5,7 @@
 #include <string>
 #include <codecvt>
 
-#include "VisualStyle.h"
+#include "libmsstyle/VisualStyle.h"
 
 std::string WStringToUTF8(const std::wstring& str)
 {
@@ -13,12 +13,12 @@ std::string WStringToUTF8(const std::wstring& str)
 	return myconv.to_bytes(str);
 }
 
-void Exporter::ExportPropertyCSV(const msstyle::VisualStyle& style)
+void Exporter::ExportPropertyCSV(const libmsstyle::VisualStyle& style)
 {
 
 }
 
-void Exporter::ExportLogicalStructure(const std::string& path, const msstyle::VisualStyle& style)
+void Exporter::ExportLogicalStructure(const std::string& path, const libmsstyle::VisualStyle& style)
 {
 	std::ofstream file(path);
 	if (!file.is_open())
@@ -29,22 +29,22 @@ void Exporter::ExportLogicalStructure(const std::string& path, const msstyle::Vi
 	std::string txt;
 	txt.reserve(1024 * 1024 * 4);
 
-	txt.append("File: "); txt.append(WStringToUTF8(style.GetFileName()));
+	txt.append("File: "); txt.append(style.GetPath());
 	sprintf(buffer, "\nProperties: %d", style.GetPropertyCount());
 	txt.append(buffer);
 
 	switch (style.GetCompatiblePlatform())
 	{
-		case msstyle::WIN7:
+		case libmsstyle::WIN7:
 		{
 			txt.append("\nPlatform: Windows 7\n\n");
 		} break;
-		case msstyle::WIN8:
-		case msstyle::WIN81:
+		case libmsstyle::WIN8:
+		case libmsstyle::WIN81:
 		{
 			txt.append("\nPlatform: Windows 8 / 8.1\n\n");
 		} break;
-		case msstyle::WIN10:
+		case libmsstyle::WIN10:
 		{
 			txt.append("\nPlatform: Windows 10\n\n");
 		} break;
@@ -56,7 +56,7 @@ void Exporter::ExportLogicalStructure(const std::string& path, const msstyle::Vi
 
 	txt.append("BEGIN STRUCTURE"); txt.append("\n");
 
-	const std::unordered_map<int32_t, msstyle::MsStyleClass*>* classes = style.GetClasses();
+	const std::unordered_map<int32_t, libmsstyle::StyleClass*>* classes = style.GetClasses();
 
 	for (auto& classIt : *classes)
 	{

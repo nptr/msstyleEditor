@@ -1,25 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Quelldateien">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Headerdateien">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
-    </Filter>
     <Filter Include="GUI">
       <UniqueIdentifier>{39aa1719-5642-4892-9461-368b8f815c03}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
-    <ClCompile Include="CustomTreeItemData.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
     <ClCompile Include="AboutDialog.cpp">
       <Filter>GUI</Filter>
     </ClCompile>
@@ -38,20 +24,11 @@
     <ClCompile Include="SearchDialog.cpp">
       <Filter>GUI</Filter>
     </ClCompile>
-    <ClCompile Include="Exporter.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
+    <ClCompile Include="CustomTreeItemData.cpp" />
+    <ClCompile Include="Exporter.cpp" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CustomTreeItemData.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="resource.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="CustomFileDropTarget.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
     <ClInclude Include="AboutDialog.h">
       <Filter>GUI</Filter>
     </ClInclude>
@@ -73,9 +50,10 @@
     <ClInclude Include="SearchDialogListener.h">
       <Filter>GUI</Filter>
     </ClInclude>
-    <ClInclude Include="Exporter.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
+    <ClInclude Include="CustomFileDropTarget.h" />
+    <ClInclude Include="CustomTreeItemData.h" />
+    <ClInclude Include="Exporter.h" />
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="msstyleEditor.rc" />

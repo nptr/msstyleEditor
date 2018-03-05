@@ -8,7 +8,7 @@
 #include <wx\treectrl.h>
 
 #include "ImageViewCtrl.h"
-#include "VisualStyle.h"
+#include "libmsstyle\VisualStyle.h"
 #include "SearchDialog.h"
 
 class MainWindow : public wxFrame, public ISearchDialogListener
@@ -34,10 +34,10 @@ private:
 
 	const int ID_FIND = 460;
 
-	msstyle::VisualStyle* currentStyle;
+	libmsstyle::VisualStyle* currentStyle;
 
-	msstyle::EmbRessource selectedImage;
-	const msstyle::MsStyleProperty* selectedImageProp;
+	libmsstyle::EmbRessource selectedImage;
+	const libmsstyle::StyleProperty* selectedImageProp;
 
 protected:
 	wxTreeCtrl* classView;
@@ -76,12 +76,12 @@ protected:
 
 	wxTreeItemId FindNext(const SearchProperties& props, wxTreeItemId node);
 
-	void FillClassView(const std::unordered_map<int, msstyle::MsStyleClass*>* classes);
-	void FillPropertyView(msstyle::MsStylePart& part);
+	void FillClassView();
+	void FillPropertyView(libmsstyle::StylePart& part);
 	
-	char* GetValueFromProperty(msstyle::MsStyleProperty& prop) const;
+	char* GetValueFromProperty(libmsstyle::StyleProperty& prop) const;
 
-	void ShowImageFromResource(const msstyle::MsStyleProperty* prop);
+	void ShowImageFromResource(const libmsstyle::StyleProperty* prop);
 	void ShowImageFromFile(wxString& imgPath);
 public:
 	MainWindow(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(800, 600), long style = wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL);

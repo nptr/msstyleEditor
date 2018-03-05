@@ -1,19 +1,21 @@
 #include "UiHelper.h"
-#include "libmsstyle/VisualStyleEnums.h"
+#include "libmsstyle\VisualStyle.h"
+#include "libmsstyle\VisualStyleEnums.h"
+#include "libmsstyle\VisualStyleProps.h"
 
 using namespace libmsstyle;
 
 wxPGProperty* GetWXPropertyFromMsStyleProperty(StyleProperty& prop)
 {
 	char* str = new char[32];
-	const char* propName = VisualStyle::FindPropName(prop.nameID);
+	const char* propName = prop.LookupName();
 
 	switch (prop.typeID)
 	{
 	case IDENTIFIER::FILENAME:
 	{
 		wxIntProperty* p = new wxIntProperty(propName, *wxPGProperty::sm_wxPG_LABEL, prop.variants.imagetype.imageID);
-		p->SetClientData(&prop);
+		p->SetClientData(const_cast<void*>(static_cast<const void*>(&prop)));
 		return p;
 	}
 	case IDENTIFIER::ENUM:
@@ -112,11 +114,11 @@ wxPGProperty* GetWXPropertyFromMsStyleProperty(StyleProperty& prop)
 	}
 }
 
-wxPGChoices* GetEnumsFromMsStyleProperty(msstyle::MsStyleProperty& prop)
+wxPGChoices* GetEnumsFromMsStyleProperty(libmsstyle::StyleProperty& prop)
 {
 	wxPGChoices* choices = new wxPGChoices();
 	int size;
-	msstyle::EnumMap* enums = VisualStyle::GetEnumMapFromNameID(prop.nameID, &size);
+	libmsstyle::EnumMap* enums = VisualStyle::GetEnumMapFromNameID(prop.nameID, &size);
 
 	if (enums == nullptr || size == 0)
 		return nullptr;

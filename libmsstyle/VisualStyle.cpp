@@ -38,9 +38,19 @@ namespace libmsstyle
 	}
 
 
-	const StyleClass* VisualStyle::GetClass(int index)
+	StyleClass* VisualStyle::GetClass(int index)
 	{
 		return &(m_classes.at(index));
+	}
+
+	Platform VisualStyle::GetCompatiblePlatform() const
+	{
+		return m_stylePlatform;
+	}
+
+	std::string VisualStyle::GetPath() const
+	{
+		return m_stylePath;
 	}
 
 	void VisualStyle::Load(const std::string& path)
@@ -224,13 +234,87 @@ namespace libmsstyle
 	}
 
 
-	const char* FindPropertyName(int propertyID)
+	EnumMap* VisualStyle::GetEnumMapFromNameID(int32_t nameID, int32_t* out_size)
 	{
-		auto ret = PROPERTY_MAP.find(propertyID);
-		if (ret != PROPERTY_MAP.end())
-			return ret->second;
-		else return "UNKNOWN";
+		EnumMap* out_map = nullptr;
+		if (nameID == IDENTIFIER::BGTYPE)
+		{
+			out_map = (EnumMap*)&libmsstyle::ENUM_BGTYPE;
+			*out_size = MSSTYLE_ARRAY_LENGTH(libmsstyle::ENUM_BGTYPE);
+		}
+		else if (nameID == IDENTIFIER::BORDERTYPE)
+		{
+			out_map = (EnumMap*)&libmsstyle::ENUM_BORDERTYPE;
+			*out_size = MSSTYLE_ARRAY_LENGTH(libmsstyle::ENUM_BORDERTYPE);
+		}
+		else if (nameID == IDENTIFIER::FILLTYPE)
+		{
+			out_map = (EnumMap*)&libmsstyle::ENUM_FILLTYPE;
+			*out_size = MSSTYLE_ARRAY_LENGTH(libmsstyle::ENUM_FILLTYPE);
+		}
+		else if (nameID == IDENTIFIER::SIZINGTYPE)
+		{
+			out_map = (EnumMap*)&libmsstyle::ENUM_SIZINGTYPE;
+			*out_size = MSSTYLE_ARRAY_LENGTH(libmsstyle::ENUM_SIZINGTYPE);
+		}
+		else if (nameID == IDENTIFIER::HALIGN)
+		{
+			out_map = (EnumMap*)&libmsstyle::ENUM_ALIGNMENT_H;
+			*out_size = MSSTYLE_ARRAY_LENGTH(libmsstyle::ENUM_ALIGNMENT_H);
+		}
+		else if (nameID == IDENTIFIER::CONTENTALIGNMENT)
+		{
+			out_map = (EnumMap*)&libmsstyle::ENUM_ALIGNMENT_H; // same as the real contentalignment..
+			*out_size = MSSTYLE_ARRAY_LENGTH(libmsstyle::ENUM_ALIGNMENT_H);
+		}
+		else if (nameID == IDENTIFIER::VALIGN)
+		{
+			out_map = (EnumMap*)&libmsstyle::ENUM_ALIGNMENT_V;
+			*out_size = MSSTYLE_ARRAY_LENGTH(libmsstyle::ENUM_ALIGNMENT_V);
+		}
+		else if (nameID == IDENTIFIER::OFFSETTYPE)
+		{
+			out_map = (EnumMap*)&libmsstyle::ENUM_OFFSET;
+			*out_size = MSSTYLE_ARRAY_LENGTH(libmsstyle::ENUM_OFFSET);
+		}
+		else if (nameID == IDENTIFIER::IMAGELAYOUT)
+		{
+			out_map = (EnumMap*)&libmsstyle::ENUM_IMAGELAYOUT;
+			*out_size = MSSTYLE_ARRAY_LENGTH(libmsstyle::ENUM_IMAGELAYOUT);
+		}
+		else if (nameID == IDENTIFIER::ICONEFFECT)
+		{
+			out_map = (EnumMap*)&libmsstyle::ENUM_ICONEFFECT;
+			*out_size = MSSTYLE_ARRAY_LENGTH(libmsstyle::ENUM_ICONEFFECT);
+		}
+		else if (nameID == IDENTIFIER::GLYPHTYPE)
+		{
+			out_map = (EnumMap*)&libmsstyle::ENUM_GLYPHTYPE;
+			*out_size = MSSTYLE_ARRAY_LENGTH(libmsstyle::ENUM_GLYPHTYPE);
+		}
+		else if (nameID == IDENTIFIER::IMAGESELECTTYPE)
+		{
+			out_map = (EnumMap*)&libmsstyle::ENUM_IMAGESELECT;
+			*out_size = MSSTYLE_ARRAY_LENGTH(libmsstyle::ENUM_IMAGESELECT);
+		}
+		else if (nameID == IDENTIFIER::GLYPHFONTSIZINGTYPE)
+		{
+			out_map = (EnumMap*)&libmsstyle::ENUM_GLYPHFONTSCALING;
+			*out_size = MSSTYLE_ARRAY_LENGTH(libmsstyle::ENUM_GLYPHFONTSCALING);
+		}
+		else if (nameID == IDENTIFIER::TRUESIZESCALINGTYPE)
+		{
+			out_map = (EnumMap*)&libmsstyle::ENUM_TRUESIZESCALING;
+			*out_size = MSSTYLE_ARRAY_LENGTH(libmsstyle::ENUM_TRUESIZESCALING);
+		}
+		else
+		{
+			*out_size = 0;
+		}
+
+		return out_map;
 	}
+
 
 	const PartMap FindParts(const char* className, Platform platform)
 	{
@@ -428,4 +512,25 @@ namespace libmsstyle
 		return m;
 	}
 
+
+	void VisualStyle::UpdateImageResource(const StyleProperty* prop, const wchar_t* newFilePath)
+	{
+		assert(prop != nullptr);
+
+		int len = lstrlenW(newFilePath);
+		wchar_t* newStr = new wchar_t[len + 1];
+		lstrcpyW(newStr, newFilePath);
+
+		imageReplaceQueue[prop] = newStr;
+	}
+
+	const wchar_t* VisualStyle::IsReplacementImageQueued(const StyleProperty* prop) const
+	{
+		auto res = imageReplaceQueue.find(prop);
+		if (res != imageReplaceQueue.end())
+		{
+			return res->second;
+		}
+		else return NULL;
+	}
 }

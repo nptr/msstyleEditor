@@ -17,7 +17,7 @@ namespace libmsstyle
 
 		StyleState* AddState(const StyleState& state);
 		int GetStateCount();
-		const StyleState* GetState(int index);
+		StyleState* GetState(int index);
 		StyleState* FindState(int stateId);
 
 		int32_t partID;

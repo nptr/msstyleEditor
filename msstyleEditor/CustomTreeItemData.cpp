@@ -2,7 +2,7 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-PropClassTreeItemData::PropClassTreeItemData(msstyle::MsStyleClass* classPtr)
+PropClassTreeItemData::PropClassTreeItemData(libmsstyle::StyleClass* classPtr)
 {
 	propClass = classPtr;
 }
@@ -12,14 +12,14 @@ PropClassTreeItemData::~PropClassTreeItemData()
 {
 }
 
-msstyle::MsStyleClass* PropClassTreeItemData::GetClass()
+libmsstyle::StyleClass* PropClassTreeItemData::GetClass()
 {
 	return propClass;
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////
-PartTreeItemData::PartTreeItemData(msstyle::MsStylePart* partptr)
+PartTreeItemData::PartTreeItemData(libmsstyle::StylePart* partptr)
 {
 	part = partptr;
 }
@@ -29,14 +29,14 @@ PartTreeItemData::~PartTreeItemData()
 
 }
 
-msstyle::MsStylePart* PartTreeItemData::GetMsStylePart()
+libmsstyle::StylePart* PartTreeItemData::GetMsStylePart()
 {
 	return part;
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////
-PropTreeItemData::PropTreeItemData(msstyle::MsStyleProperty* propPtr)
+PropTreeItemData::PropTreeItemData(libmsstyle::StyleProperty* propPtr)
 {
 	property = propPtr;
 }
@@ -46,7 +46,7 @@ PropTreeItemData::~PropTreeItemData()
 
 }
 
-msstyle::MsStyleProperty* PropTreeItemData::GetMSStyleProp()
+libmsstyle::StyleProperty* PropTreeItemData::GetMSStyleProp()
 {
 	return property;
 }

@@ -94,8 +94,9 @@ namespace libmsstyle
 
 		bool IsPropertyValid();
 		int GetPropertySize();
+		const char* LookupName();
 
-		void UpdateImage(int imageID);
+		void UpdateImageLink(int imageID);
 		void UpdateInteger(int intVal);
 		void UpdateSize(int size);
 		void UpdateEnum(int enumVal);
@@ -105,7 +106,6 @@ namespace libmsstyle
 		void UpdateMargin(int left, int top, int right, int bottom);
 		void UpdatePosition(int x, int y);
 		void UpdateFont(int fontID);
-		void UpdateImage(const wchar_t* newFilePath);
 	};
 
 }

@@ -26,7 +26,7 @@ namespace libmsstyle
 	}
 
 
-	const StyleState* StylePart::GetState(int index)
+	StyleState* StylePart::GetState(int index)
 	{
 		return &(m_states.at(index));
 	}

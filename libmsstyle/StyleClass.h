@@ -18,7 +18,7 @@ namespace libmsstyle
 		StylePart* AddPart(const StylePart& part);
 
 		int GetPartCount();
-		const StylePart* GetPart(int index);
+		StylePart* GetPart(int index);
 		StylePart* FindPart(int partId);
 
 		int32_t classID;

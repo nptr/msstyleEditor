@@ -6,6 +6,8 @@
 #include "StyleProperty.h"
 
 #include "VisualStyleParts.h"
+#include "VisualStyleEnums.h"
+#include "VisualStyleProps.h"
 
 #include "ResourceUtil.h"
 
@@ -23,18 +25,34 @@ namespace libmsstyle
 		WIN10
 	};
 
+	struct ResourceItem
+	{
+		const void* data;
+		unsigned long size;
+	};
+
 	class VisualStyle
 	{
 	public:
 		VisualStyle();
 		~VisualStyle();
 
-		const StyleClass* GetClass(int index);
+		StyleClass* GetClass(int index);
 		int GetClassCount();
 
 		void Load(const std::string& path);
 		void Save(const std::string& path);
 
+		Platform GetCompatiblePlatform() const;
+		std::string GetPath() const;
+
+		ResourceItem GetResourceById();
+
+		void UpdateImageResource(const StyleProperty* prop, const std::string& newFilePath);
+		std::string IsReplacementImageQueued(const StyleProperty* prop) const;
+
+
+		static EnumMap* GetEnumMapFromNameID(int32_t nameID, int32_t* out_size);
 
 	private:
 		void LoadClassmap(Resource classResource);

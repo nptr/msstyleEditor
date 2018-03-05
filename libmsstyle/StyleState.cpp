@@ -27,13 +27,13 @@ namespace libmsstyle
 	}
 
 
-	int StyleState::GetPropertyCount()
+	int StyleState::GetPropertyCount() const
 	{
 		return m_properties.size();
 	}
 
 
-	const StyleProperty* StyleState::GetProperty(int index)
+	StyleProperty* StyleState::GetProperty(int index) const
 	{
 		return m_properties[index];
 	}

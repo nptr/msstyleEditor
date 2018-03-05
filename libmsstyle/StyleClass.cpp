@@ -24,7 +24,7 @@ namespace libmsstyle
 		return m_parts.size();
 	}
 
-	const StylePart* StyleClass::GetPart(int index)
+	StylePart* StyleClass::GetPart(int index)
 	{
 		return &(m_parts.at(index));
 	}

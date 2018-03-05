@@ -80,7 +80,16 @@ namespace libmsstyle
 	}
 
 
-	void StyleProperty::UpdateImage(int imageID)
+	const char* StyleProperty::LookupName()
+	{
+		auto ret = libmsstyle::PROPERTY_MAP.find(nameID);
+		if (ret != libmsstyle::PROPERTY_MAP.end())
+			return ret->second;
+		else return "UNKNOWN";
+	}
+
+
+	void StyleProperty::UpdateImageLink(int imageID)
 	{
 		variants.imagetype.imageID = imageID;
 	}
@@ -138,10 +147,4 @@ namespace libmsstyle
 	{
 		variants.fonttype.fontID = fontID;
 	}
-
-	void StyleProperty::UpdateImage(const wchar_t* newFilePath)
-	{
-
-	}
-
 }

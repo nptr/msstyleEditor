@@ -16,10 +16,11 @@
 
 #include <shlobj.h> // SHGetKnownFolderPath()
 
+#include "libmsstyle/VisualStyle.h"
 #include "Exporter.h"
 #include "UxthemeUndocumented.h"
 
-using namespace msstyle;
+using namespace libmsstyle;
 
 
 MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style) : wxFrame(parent, id, title, pos, size, style)
@@ -168,12 +169,9 @@ void MainWindow::OnFileSaveMenuClicked(wxCommandEvent& event)
 	if (saveFileDialog.ShowModal() == wxID_CANCEL)
 		return;
 
-	wchar_t newPath[256]; // max path lenght for pretty much every FS
-	lstrcpyW(newPath, (wchar_t*)saveFileDialog.GetPath().wc_str());
-
 	try
 	{
-		currentStyle->Save(newPath);
+		currentStyle->Save(saveFileDialog.GetPath().ToStdString());
 	}
 	catch (std::runtime_error err)
 	{
@@ -208,10 +206,6 @@ void MainWindow::OnThemeApply(wxCommandEvent& event)
 	if (currentStyle == nullptr)
 		return;
 
-	const wchar_t* file = currentStyle->GetFileName();
-	if (file == nullptr)
-		return;
-
 	bool needConfirmation = false;
 	OSVERSIONINFO version;
 	ZeroMemory(&version, sizeof(OSVERSIONINFO));
@@ -220,26 +214,26 @@ void MainWindow::OnThemeApply(wxCommandEvent& event)
 #pragma warning( disable : 4996 )
 	GetVersionEx(&version);
 
-	msstyle::Platform styleplatform = currentStyle->GetCompatiblePlatform();
+	libmsstyle::Platform styleplatform = currentStyle->GetCompatiblePlatform();
 
 	if (version.dwMajorVersion == 6 &&
 		version.dwMinorVersion == 1 &&
-		styleplatform != msstyle::Platform::WIN7)
+		styleplatform != libmsstyle::Platform::WIN7)
 	{
 		needConfirmation = true;
 	}
 
 	if (version.dwMajorVersion == 6 &&
 		version.dwMinorVersion >= 2 &&
-		styleplatform != msstyle::Platform::WIN8 &&
-		styleplatform != msstyle::Platform::WIN81)
+		styleplatform != libmsstyle::Platform::WIN8 &&
+		styleplatform != libmsstyle::Platform::WIN81)
 	{
 		needConfirmation = true;
 	}
 
 	if (version.dwMajorVersion == 10 &&
 		version.dwMinorVersion >= 0  &&
-		styleplatform != msstyle::Platform::WIN10)
+		styleplatform != libmsstyle::Platform::WIN10)
 	{
 		needConfirmation = true;
 	}
@@ -250,7 +244,7 @@ void MainWindow::OnThemeApply(wxCommandEvent& event)
 			return;
 	}
 
-	if (msstyle::SetSystemTheme(file, L"NormalColor", L"NormalSize", 0) != S_OK)
+	if (msstyle::SetSystemTheme(currentStyle->GetPath().c_str(), L"NormalColor", L"NormalSize", 0) != S_OK)
 		wxMessageBox(wxT("Failed to apply the theme as the OS rejected it!"), wxT("msstyleEditor"), wxICON_ERROR);
 }
 
@@ -274,7 +268,7 @@ void MainWindow::OnClassViewTreeSelChanged(wxTreeEvent& event)
 	PartTreeItemData* partData = dynamic_cast<PartTreeItemData*>(treeItemData);
 	if (partData != nullptr)
 	{
-		MsStylePart* part = partData->GetMsStylePart();
+		StylePart* part = partData->GetMsStylePart();
 		statusBar->SetStatusText(wxString::Format("Part ID: %d", part->partID));
 		FillPropertyView(*part);
 		return;
@@ -308,7 +302,7 @@ void MainWindow::OnClassViewTreeSelChanged(wxTreeEvent& event)
 void MainWindow::OnPropertyGridChanging(wxPropertyGridEvent& event)
 {
 	wxPGProperty* tmpProp = event.GetProperty();
-	MsStyleProperty* styleProp = (MsStyleProperty*)tmpProp->GetClientData();
+	StyleProperty* styleProp = (StyleProperty*)tmpProp->GetClientData();
 
 	// Update Data. TODO: Check data for validity!
 	if (styleProp->typeID == IDENTIFIER::FILENAME)
@@ -562,25 +556,29 @@ bool ContainsProperty(const SearchProperties& search, wxTreeItemData* treeItemDa
 	if (partData == nullptr)
 		return false;
 
-	MsStylePart* part = partData->GetMsStylePart();
+	StylePart* part = partData->GetMsStylePart();
 	
-	for (auto stateIt = part->states.begin(); stateIt != part->states.end(); ++stateIt)
+	for (int stateIx = 0; stateIx < part->GetStateCount(); ++stateIx)
 	{
-		for (auto& propIt : stateIt->second->properties)
+		const StyleState* state = part->GetState(stateIx);
+
+		for (int propIx = 0; propIx < state->GetPropertyCount(); ++propIx)
 		{
+			const StyleProperty* prop = state->GetProperty(propIx);
+
 			// if its a property of the desired type, do a comparison
-			if (propIt->typeID != search.type)
+			if (prop->typeID != search.type)
 				continue;
 
 			// comparison
-			switch (propIt->typeID)
+			switch (prop->typeID)
 			{
 				case IDENTIFIER::POSITION:
 				{
 					char propPos[32];
 					sprintf(propPos, "%d,%d",
-						propIt->variants.positiontype.x,
-						propIt->variants.positiontype.y);
+						prop->variants.positiontype.x,
+						prop->variants.positiontype.y);
 
 					std::string tmp = search.value;
 					tmp.erase(std::remove_if(tmp.begin(), tmp.end(), std::isspace), tmp.end());
@@ -592,9 +590,9 @@ bool ContainsProperty(const SearchProperties& search, wxTreeItemData* treeItemDa
 				{
 					char propColor[32];
 					sprintf(propColor, "%d,%d,%d",
-						propIt->variants.colortype.r,
-						propIt->variants.colortype.g,
-						propIt->variants.colortype.b);
+						prop->variants.colortype.r,
+						prop->variants.colortype.g,
+						prop->variants.colortype.b);
 
 					std::string tmp = search.value;
 					tmp.erase(std::remove_if(tmp.begin(), tmp.end(), std::isspace), tmp.end());
@@ -606,10 +604,10 @@ bool ContainsProperty(const SearchProperties& search, wxTreeItemData* treeItemDa
 				{
 					char propMargin[32];
 					sprintf(propMargin, "%d,%d,%d,%d",
-						propIt->variants.margintype.left,
-						propIt->variants.margintype.top,
-						propIt->variants.margintype.right,
-						propIt->variants.margintype.bottom);
+						prop->variants.margintype.left,
+						prop->variants.margintype.top,
+						prop->variants.margintype.right,
+						prop->variants.margintype.bottom);
 
 					std::string tmp = search.value;
 					tmp.erase(std::remove_if(tmp.begin(), tmp.end(), std::isspace), tmp.end());
@@ -621,10 +619,10 @@ bool ContainsProperty(const SearchProperties& search, wxTreeItemData* treeItemDa
 				{
 					char propRect[32];
 					sprintf(propRect, "%d,%d,%d,%d",
-						propIt->variants.recttype.left,
-						propIt->variants.recttype.top,
-						propIt->variants.recttype.right,
-						propIt->variants.recttype.bottom);
+						prop->variants.recttype.left,
+						prop->variants.recttype.top,
+						prop->variants.recttype.right,
+						prop->variants.recttype.bottom);
 
 					std::string tmp = search.value;
 					tmp.erase(std::remove_if(tmp.begin(), tmp.end(), std::isspace), tmp.end());
@@ -637,7 +635,7 @@ bool ContainsProperty(const SearchProperties& search, wxTreeItemData* treeItemDa
 					try
 					{
 						int size = std::stoi(search.value);
-						if (size == propIt->variants.sizetype.size)
+						if (size == prop->variants.sizetype.size)
 							return true;
 					}
 					catch (...) {}
@@ -672,7 +670,7 @@ bool ContainsName(const std::string& str, wxTreeItemData* treeItemData)
 	PropTreeItemData* propData = dynamic_cast<PropTreeItemData*>(treeItemData);
 	if (propData != nullptr)
 	{
-		const char* name = VisualStyle::FindPropName(propData->GetMSStyleProp()->nameID);
+		const char* name = propData->GetMSStyleProp()->LookupName();
 		if (name == nullptr)
 			return false;
 		else return ContainsStringInvariant(std::string(name), str);
@@ -749,9 +747,9 @@ wxTreeItemId MainWindow::FindNext(const SearchProperties& search, wxTreeItemId n
 void MainWindow::OpenStyle(const wxString& file)
 {
 	currentStyle = new VisualStyle();
-	currentStyle->Load(file);
+	currentStyle->Load(file.ToStdString());
 
-	FillClassView(currentStyle->GetClasses());
+	FillClassView();
 
 	imageMenu->Enable(ID_IEXPORT, true);
 	imageMenu->Enable(ID_IREPLACE, true);
@@ -760,7 +758,7 @@ void MainWindow::OpenStyle(const wxString& file)
 	viewMenu->Enable(ID_RESOURCEDLG, true);
 
 
-	this->SetTitle(wxString("msstyleEditor - ") + wxString(currentStyle->GetFileName()));
+	this->SetTitle(wxString("msstyleEditor - ") + wxString(currentStyle->GetPath()));
 }
 
 void MainWindow::CloseStyle()
@@ -780,58 +778,71 @@ void MainWindow::CloseStyle()
 }
 
 
-void MainWindow::FillClassView(const std::unordered_map<int, MsStyleClass*>* classes)
+void MainWindow::FillClassView()
 {
 	classView->Freeze();
 	classView->DeleteAllItems();
 	wxTreeItemId rootNode = classView->AddRoot(wxT("[StyleName]"));
 	
 	// Add classes
-	for (auto& cls : *classes)
+	for (int ci = 0; ci < currentStyle->GetClassCount(); ++ci)
 	{
-		wxTreeItemId classNode = classView->AppendItem(rootNode, cls.second->className, -1, -1, static_cast<wxTreeItemData*>(new PropClassTreeItemData(cls.second)));
+		StyleClass* cls = currentStyle->GetClass(ci);
+		wxTreeItemId classNode = classView->AppendItem(rootNode, cls->className, -1, -1, static_cast<wxTreeItemData*>(new PropClassTreeItemData(cls)));
 
 		// Add parts
-		for (auto& part : cls.second->parts)
+		for (int pi = 0; pi < cls->GetPartCount(); ++pi)
 		{
-			wxTreeItemId partNode = classView->AppendItem(classNode, part.second->partName, -1, -1, static_cast<wxTreeItemData*>(new PartTreeItemData(part.second)));
+			StylePart* part = cls->GetPart(pi);
+			wxTreeItemId partNode = classView->AppendItem(classNode, part->partName, -1, -1, static_cast<wxTreeItemData*>(new PartTreeItemData(part)));
 
 			// Add images
-			for (auto& state : part.second->states)
+			for (int si = 0; si < part->GetStateCount(); ++si)
 			{
-				for (auto& prop : state.second->properties)
+				StyleState* state = part->GetState(si);
+
+				// Add properties
+				for (int pri = 0; pri < state->GetPropertyCount(); ++pri)
 				{
+					StyleProperty* prop = state->GetProperty(pri);
+
+					// Add images
 					if (prop->typeID == IDENTIFIER::FILENAME || prop->typeID == IDENTIFIER::DISKSTREAM)
 					{
-						const char* propName = VisualStyle::FindPropName(prop->nameID); // propnames have to be looked up, but thats fast
+						const char* propName = prop->LookupName(); // propnames have to be looked up, but thats fast
 						classView->AppendItem(partNode, propName, -1, -1, static_cast<wxTreeItemData*>(new PropTreeItemData(prop)));
 					}
 				}
 			}
 		}
+
 	}
+
 	classView->SortChildren(rootNode);
 	classView->Thaw();
 }
 
-void MainWindow::FillPropertyView(MsStylePart& part)
+void MainWindow::FillPropertyView(StylePart& part)
 {
 	propView->Clear();
 
-	for (auto& state : part.states)
+	for (int si = 0; si < part.GetStateCount(); ++si)
 	{
-		wxPropertyCategory* category = new wxPropertyCategory(state.second->stateName);
-		for (auto& prop : state.second->properties)
+		const StyleState* state = part.GetState(si);
+		wxPropertyCategory* category = new wxPropertyCategory(state->stateName);
+		
+		for (int pi = 0; pi < part.GetStateCount(); ++pi)
 		{
+			const StyleProperty* prop = state->GetProperty(pi);
 			category->AppendChild(GetWXPropertyFromMsStyleProperty(*prop));
 		}
-
+		
 		propView->Append(category);
 	}
 }
 
 
-void MainWindow::ShowImageFromResource(const MsStyleProperty* prop)
+void MainWindow::ShowImageFromResource(const StyleProperty* prop)
 {
 	if (prop->typeID == IDENTIFIER::FILENAME)
 		selectedImage = currentStyle->GetResource(MAKEINTRESOURCEA(prop->variants.imagetype.imageID), "IMAGE");

@@ -18,8 +18,8 @@ namespace libmsstyle
 		StyleProperty* AddProperty(StyleProperty* prop);
 
 		void RemoveProperty(int index);
-		int GetPropertyCount();
-		const StyleProperty* GetProperty(int index);
+		int GetPropertyCount() const;
+		StyleProperty* GetProperty(int index) const;
 
 		int32_t stateID;
 		std::string stateName;
