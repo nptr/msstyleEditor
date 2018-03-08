@@ -281,4 +281,12 @@ namespace libmsstyle
 		ATLASINPUTIMAGE = 8001,
 		ATLASRECT = 8002
 	};
+
+	enum Platform
+	{
+		WIN7,
+		WIN8,
+		WIN81,
+		WIN10
+	};
 }

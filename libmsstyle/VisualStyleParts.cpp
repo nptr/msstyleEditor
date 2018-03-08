@@ -8,7 +8,7 @@
 
 namespace libmsstyle
 {
-	const NameMap PARTS_BUTTON[] =
+	const PartMap PARTS_BUTTON[] =
 	{
 		{ 0, "Common Properties", VS_STATE_NONE },
 		{ 1, "PUSHBUTTON", VS_STATE(STATES_PUSHBUTTON) },
@@ -20,7 +20,7 @@ namespace libmsstyle
 		{ 7, "COMMANDLINKGLYPH", VS_STATE(STATES_COMMANDLINKGLYPHS) },
 	};
 
-	const NameMap PARTS_COMBOBOX[] =
+	const PartMap PARTS_COMBOBOX[] =
 	{
 		{ 0, "Common Properties", VS_STATE_NONE },
 		{ 1, "DROPDOWNBUTTON", VS_STATE_NONE },
@@ -33,7 +33,7 @@ namespace libmsstyle
 		{ 8, "CUEBANNER", VS_STATE(STATES_CB_CUEBANNER) },
 	};
 
-	const NameMap PARTS_CONTROLPANEL[] =
+	const PartMap PARTS_CONTROLPANEL[] =
 	{
 		{ 0, "Common Properties", VS_STATE_NONE },
 		{ 1, "NAVIGATIONPANE", VS_STATE_NONE },
@@ -57,7 +57,7 @@ namespace libmsstyle
 		{ 19, "BODYTITLE", VS_STATE_NONE },
 	};
 
-	const NameMap PARTS_EXPLORERBAR[] =
+	const PartMap PARTS_EXPLORERBAR[] =
 	{
 		{ 0, "Common Properties", VS_STATE_NONE },
 		{ 1, "HEADERBACKGROUND", VS_STATE_NONE },
@@ -74,7 +74,7 @@ namespace libmsstyle
 		{ 12, "SPECIALGROUPHEAD", VS_STATE_NONE },
 	};
 
-	const NameMap PARTS_LISTBOX[] =
+	const PartMap PARTS_LISTBOX[] =
 	{
 		{ 0, "Common Properties", VS_STATE_NONE },
 		{ 1, "BORDER_HSCROLL", VS_STATE(STATES_LISTBOX_SCROLL) },
@@ -84,7 +84,7 @@ namespace libmsstyle
 		{ 5, "ITEM", VS_STATE(STATES_LISTBOX_ITEMS) },
 	};
 
-	const NameMap PARTS_LISTVIEW[] =
+	const PartMap PARTS_LISTVIEW[] =
 	{
 		{ 0, "Common Properties", VS_STATE_NONE },
 		{ 1, "LISTITEM", VS_STATE(STATES_LISTVIEW_ITEMS) },
@@ -99,7 +99,7 @@ namespace libmsstyle
 		{ 10, "COLUMNDETAIL", VS_STATE_NONE },
 	};
 
-	const NameMap PARTS_MENU[] =
+	const PartMap PARTS_MENU[] =
 	{
 		{ 0, "Common Properties", VS_STATE_NONE },
 		{ 1, "MENUITEM", VS_STATE_NONE },
@@ -124,7 +124,7 @@ namespace libmsstyle
 		{ 20, "SYSTEMRESTORE", VS_STATE(STATES_MENU_SYSTEM_GENERAL) },
 	};
 
-	const NameMap PARTS_TREEVIEW[] =
+	const PartMap PARTS_TREEVIEW[] =
 	{
 		{ 0, "Common Properties", VS_STATE_NONE },
 		{ 1, "TREEITEM", VS_STATE(STATES_TREEVIEW_ITEM) },
@@ -133,7 +133,7 @@ namespace libmsstyle
 		{ 4, "HOTGLYPH", VS_STATE(STATES_TREEVIEW_GLYPH) },
 	};
 
-	const NameMap PARTS_WINDOW[] =
+	const PartMap PARTS_WINDOW[] =
 	{
 		{ 0, "Common Properties", VS_STATE_NONE },
 		{ 1, "CAPTION", VS_STATE(STATES_WINDOW_CAPTION_GEN) },
@@ -176,7 +176,7 @@ namespace libmsstyle
 		{ 38, "FRAME", VS_STATE(STATES_WINDOW_FRAME_GEN) },
 	};
 
-	const NameMap PARTS_DWMWINDOW_WIN7[] =
+	const PartMap PARTS_DWMWINDOW_WIN7[] =
 	{
 		{ 0, "Common Properties", VS_STATE_NONE },
 		{ 1, "FRAMEBOTTOM", VS_STATE(STATES_WINDOW_FRAME_GEN) },
@@ -253,7 +253,7 @@ namespace libmsstyle
 	};
 
 	// Incomplete and maybe incorrect list of parts for Win 8.1
-	const NameMap PARTS_DWMWINDOW_WIN81[] =
+	const PartMap PARTS_DWMWINDOW_WIN81[] =
 	{
 		{ 0, "Common Properties", VS_STATE_NONE },
 		{ 1, "FRAMEBOTTOM", VS_STATE(STATES_WINDOW_FRAME_GEN) },
@@ -308,7 +308,7 @@ namespace libmsstyle
 		{ 50, "FRAMEBOTTOM_NOSHADOW", VS_STATE(STATES_WINDOW_FRAME_GEN) },
 	};
 
-	const NameMap PARTS_EDIT[] =
+	const PartMap PARTS_EDIT[] =
 	{
 		{ 0, "Common Properties", VS_STATE_NONE },
 		{ 1, "EDITTEXT", VS_STATE(STATES_EDITTEXT) },
@@ -322,7 +322,7 @@ namespace libmsstyle
 		{ 9, "EDITBORDER_HVSCROLL", VS_STATE(STATES_EDITTEXT_GENERAL) },
 	};
 
-	const NameMap PARTS_TASKDIALOG[] =
+	const PartMap PARTS_TASKDIALOG[] =
 	{
 		{ 0, "Common Properties", VS_STATE_NONE },
 		{ 1, "PRIMARYPANEL", VS_STATE_NONE },
@@ -348,7 +348,7 @@ namespace libmsstyle
 		{ 21, "RADIOBUTTONPANE", VS_STATE_NONE },
 	};
 
-	const NameMap PARTS_HEADER[] =
+	const PartMap PARTS_HEADER[] =
 	{
 		{ 0, "Common Properties", VS_STATE_NONE },
 		{ 1, "HEADERITEM", VS_STATE(STATES_HEADER_ITEMSTATES) },
@@ -360,7 +360,7 @@ namespace libmsstyle
 		{ 7, "HEADEROVERFLOW", VS_STATE(STATES_HEADEROVERFLOWSTATES) },
 	};
 
-	const NameMap PARTS_REBAR[] =
+	const PartMap PARTS_REBAR[] =
 	{
 		{ 0, "Common Properties", VS_STATE_NONE },
 		{ 1, "GRIPPER", VS_STATE_NONE },
@@ -373,7 +373,7 @@ namespace libmsstyle
 		{ 8, "SPLITTERVERT", VS_STATE(STATES_REBAR_GENERAL) },
 	};
 
-	const NameMap PARTS_AEROWIZARD[] =
+	const PartMap PARTS_AEROWIZARD[] =
 	{
 		{ 0, "Common Properties", VS_STATE_NONE },
 		{ 1, "TITLEBAR", VS_STATE_NONE },
@@ -383,7 +383,7 @@ namespace libmsstyle
 		{ 5, "BUTTON", VS_STATE_NONE },
 	};
 
-	const NameMap PARTS_PROGRESS[] =
+	const PartMap PARTS_PROGRESS[] =
 	{
 		{ 0, "Common Properties", VS_STATE_NONE },
 		{ 1, "BAR", VS_STATE_NONE },
@@ -400,7 +400,7 @@ namespace libmsstyle
 		{ 12, "TRANSPARENTBARVERT", VS_STATE(STATES_PROGRESS_TRANSPARENT_GENERAL) },
 	};
 
-	const NameMap PARTS_TRACKBAR[] =
+	const PartMap PARTS_TRACKBAR[] =
 	{
 		{ 0, "Common Properties", VS_STATE_NONE },
 		{ 1, "TRACK", VS_STATE(STATES_TRACKBAR_GENERAL) },
@@ -415,7 +415,7 @@ namespace libmsstyle
 		{ 10, "TICSVERT", VS_STATE(STATES_TRACKBAR_GENERAL) },
 	};
 
-	const NameMap PARTS_TAB[] =
+	const PartMap PARTS_TAB[] =
 	{
 		{ 0, "Common Properties", VS_STATE_NONE },
 		{ 1, "TABITEM", VS_STATE(STATES_TABITEM_GENERAL) },
@@ -431,7 +431,7 @@ namespace libmsstyle
 		{ 11, "AEROWIZARDBODY", VS_STATE_NONE },
 	};
 
-	const NameMap PARTS_TOOLTIP[] =
+	const PartMap PARTS_TOOLTIP[] =
 	{
 		{ 0, "Common Properties", VS_STATE_NONE },
 		{ 1, "STANDARD", VS_STATE(STATES_TOOLTIP_BALLOON_AND_STANDARD) },
@@ -443,7 +443,7 @@ namespace libmsstyle
 		{ 7, "WRENCH", VS_STATE(STATES_TOOLTIP_WRENCH) },
 	};
 
-	const NameMap PARTS_TOOLBAR[] =
+	const PartMap PARTS_TOOLBAR[] =
 	{
 		{ 0, "Common Properties", VS_STATE(STATES_TOOLBARSTYLE) },
 		{ 1, "BUTTON", VS_STATE_NONE },
@@ -455,7 +455,7 @@ namespace libmsstyle
 		{ 7, "DROPDOWNBUTTONGLYPH", VS_STATE_NONE },
 	};
 
-	const NameMap PARTS_TASKBAND[] =
+	const PartMap PARTS_TASKBAND[] =
 	{
 		{ 0, "Common Properties", VS_STATE_NONE },
 		{ 1, "GROUPCONTENT", VS_STATE_NONE },
@@ -463,7 +463,7 @@ namespace libmsstyle
 		{ 3, "FLASHBUTTONGROUPMENU", VS_STATE_NONE },
 	};
 
-	const NameMap PARTS_TASKBAND2[] =
+	const PartMap PARTS_TASKBAND2[] =
 	{
 		{ 0, "Common Properties", VS_STATE_NONE },
 		{ 1, "BARTOP", VS_STATE_NONE },
@@ -482,7 +482,7 @@ namespace libmsstyle
 		{ 14, "TASKITEMGROUPSELECTED", VS_STATE_NONE },
 	};
 
-	const NameMap PARTS_TEXTSTYLE[] =
+	const PartMap PARTS_TEXTSTYLE[] =
 	{
 		{ 0, "Common Properties", VS_STATE_NONE },
 		{ 1, "MAININSTRUCTION", VS_STATE_NONE },
@@ -496,7 +496,7 @@ namespace libmsstyle
 		{ 9, "CONTROLLABEL", VS_STATE(STATES_TEXTSTYLE_CTRLLABEL) },
 	};
 
-	const NameMap PARTS_SPIN[] =
+	const PartMap PARTS_SPIN[] =
 	{
 		{ 0, "Common Properties", VS_STATE_NONE },
 		{ 1, "UP", VS_STATE(STATES_SPIN_GENERAL) },
@@ -505,7 +505,7 @@ namespace libmsstyle
 		{ 4, "DOWNHORZ", VS_STATE(STATES_SPIN_GENERAL) },
 	};
 
-	const NameMap PARTS_SCROLLBAR[] =
+	const PartMap PARTS_SCROLLBAR[] =
 	{
 		{ 0, "Common Properties", VS_STATE(STATES_SCROLLBAR_STYLE) },
 		{ 1, "ARROWBTN", VS_STATE(STATES_SCROLLBAR_ARROWBTN) },
@@ -520,7 +520,7 @@ namespace libmsstyle
 		{ 10, "SIZEBOX", VS_STATE(STATES_SCROLLBAR_SIZEBOX) },
 	};
 
-	const NameMap PARTS_FLYOUT[] =
+	const PartMap PARTS_FLYOUT[] =
 	{
 		{ 0, "Common Properties", VS_STATE_NONE },
 		{ 1, "HEADER", VS_STATE(STATES_FLYOUT_HEADER) },
@@ -533,7 +533,7 @@ namespace libmsstyle
 		{ 8, "LINKHEADER", VS_STATE_NONE },
 	};
 
-	const NameMap PARTS_DRAGDROP[] =
+	const PartMap PARTS_DRAGDROP[] =
 	{
 		{ 0, "Common Properties", VS_STATE_NONE },
 		{ 1, "COPY", VS_STATE(STATES_DND_GENERAL) },
@@ -546,7 +546,7 @@ namespace libmsstyle
 		{ 8, "TEXTBG", VS_STATE_NONE },
 	};
 
-	const NameMap PARTS_DATEPICKER[] =
+	const PartMap PARTS_DATEPICKER[] =
 	{
 		{ 0, "Common Properties", VS_STATE_NONE },
 		{ 1, "DATETEXT", VS_STATE(STATES_DATE_TEXT) },
@@ -554,7 +554,7 @@ namespace libmsstyle
 		{ 3, "SHOWCALENDARBUTTONRIGHT", VS_STATE(STATES_DATE_CALENDERBUTTONRIGHT) },
 	};
 
-	const NameMap PARTS_TASKBAR[] =
+	const PartMap PARTS_TASKBAR[] =
 	{
 		{ 0, "Common Properties", VS_STATE_NONE },
 		{ 1, "BACKGROUNDBOTTOM", VS_STATE_NONE },
@@ -567,7 +567,7 @@ namespace libmsstyle
 		{ 8, "SIZINGBARLEFT", VS_STATE_NONE },
 	};
 
-	const NameMap PARTS_STARTPANEL[] =
+	const PartMap PARTS_STARTPANEL[] =
 	{
 		{ 0, "Common Properties", VS_STATE_NONE },
 		{ 1, "USERPANE", VS_STATE_NONE },
@@ -593,7 +593,7 @@ namespace libmsstyle
 
 	// incomplete list, derived from PARTS_STARTPANEL
 	// with a bit of guessing. Works best for Win7.
-	const NameMap PARTS_STARTPANELPRIV[] =
+	const PartMap PARTS_STARTPANELPRIV[] =
 	{
 		{ 0, "Common Properties", VS_STATE_NONE },
 		{ 1, "Part 1", VS_STATE_NONE },
@@ -636,7 +636,7 @@ namespace libmsstyle
 		{ 38, "LOGOFFSPLITBUTTONLEFT2", VS_STATE_NONE },
 	};
 
-	const NameMap PARTS_MONTHCAL[] =
+	const PartMap PARTS_MONTHCAL[] =
 	{
 		{ 0, "Common Properties", VS_STATE_NONE },
 		{ 1, "BACKGROUND", VS_STATE_NONE },

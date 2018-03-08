@@ -13,18 +13,10 @@
 
 #include <vector>
 #include <string>
+#include <memory>
 
 namespace libmsstyle
 {
-
-	enum Platform
-	{
-		WIN7,
-		WIN8,
-		WIN81,
-		WIN10
-	};
-
 	struct ResourceItem
 	{
 		const void* data;
@@ -46,25 +38,8 @@ namespace libmsstyle
 		Platform GetCompatiblePlatform() const;
 		std::string GetPath() const;
 
-		ResourceItem GetResourceById();
-
-		void UpdateImageResource(const StyleProperty* prop, const std::string& newFilePath);
-		std::string IsReplacementImageQueued(const StyleProperty* prop) const;
-
-
-		static EnumMap* GetEnumMapFromNameID(int32_t nameID, int32_t* out_size);
-
 	private:
-		void LoadClassmap(Resource classResource);
-		void LoadProperties(Resource propResource);
-		Platform DeterminePlatform();
-
-		ModuleHandle m_moduleHandle;
-		Platform m_stylePlatform;
-
-		std::string m_stylePath;
-		std::unordered_map<int32_t, StyleClass> m_classes;
+		class Impl;
+		Impl* impl;
 	};
-
 }
-

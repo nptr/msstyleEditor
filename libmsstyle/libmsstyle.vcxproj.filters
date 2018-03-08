@@ -7,7 +7,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="libmsstyle.h" />
     <ClInclude Include="ResourceUtil.h" />
     <ClInclude Include="StyleClass.h" />
     <ClInclude Include="StylePart.h" />
@@ -21,7 +20,6 @@
     <ClInclude Include="VisualStyleStates.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="libmsstyle.cpp" />
     <ClCompile Include="ResourceUtil.cpp" />
     <ClCompile Include="StyleClass.cpp" />
     <ClCompile Include="StylePart.cpp" />

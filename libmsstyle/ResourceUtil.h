@@ -16,3 +16,4 @@ void CloseModule(ModuleHandle moduleHandle);
 
 Resource GetResource(ModuleHandle moduleHandle, const char* name, const char* type);
 Resource GetResource(ModuleHandle moduleHandle, const wchar_t* name, const wchar_t* type);
+

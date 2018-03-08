@@ -130,7 +130,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="libmsstyle.h" />
     <ClInclude Include="ResourceUtil.h" />
     <ClInclude Include="StringConvert.h" />
     <ClInclude Include="StyleClass.h" />
@@ -144,7 +143,6 @@
     <ClInclude Include="VisualStyleStates.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="libmsstyle.cpp" />
     <ClCompile Include="ResourceUtil.cpp" />
     <ClCompile Include="StyleClass.cpp" />
     <ClCompile Include="StylePart.cpp" />
