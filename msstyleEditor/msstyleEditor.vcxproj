@@ -179,6 +179,7 @@
     <ClInclude Include="SearchDialog.h" />
     <ClInclude Include="SearchDialogListener.h" />
     <ClInclude Include="UiHelper.h" />
+    <ClInclude Include="UxthemeUndocumented.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="msstyleEditor.rc" />

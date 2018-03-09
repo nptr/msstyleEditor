@@ -1,5 +1,7 @@
 #pragma once
 
+#include "VisualStyleParts.h"
+#include "VisualStyleEnums.h"
 #include "VisualStyleDefinitions.h"
 
 namespace libmsstyle

@@ -244,7 +244,9 @@ void MainWindow::OnThemeApply(wxCommandEvent& event)
 			return;
 	}
 
-	if (msstyle::SetSystemTheme(currentStyle->GetPath().c_str(), L"NormalColor", L"NormalSize", 0) != S_OK)
+	std::wstring widePath = UTF8ToWide(currentStyle->GetPath());
+
+	if (uxtheme::SetSystemTheme(widePath.c_str(), L"NormalColor", L"NormalSize", 0) != S_OK)
 		wxMessageBox(wxT("Failed to apply the theme as the OS rejected it!"), wxT("msstyleEditor"), wxICON_ERROR);
 }
 

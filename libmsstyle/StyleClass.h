@@ -3,7 +3,6 @@
 #include "StylePart.h"
 
 #include <string>
-#include <unordered_map>
 #include <stdint.h>
 
 namespace libmsstyle
@@ -25,7 +24,8 @@ namespace libmsstyle
 		std::string className;
 
 	private:
-		std::unordered_map<int32_t, StylePart> m_parts;
+		class Impl;
+		Impl* impl;
 	};
 
 }

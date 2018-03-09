@@ -7,9 +7,9 @@
 
 #include "VisualStyleParts.h"
 #include "VisualStyleEnums.h"
-#include "VisualStyleProps.h"
-
+#include "VisualStyleDefinitions.h"
 #include "ResourceUtil.h"
+#include "Lookup.h"
 
 #include <vector>
 #include <string>
@@ -37,6 +37,8 @@ namespace libmsstyle
 
 		Platform GetCompatiblePlatform() const;
 		std::string GetPath() const;
+
+		ResourceItem GetResourceFromProperty();
 
 	private:
 		class Impl;

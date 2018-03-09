@@ -1,7 +1,11 @@
 #include "UiHelper.h"
 #include "libmsstyle\VisualStyle.h"
 #include "libmsstyle\VisualStyleEnums.h"
-#include "libmsstyle\VisualStyleProps.h"
+#include "libmsstyle\VisualStyleDefinitions.h"
+
+#include <string>
+#include <codecvt>	// codecvt_utf8_utf16
+#include <locale>	// wstring_convert
 
 using namespace libmsstyle;
 
@@ -117,15 +121,27 @@ wxPGProperty* GetWXPropertyFromMsStyleProperty(StyleProperty& prop)
 wxPGChoices* GetEnumsFromMsStyleProperty(libmsstyle::StyleProperty& prop)
 {
 	wxPGChoices* choices = new wxPGChoices();
-	int size;
-	libmsstyle::EnumMap* enums = VisualStyle::GetEnumMapFromNameID(prop.nameID, &size);
 
-	if (enums == nullptr || size == 0)
+	libmsstyle::lookup::EnumList result = libmsstyle::lookup::FindEnums(prop.nameID);
+	if (result.enums == nullptr || result.numEnums == 0)
 		return nullptr;
 
-	for (int i = 0; i < size; ++i){
-		choices->Add(enums[i].value, enums[i].key);
+	for (int i = 0; i < result.numEnums; ++i)
+	{
+		choices->Add(result.enums[i].value, result.enums[i].key);
 	}
 
 	return choices;
+}
+
+std::string WideToUTF8(const std::wstring& str)
+{
+	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> convert;
+	return convert.to_bytes(str);
+}
+
+std::wstring UTF8ToWide(const std::string& str)
+{
+	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> convert;
+	return convert.from_bytes(str);
 }

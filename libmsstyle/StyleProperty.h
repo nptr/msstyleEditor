@@ -2,6 +2,8 @@
 
 #include <stdint.h>
 
+#include "VisualStyleDefinitions.h"
+
 namespace libmsstyle
 {
 
@@ -94,6 +96,9 @@ namespace libmsstyle
 
 		bool IsPropertyValid();
 		int GetPropertySize();
+		
+		IDENTIFIER GetTypeID();
+		IDENTIFIER GetNameID();
 		const char* LookupName();
 
 		void UpdateImageLink(int imageID);
@@ -107,5 +112,4 @@ namespace libmsstyle
 		void UpdatePosition(int x, int y);
 		void UpdateFont(int fontID);
 	};
-
 }

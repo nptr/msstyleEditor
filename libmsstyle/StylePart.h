@@ -3,7 +3,6 @@
 #include "StyleState.h"
 
 #include <string>
-#include <unordered_map>
 #include <stdint.h>
 
 namespace libmsstyle
@@ -24,7 +23,8 @@ namespace libmsstyle
 		std::string partName;
 
 	private:
-		std::unordered_map<int32_t, StyleState> m_states;
+		class Impl;
+		Impl* impl;
 	};
 
 }

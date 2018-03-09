@@ -1,5 +1,5 @@
 #include "StyleProperty.h"
-#include "VisualStyleProps.h"
+#include "VisualStyleDefinitions.h"
 
 using namespace libmsstyle;
 
@@ -77,6 +77,18 @@ namespace libmsstyle
 		default:
 			return 40;
 		}
+	}
+
+
+	IDENTIFIER StyleProperty::GetTypeID()
+	{
+		return static_cast<IDENTIFIER>(typeID);
+	}
+
+
+	IDENTIFIER StyleProperty::GetNameID()
+	{
+		return static_cast<IDENTIFIER>(nameID);
 	}
 
 

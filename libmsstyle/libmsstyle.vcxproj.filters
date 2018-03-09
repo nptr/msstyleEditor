@@ -16,8 +16,9 @@
     <ClInclude Include="StringConvert.h" />
     <ClInclude Include="VisualStyleEnums.h" />
     <ClInclude Include="VisualStyleParts.h" />
-    <ClInclude Include="VisualStyleProps.h" />
     <ClInclude Include="VisualStyleStates.h" />
+    <ClInclude Include="Lookup.h" />
+    <ClInclude Include="VisualStyleDefinitions.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ResourceUtil.cpp" />
@@ -28,7 +29,8 @@
     <ClCompile Include="VisualStyle.cpp" />
     <ClCompile Include="VisualStyleEnums.cpp" />
     <ClCompile Include="VisualStyleParts.cpp" />
-    <ClCompile Include="VisualStyleProps.cpp" />
     <ClCompile Include="VisualStyleStates.cpp" />
+    <ClCompile Include="Lookup.cpp" />
+    <ClCompile Include="VisualStyleDefinitions.cpp" />
   </ItemGroup>
 </Project>

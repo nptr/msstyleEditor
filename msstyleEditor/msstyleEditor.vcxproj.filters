@@ -54,6 +54,7 @@
     <ClInclude Include="CustomTreeItemData.h" />
     <ClInclude Include="Exporter.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="UxthemeUndocumented.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="msstyleEditor.rc" />

@@ -2,7 +2,6 @@
 
 #include "StyleProperty.h"
 
-#include <vector>
 #include <string>
 #include <stdint.h>
 
@@ -25,7 +24,8 @@ namespace libmsstyle
 		std::string stateName;
 
 	private:
-		std::vector<StyleProperty*> m_properties;
+		class Impl;
+		Impl* impl;
 	};
 
 }

@@ -4,7 +4,7 @@
 
 namespace libmsstyle
 {
-	typedef struct
+	typedef struct _EnumMap
 	{
 		int32_t key;
 		const char* value;

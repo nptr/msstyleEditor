@@ -130,6 +130,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Lookup.h" />
     <ClInclude Include="ResourceUtil.h" />
     <ClInclude Include="StringConvert.h" />
     <ClInclude Include="StyleClass.h" />
@@ -139,10 +140,11 @@
     <ClInclude Include="VisualStyle.h" />
     <ClInclude Include="VisualStyleEnums.h" />
     <ClInclude Include="VisualStyleParts.h" />
-    <ClInclude Include="VisualStyleProps.h" />
+    <ClInclude Include="VisualStyleDefinitions.h" />
     <ClInclude Include="VisualStyleStates.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Lookup.cpp" />
     <ClCompile Include="ResourceUtil.cpp" />
     <ClCompile Include="StyleClass.cpp" />
     <ClCompile Include="StylePart.cpp" />
@@ -151,7 +153,7 @@
     <ClCompile Include="VisualStyle.cpp" />
     <ClCompile Include="VisualStyleEnums.cpp" />
     <ClCompile Include="VisualStyleParts.cpp" />
-    <ClCompile Include="VisualStyleProps.cpp" />
+    <ClCompile Include="VisualStyleDefinitions.cpp" />
     <ClCompile Include="VisualStyleStates.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
