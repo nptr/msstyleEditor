@@ -80,13 +80,13 @@ namespace libmsstyle
 	}
 
 
-	IDENTIFIER StyleProperty::GetTypeID()
+	IDENTIFIER StyleProperty::GetTypeID() const
 	{
 		return static_cast<IDENTIFIER>(typeID);
 	}
 
 
-	IDENTIFIER StyleProperty::GetNameID()
+	IDENTIFIER StyleProperty::GetNameID() const
 	{
 		return static_cast<IDENTIFIER>(nameID);
 	}

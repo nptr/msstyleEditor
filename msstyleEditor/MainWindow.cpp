@@ -133,7 +133,6 @@ MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, c
 	propView->SetMarginColour(*wxWHITE);
 
 	// Make sure selected image struct is 0
-	selectedImage = { 0 };
 	currentStyle = nullptr;
 
 	// Looks like the resource has to be on top alphabetically or it wont be used as caption image..
@@ -366,7 +365,7 @@ void MainWindow::OnPropertyGridChanging(wxPropertyGridEvent& event)
 
 void MainWindow::OnImageExportClicked(wxCommandEvent& event)
 {
-	if (selectedImage.size == 0 || selectedImage.data == 0 || selectedImageProp == nullptr)
+	if (selectedImage.GetSize() == 0 || selectedImage.GetData() == 0 || selectedImageProp == nullptr)
 	{
 		wxMessageBox("Select an image first!", "Export Image", wxICON_ERROR);
 		return;
@@ -383,7 +382,7 @@ void MainWindow::OnImageExportClicked(wxCommandEvent& event)
 		return;
 	}
 
-	if (!outputStream.WriteAll(selectedImage.data, selectedImage.size))
+	if (!outputStream.WriteAll(selectedImage.GetData(), selectedImage.GetSize()))
 	{
 		wxLogError("Error while writing to the file!");
 		return;
@@ -846,16 +845,14 @@ void MainWindow::FillPropertyView(StylePart& part)
 
 void MainWindow::ShowImageFromResource(const StyleProperty* prop)
 {
-	if (prop->typeID == IDENTIFIER::FILENAME)
-		selectedImage = currentStyle->GetResource(MAKEINTRESOURCEA(prop->variants.imagetype.imageID), "IMAGE");
-	else if (prop->typeID == IDENTIFIER::DISKSTREAM)
-		selectedImage = currentStyle->GetResource(MAKEINTRESOURCEA(prop->variants.imagetype.imageID), "STREAM");
-	else return;
-
-	wxMemoryInputStream stream(selectedImage.data, selectedImage.size);
-
-	wxImage img(stream, wxBITMAP_TYPE_PNG);
-	imageView->SetImage(img);
+	StyleResource res = currentStyle->GetResourceFromProperty(*prop);
+	if (res.GetData() != nullptr && res.GetSize() != 0)
+	{
+		selectedImage = res;
+		wxMemoryInputStream stream(selectedImage.GetData(), selectedImage.GetSize());
+		wxImage img(stream, wxBITMAP_TYPE_PNG);
+		imageView->SetImage(img);
+	}
 }
 
 void MainWindow::ShowImageFromFile(wxString& imgPath)

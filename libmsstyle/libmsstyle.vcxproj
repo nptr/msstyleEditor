@@ -136,6 +136,7 @@
     <ClInclude Include="StyleClass.h" />
     <ClInclude Include="StylePart.h" />
     <ClInclude Include="StyleProperty.h" />
+    <ClInclude Include="StyleResource.h" />
     <ClInclude Include="StyleState.h" />
     <ClInclude Include="VisualStyle.h" />
     <ClInclude Include="VisualStyleEnums.h" />
@@ -149,6 +150,7 @@
     <ClCompile Include="StyleClass.cpp" />
     <ClCompile Include="StylePart.cpp" />
     <ClCompile Include="StyleProperty.cpp" />
+    <ClCompile Include="StyleResource.cpp" />
     <ClCompile Include="StyleState.cpp" />
     <ClCompile Include="VisualStyle.cpp" />
     <ClCompile Include="VisualStyleEnums.cpp" />

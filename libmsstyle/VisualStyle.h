@@ -4,6 +4,7 @@
 #include "StylePart.h"
 #include "StyleState.h"
 #include "StyleProperty.h"
+#include "StyleResource.h"
 
 #include "VisualStyleParts.h"
 #include "VisualStyleEnums.h"
@@ -17,12 +18,6 @@
 
 namespace libmsstyle
 {
-	struct ResourceItem
-	{
-		const void* data;
-		unsigned long size;
-	};
-
 	class VisualStyle
 	{
 	public:
@@ -38,7 +33,7 @@ namespace libmsstyle
 		Platform GetCompatiblePlatform() const;
 		std::string GetPath() const;
 
-		ResourceItem GetResourceFromProperty();
+		StyleResource GetResourceFromProperty(const StyleProperty& prop);
 
 	private:
 		class Impl;

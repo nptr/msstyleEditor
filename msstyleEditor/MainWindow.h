@@ -36,7 +36,7 @@ private:
 
 	libmsstyle::VisualStyle* currentStyle;
 
-	libmsstyle::EmbRessource selectedImage;
+	libmsstyle::StyleResource selectedImage;
 	const libmsstyle::StyleProperty* selectedImageProp;
 
 protected:

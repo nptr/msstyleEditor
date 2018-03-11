@@ -97,8 +97,8 @@ namespace libmsstyle
 		bool IsPropertyValid();
 		int GetPropertySize();
 		
-		IDENTIFIER GetTypeID();
-		IDENTIFIER GetNameID();
+		IDENTIFIER GetTypeID() const;
+		IDENTIFIER GetNameID() const;
 		const char* LookupName();
 
 		void UpdateImageLink(int imageID);

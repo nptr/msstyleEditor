@@ -19,6 +19,7 @@
     <ClInclude Include="VisualStyleStates.h" />
     <ClInclude Include="Lookup.h" />
     <ClInclude Include="VisualStyleDefinitions.h" />
+    <ClInclude Include="StyleResource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ResourceUtil.cpp" />
@@ -32,5 +33,6 @@
     <ClCompile Include="VisualStyleStates.cpp" />
     <ClCompile Include="Lookup.cpp" />
     <ClCompile Include="VisualStyleDefinitions.cpp" />
+    <ClCompile Include="StyleResource.cpp" />
   </ItemGroup>
 </Project>

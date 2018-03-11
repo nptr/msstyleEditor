@@ -18,7 +18,7 @@ void Exporter::ExportPropertyCSV(const libmsstyle::VisualStyle& style)
 
 }
 
-void Exporter::ExportLogicalStructure(const std::string& path, const libmsstyle::VisualStyle& style)
+void Exporter::ExportLogicalStructure(const std::string& path, libmsstyle::VisualStyle& style)
 {
 	std::ofstream file(path);
 	if (!file.is_open())
@@ -56,29 +56,34 @@ void Exporter::ExportLogicalStructure(const std::string& path, const libmsstyle:
 
 	txt.append("BEGIN STRUCTURE"); txt.append("\n");
 
-	const std::unordered_map<int32_t, libmsstyle::StyleClass*>* classes = style.GetClasses();
+	//const std::unordered_map<int32_t, libmsstyle::StyleClass*>* classes = style.GetClasses();
 
-	for (auto& classIt : *classes)
+	for (int ci = 0; ci < style.GetClassCount(); ++ci)
 	{
-		txt.append("Class: "); txt.append(classIt.second->className);
+		libmsstyle::StyleClass* cls = style.GetClass(ci);
+		txt.append("Class: "); txt.append(cls->className);
 		txt.append("\n");
 
-		for (auto& partIt : classIt.second->parts)
+		for (int pi = 0; pi < cls->GetPartCount(); ++pi)
 		{
-			txt.append("\tPart: "); txt.append(partIt.second->partName);
+			libmsstyle::StylePart* part = cls->GetPart(pi);
+			txt.append("\tPart: "); txt.append(part->partName);
 			txt.append("\n");
 
-			for (auto& stateIt : partIt.second->states)
+			for (int si = 0; si < part->GetStateCount(); ++si)
 			{
-				txt.append("\t\tState: "); txt.append(stateIt.second->stateName);
+				libmsstyle::StyleState* state = part->GetState(si);
+				txt.append("\t\tState: "); txt.append(state->stateName);
 				txt.append("\n");
 
-				for (auto& propIt : stateIt.second->properties)
+				for (int pri = 0; pri < state->GetPropertyCount(); ++pri)
 				{
-					sprintf(buffer, "\t\t\tProp @ 0x%.6x, %s (%s) (%s)"	, &propIt->nameID - (int32_t*)style.GetPropertyBaseAddress()
-																	, msstyle::VisualStyle::FindPropName(propIt->nameID)
-																	, msstyle::VisualStyle::FindPropName(propIt->typeID)
-																	, msstyle::VisualStyle::GetPropertyValueAsString(*propIt).c_str());
+					libmsstyle::StyleProperty* prop = state->GetProperty(pri);
+
+					sprintf(buffer, "\t\t\tProp @ 0x%.6x, %s (%s) (%s)", prop->nameID - (int32_t*)style.GetPropertyBaseAddress()
+						, msstyle::VisualStyle::FindPropName(prop->nameID)
+						, msstyle::VisualStyle::FindPropName(prop->typeID)
+						, msstyle::VisualStyle::GetPropertyValueAsString(*propIt).c_str());
 					txt.append(buffer);
 					txt.append("\n");
 				}

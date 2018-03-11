@@ -36,12 +36,12 @@ namespace libmsstyle
 			m_moduleHandle = OpenModule(path);
 			if (m_moduleHandle != 0)
 			{
-				Resource cmap = GetResource(m_moduleHandle, L"CMAP", L"CMAP");
+				Resource cmap = GetResource(m_moduleHandle, "CMAP", "CMAP");
 				LoadClassmap(cmap);
 
 				m_stylePlatform = DeterminePlatform();
 
-				Resource pmap = GetResource(m_moduleHandle, L"NORMAL", L"VARIANT");
+				Resource pmap = GetResource(m_moduleHandle, "NORMAL", "VARIANT");
 				LoadProperties(pmap);
 			}
 			else throw std::runtime_error("Couldn't open file as PE resource!");
@@ -62,6 +62,23 @@ namespace libmsstyle
 			return m_stylePath;
 		}
 
+		StyleResource GetResourceFromProperty(const StyleProperty& prop)
+		{
+			Resource r;
+
+			if (prop.GetTypeID() == IDENTIFIER::FILENAME)
+			{
+				r = libmsstyle::GetResource(m_moduleHandle, prop.variants.imagetype.imageID, "IMAGE");
+				return StyleResource(r.data, r.size, prop.nameID , StyleResourceType::IMAGE);
+			}
+			else if (prop.GetTypeID() == IDENTIFIER::DISKSTREAM)
+			{
+				r = libmsstyle::GetResource(m_moduleHandle, prop.variants.imagetype.imageID, "STREAM");
+				return StyleResource(r.data, r.size, prop.nameID, StyleResourceType::ATLAS);
+			}
+
+			return StyleResource(nullptr, 0, 0, StyleResourceType::IMAGE);
+		}
 		
 
 		void LoadClassmap(Resource classResource)
@@ -265,6 +282,11 @@ namespace libmsstyle
 	Platform VisualStyle::GetCompatiblePlatform() const
 	{
 		return impl->GetCompatiblePlatform();
+	}
+
+	StyleResource VisualStyle::GetResourceFromProperty(const StyleProperty& prop)
+	{
+		return impl->GetResourceFromProperty(prop);
 	}
 
 	std::string VisualStyle::GetPath() const
