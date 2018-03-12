@@ -31,7 +31,7 @@ namespace libmsstyle
 
 		StylePart* FindPart(int partId)
 		{
-			const auto& res = m_parts.find(partId);
+			const auto res = m_parts.find(partId);
 			if (res != m_parts.end())
 				return &(res->second);
 			else return nullptr;

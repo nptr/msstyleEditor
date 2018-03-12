@@ -80,10 +80,10 @@ void Exporter::ExportLogicalStructure(const std::string& path, libmsstyle::Visua
 				{
 					libmsstyle::StyleProperty* prop = state->GetProperty(pri);
 
-					sprintf(buffer, "\t\t\tProp @ 0x%.6x, %s (%s) (%s)", prop->nameID - (int32_t*)style.GetPropertyBaseAddress()
-						, msstyle::VisualStyle::FindPropName(prop->nameID)
-						, msstyle::VisualStyle::FindPropName(prop->typeID)
-						, msstyle::VisualStyle::GetPropertyValueAsString(*propIt).c_str());
+					sprintf(buffer, "\t\t\tProp %s (%s) (%s)"
+						, prop->LookupName()
+						, prop->LookupTypeName()
+						, prop->GetValueAsString().c_str());
 					txt.append(buffer);
 					txt.append("\n");
 				}

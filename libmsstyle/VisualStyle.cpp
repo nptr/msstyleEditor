@@ -5,19 +5,30 @@
 #include "VisualStyleParts.h"
 #include "VisualStyleDefinitions.h"
 #include "VisualStyleStates.h"
-
+#include <string.h>
 using namespace libmsstyle;
 
 #define MSSTYLE_ARRAY_LENGTH(name) (sizeof(name) / sizeof(name[0]))
 
 namespace libmsstyle
 {
+	struct ResourceHasher
+	{
+		std::size_t operator()(const StyleResource& r) const
+		{
+			return ((std::hash<int>()(r.GetNameID())
+				  ^ (std::hash<int>()(r.GetType()) << 1)) >> 1)
+				  ^ (std::hash<int>()(r.GetSize()) << 1);
+		}
+	};
+
 	class VisualStyle::Impl
 	{
 	public:
 		Impl()
+			: m_propsFound(0)
+			, m_moduleHandle(0)
 		{
-
 		}
 
 		StyleClass* GetClass(int index)
@@ -78,6 +89,25 @@ namespace libmsstyle
 			}
 
 			return StyleResource(nullptr, 0, 0, StyleResourceType::IMAGE);
+		}
+
+
+		std::string GetQueuedResourceUpdate(int nameId, StyleResourceType type)
+		{
+			StyleResource key(nullptr, 0, nameId, type);
+			auto res = m_resourceUpdates.find(key);
+			if (res != m_resourceUpdates.end())
+			{
+				return res->second;
+			}
+			else return std::string();
+		}
+
+
+		void QueueResourceUpdate(int nameId, StyleResourceType type, std::string pathToNew)
+		{
+			StyleResource key(nullptr, 0, nameId, type);
+			m_resourceUpdates[key] = pathToNew;
 		}
 		
 
@@ -189,6 +219,7 @@ namespace libmsstyle
 
 					// problem: i saved just ptrs before. now i need real data!!
 					state->AddProperty(tmpProp);
+					m_propsFound++;
 					prevprop = tmpProp;
 					// the sizes are known, so jump right to the next prop
 					dataPtr += tmpProp->GetPropertySize();
@@ -240,12 +271,13 @@ namespace libmsstyle
 		}
 
 		
-
+		int m_propsFound;
 		ModuleHandle m_moduleHandle;
 		Platform m_stylePlatform;
 
 		std::string m_stylePath;
 		std::unordered_map<int32_t, StyleClass> m_classes;
+		std::unordered_map<StyleResource, std::string, ResourceHasher> m_resourceUpdates;
 	};
 
 
@@ -284,9 +316,24 @@ namespace libmsstyle
 		return impl->GetCompatiblePlatform();
 	}
 
+	int VisualStyle::GetPropertyCount() const
+	{
+		return impl->m_propsFound;
+	}
+
 	StyleResource VisualStyle::GetResourceFromProperty(const StyleProperty& prop)
 	{
 		return impl->GetResourceFromProperty(prop);
+	}
+
+	std::string VisualStyle::GetQueuedResourceUpdate(int nameId, StyleResourceType type)
+	{
+		return impl->GetQueuedResourceUpdate(nameId, type);
+	}
+
+	void VisualStyle::QueueResourceUpdate(int nameId, StyleResourceType type, const std::string& newResource)
+	{
+		return impl->QueueResourceUpdate(nameId, type, newResource);
 	}
 
 	std::string VisualStyle::GetPath() const

@@ -280,9 +280,16 @@ void MainWindow::OnClassViewTreeSelChanged(wxTreeEvent& event)
 	if (propData != nullptr)
 	{
 		selectedImageProp = propData->GetMSStyleProp();
+		
+		StyleResourceType type;
+		if (selectedImageProp->GetTypeID() == IDENTIFIER::FILENAME)
+			type = StyleResourceType::IMAGE;
+		else if (selectedImageProp->GetTypeID() == IDENTIFIER::DISKSTREAM)
+			type = StyleResourceType::ATLAS;
+		else type == StyleResourceType::NONE;
 
-		const wchar_t* file = currentStyle->IsReplacementImageQueued(propData->GetMSStyleProp());
-		if (file != nullptr)
+		std::string file = currentStyle->GetQueuedResourceUpdate(selectedImageProp->variants.imagetype.imageID, type);
+		if (!file.empty())
 		{
 			wxString tmpFile(file);
 			ShowImageFromFile(tmpFile);
@@ -403,7 +410,15 @@ void MainWindow::OnImageReplaceClicked(wxCommandEvent& event)
 	if (openFileDialog.ShowModal() == wxID_CANCEL)
 		return;
 
-	currentStyle->UpdateImageResource(selectedImageProp, openFileDialog.GetPath().wc_str());
+	// TODO: ugly
+	StyleResourceType tp;
+	if (selectedImageProp->GetTypeID() == IDENTIFIER::FILENAME)
+		tp = StyleResourceType::IMAGE;
+	else if (selectedImageProp->GetTypeID() == IDENTIFIER::DISKSTREAM)
+		tp = StyleResourceType::ATLAS;
+	else tp = StyleResourceType::NONE;
+
+	currentStyle->QueueResourceUpdate(selectedImageProp->variants.imagetype.imageID, tp, openFileDialog.GetPath().ToStdString());
 }
 
 void MainWindow::OnImageViewContextMenuTriggered(wxContextMenuEvent& event)
@@ -834,7 +849,7 @@ void MainWindow::FillPropertyView(StylePart& part)
 		
 		for (int pi = 0; pi < part.GetStateCount(); ++pi)
 		{
-			const StyleProperty* prop = state->GetProperty(pi);
+			StyleProperty* prop = state->GetProperty(pi);
 			category->AppendChild(GetWXPropertyFromMsStyleProperty(*prop));
 		}
 		

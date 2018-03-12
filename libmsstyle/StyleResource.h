@@ -4,6 +4,7 @@ namespace libmsstyle
 {
 	enum StyleResourceType
 	{
+		NONE,
 		IMAGE,	// image
 		ATLAS	// image atlas
 	};
@@ -15,10 +16,12 @@ namespace libmsstyle
 		StyleResource(const void* data, int size, int nameId, StyleResourceType type);
 		~StyleResource();
 
-		int GetNameID();
-		StyleResourceType GetType();
-		const char* GetData();
-		int GetSize();
+		bool operator==(const StyleResource& rhs) const;
+
+		int GetNameID() const;
+		StyleResourceType GetType() const;
+		const char* GetData() const;
+		int GetSize() const;
 
 	private:
 		class Impl;

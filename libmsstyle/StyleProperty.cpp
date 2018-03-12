@@ -1,5 +1,8 @@
 #include "StyleProperty.h"
 #include "VisualStyleDefinitions.h"
+#include <string.h>
+#include "StringConvert.h"
+#include "Lookup.h"
 
 using namespace libmsstyle;
 
@@ -92,7 +95,7 @@ namespace libmsstyle
 	}
 
 
-	const char* StyleProperty::LookupName()
+	const char* StyleProperty::LookupName() const
 	{
 		auto ret = libmsstyle::PROPERTY_MAP.find(nameID);
 		if (ret != libmsstyle::PROPERTY_MAP.end())
@@ -100,6 +103,13 @@ namespace libmsstyle
 		else return "UNKNOWN";
 	}
 
+	const char* StyleProperty::LookupTypeName() const
+	{
+		auto ret = libmsstyle::PROPERTY_MAP.find(typeID);
+		if (ret != libmsstyle::PROPERTY_MAP.end())
+			return ret->second;
+		else return "UNKNOWN";
+	}
 
 	void StyleProperty::UpdateImageLink(int imageID)
 	{
@@ -158,5 +168,83 @@ namespace libmsstyle
 	void StyleProperty::UpdateFont(int fontID)
 	{
 		variants.fonttype.fontID = fontID;
+	}
+
+	std::string StyleProperty::GetValueAsString() const
+	{
+		char textbuffer[64];
+		switch (typeID)
+		{
+		case IDENTIFIER::ENUM:
+		{
+			const char* enumStr = lookup::GetEnumAsString(nameID, variants.enumtype.enumvalue);
+			if (enumStr != nullptr)
+				return std::string(enumStr);
+			else return std::string("UNKNOWN ENUM");
+		} break;
+		case IDENTIFIER::STRING:
+		{
+			return WideToUTF8(&variants.texttype.firstchar);
+		} break;
+		case IDENTIFIER::INT:
+		{
+			return std::to_string(variants.inttype.value);
+		} break;
+		case IDENTIFIER::BOOL:
+		{
+			if (variants.booltype.boolvalue > 0)
+				return std::string("true");
+			else return std::string("false");
+		} break;
+		case IDENTIFIER::COLOR:
+		{
+			sprintf(textbuffer, "%d, %d, %d", variants.colortype.r, variants.colortype.g, variants.colortype.b);
+			return std::string(textbuffer);
+		} break;
+		case IDENTIFIER::MARGINS:
+		{
+			sprintf(textbuffer, "%d, %d, %d, %d", variants.margintype.left, variants.margintype.top, variants.margintype.right, variants.margintype.bottom);
+			return std::string(textbuffer);
+		} break;
+		case IDENTIFIER::FILENAME:
+		{
+			return std::to_string(variants.imagetype.imageID);
+		} break;
+		case IDENTIFIER::SIZE:
+		{
+			return std::to_string(variants.sizetype.size);
+		} break;
+		case IDENTIFIER::POSITION:
+		{
+			sprintf(textbuffer, "%d, %d", variants.positiontype.x, variants.positiontype.y);
+			return std::string(textbuffer);
+		} break;
+		case IDENTIFIER::RECT:
+		{
+			sprintf(textbuffer, "%d, %d, %d, %d", variants.recttype.left, variants.recttype.top, variants.recttype.right, variants.recttype.bottom);
+			return std::string(textbuffer);
+		} break;
+		case IDENTIFIER::FONT:
+		{
+			// todo: lookup resource id?
+			return std::to_string(variants.fonttype.fontID);
+		} break;
+		case IDENTIFIER::INTLIST:
+		{
+			if (variants.intlist.numints >= 3)
+			{
+				sprintf(textbuffer, "Len: %d, Values: %d, %d, %d, ...", variants.intlist.numints
+					, *(&variants.intlist.firstint + 0)
+					, *(&variants.intlist.firstint + 1)
+					, *(&variants.intlist.firstint + 2));
+			}
+			else sprintf(textbuffer, "Len: %d, Values omitted");
+			return std::string(textbuffer);
+		} break;
+		default:
+		{
+			return "Unsupported";
+		}
+		}
 	}
 }

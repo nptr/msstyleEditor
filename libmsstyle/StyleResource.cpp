@@ -7,6 +7,17 @@ namespace libmsstyle
 	class StyleResource::Impl
 	{
 	public:
+
+		bool operator==(const Impl& rhs)
+		{
+			if (this->m_name == rhs.m_name &&
+				this->m_type == rhs.m_type &&
+				this->m_size == rhs.m_size &&
+				this->m_data == rhs.m_data)
+				return true;
+			else return false;
+		}
+
 		const void* m_data;
 		int m_size;
 		int m_name;
@@ -39,22 +50,27 @@ namespace libmsstyle
 		}
 	}
 
-	int StyleResource::GetNameID()
+	bool StyleResource::operator==(const StyleResource& rhs) const
+	{
+		return impl == rhs.impl;
+	}
+
+	int StyleResource::GetNameID() const
 	{
 		return impl->m_name;
 	}
 
-	StyleResourceType StyleResource::GetType()
+	StyleResourceType StyleResource::GetType() const
 	{
 		return impl->m_type;
 	}
 
-	const char* StyleResource::GetData()
+	const char* StyleResource::GetData() const
 	{
 		return static_cast<const char*>(impl->m_data);
 	}
-
-	int StyleResource::GetSize()
+	
+	int StyleResource::GetSize() const
 	{
 		return impl->m_size;
 	}

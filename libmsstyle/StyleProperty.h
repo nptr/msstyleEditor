@@ -99,7 +99,9 @@ namespace libmsstyle
 		
 		IDENTIFIER GetTypeID() const;
 		IDENTIFIER GetNameID() const;
-		const char* LookupName();
+		const char* LookupName() const;
+		const char* LookupTypeName() const;
+		std::string GetValueAsString() const;
 
 		void UpdateImageLink(int imageID);
 		void UpdateInteger(int intVal);
