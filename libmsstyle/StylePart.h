@@ -3,6 +3,8 @@
 #include "StyleState.h"
 
 #include <string>
+#include <memory>
+
 #include <stdint.h>
 
 namespace libmsstyle
@@ -24,7 +26,7 @@ namespace libmsstyle
 
 	private:
 		class Impl;
-		Impl* impl;
+		std::shared_ptr<Impl> impl;
 	};
 
 }

@@ -173,13 +173,13 @@ namespace libmsstyle
 
 						if (tmpProp->partID < partInfo.numParts)
 						{
-							part->partName = partInfo.parts[tmpProp->partID].partName;
+							newPart.partName = partInfo.parts[tmpProp->partID].partName;
 						}
 						else
 						{
 							char txt[16];
 							sprintf(txt, "Part %d", tmpProp->partID);
-							part->partName = std::string(txt);
+							newPart.partName = std::string(txt);
 						}
 
 						part = cls->AddPart(newPart);
@@ -209,7 +209,7 @@ namespace libmsstyle
 							{
 								char txt[16];
 								sprintf(txt, "State %d", tmpProp->stateID);
-								state->stateName = std::string(txt);
+								newState.stateName = std::string(txt);
 							}
 						}
 

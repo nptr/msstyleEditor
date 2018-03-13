@@ -45,17 +45,13 @@ namespace libmsstyle
 
 
 	StylePart::StylePart()
-		: impl(new Impl())
+		: impl(std::make_shared<Impl>())
 	{
 	}
 
 
 	StylePart::~StylePart()
 	{
-		if (impl)
-		{
-			delete impl;
-		}
 	}
 
 

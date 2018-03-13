@@ -42,17 +42,13 @@ namespace libmsstyle
 
 
 	StyleState::StyleState()
-		: impl(new Impl())
+		: impl(std::make_shared<Impl>())
 	{
 	}
 
 
 	StyleState::~StyleState()
 	{
-		if (impl)
-		{
-			delete impl;
-		}
 	}
 
 

@@ -796,46 +796,53 @@ void MainWindow::CloseStyle()
 
 void MainWindow::FillClassView()
 {
-	classView->Freeze();
-	classView->DeleteAllItems();
-	wxTreeItemId rootNode = classView->AddRoot(wxT("[StyleName]"));
-	
-	// Add classes
-	for (int ci = 0; ci < currentStyle->GetClassCount(); ++ci)
+	try
 	{
-		StyleClass* cls = currentStyle->GetClass(ci);
-		wxTreeItemId classNode = classView->AppendItem(rootNode, cls->className, -1, -1, static_cast<wxTreeItemData*>(new PropClassTreeItemData(cls)));
+		classView->Freeze();
+		classView->DeleteAllItems();
+		wxTreeItemId rootNode = classView->AddRoot(wxT("[StyleName]"));
 
-		// Add parts
-		for (int pi = 0; pi < cls->GetPartCount(); ++pi)
+		// Add classes
+		for (int ci = 0; ci < currentStyle->GetClassCount(); ++ci)
 		{
-			StylePart* part = cls->GetPart(pi);
-			wxTreeItemId partNode = classView->AppendItem(classNode, part->partName, -1, -1, static_cast<wxTreeItemData*>(new PartTreeItemData(part)));
+			StyleClass* cls = currentStyle->GetClass(ci);
+			wxTreeItemId classNode = classView->AppendItem(rootNode, cls->className, -1, -1, static_cast<wxTreeItemData*>(new PropClassTreeItemData(cls)));
 
-			// Add images
-			for (int si = 0; si < part->GetStateCount(); ++si)
+			// Add parts
+			for (int pi = 0; pi < cls->GetPartCount(); ++pi)
 			{
-				StyleState* state = part->GetState(si);
+				StylePart* part = cls->GetPart(pi);
+				wxTreeItemId partNode = classView->AppendItem(classNode, part->partName, -1, -1, static_cast<wxTreeItemData*>(new PartTreeItemData(part)));
 
-				// Add properties
-				for (int pri = 0; pri < state->GetPropertyCount(); ++pri)
+				// Add images
+				for (int si = 0; si < part->GetStateCount(); ++si)
 				{
-					StyleProperty* prop = state->GetProperty(pri);
+					StyleState* state = part->GetState(si);
 
-					// Add images
-					if (prop->typeID == IDENTIFIER::FILENAME || prop->typeID == IDENTIFIER::DISKSTREAM)
+					// Add properties
+					for (int pri = 0; pri < state->GetPropertyCount(); ++pri)
 					{
-						const char* propName = prop->LookupName(); // propnames have to be looked up, but thats fast
-						classView->AppendItem(partNode, propName, -1, -1, static_cast<wxTreeItemData*>(new PropTreeItemData(prop)));
+						StyleProperty* prop = state->GetProperty(pri);
+
+						// Add images
+						if (prop->typeID == IDENTIFIER::FILENAME || prop->typeID == IDENTIFIER::DISKSTREAM)
+						{
+							const char* propName = prop->LookupName(); // propnames have to be looked up, but thats fast
+							classView->AppendItem(partNode, propName, -1, -1, static_cast<wxTreeItemData*>(new PropTreeItemData(prop)));
+						}
 					}
 				}
 			}
+
 		}
 
+		classView->SortChildren(rootNode);
+		classView->Thaw();
 	}
-
-	classView->SortChildren(rootNode);
-	classView->Thaw();
+	catch (std::exception& ex)
+	{
+		int xx = 0;
+	}
 }
 
 void MainWindow::FillPropertyView(StylePart& part)
