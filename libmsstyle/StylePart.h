@@ -9,17 +9,20 @@
 
 namespace libmsstyle
 {
-
 	class StylePart
 	{
 	public:
+		typedef std::unordered_map<int, StyleState>::iterator StateIterator;
+
 		StylePart();
 		~StylePart();
 
 		StyleState* AddState(const StyleState& state);
-		int GetStateCount();
-		StyleState* GetState(int index);
-		StyleState* FindState(int stateId);
+		StyleState* FindState(int stateId) const;
+		size_t GetStateCount() const;
+
+		StateIterator begin();
+		StateIterator end();
 
 		int32_t partID;
 		std::string partName;

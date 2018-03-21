@@ -21,11 +21,15 @@ namespace libmsstyle
 	class VisualStyle
 	{
 	public:
+		typedef std::unordered_map<int32_t, StyleClass>::iterator ClassIterator;
+
 		VisualStyle();
 		~VisualStyle();
 
-		StyleClass* GetClass(int index);
-		int GetClassCount();
+		size_t GetClassCount();
+
+		ClassIterator begin();
+		ClassIterator end();
 
 		void Load(const std::string& path);
 		void Save(const std::string& path);

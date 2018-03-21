@@ -106,7 +106,7 @@ wxPGProperty* GetWXPropertyFromMsStyleProperty(StyleProperty& prop)
 				, *(&prop.variants.intlist.firstint + 1)
 				, *(&prop.variants.intlist.firstint + 2));
 		}
-		else sprintf(str, "Len: %d, Values omitted");
+		else sprintf(str, "Len: %d, Values omitted", prop.variants.intlist.numints);
 		wxStringProperty* p = new wxStringProperty(propName, *wxPGProperty::sm_wxPG_LABEL, str);
 		p->SetClientData(&prop);
 		return p;

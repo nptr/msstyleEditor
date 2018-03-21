@@ -292,7 +292,6 @@ namespace libmsstyle
 
 		const char* GetEnumAsString(int32_t nameID, int32_t enumValue)
 		{
-			int32_t size = 0;
 			EnumList enums = FindEnums(nameID);
 
 			if (enums.enums != nullptr && enums.numEnums > enumValue)

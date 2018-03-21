@@ -13,14 +13,17 @@ namespace libmsstyle
 	class StyleClass
 	{
 	public:
+		typedef std::unordered_map<int, StylePart>::iterator PartIterator;
+
 		StyleClass();
 		~StyleClass();
 
 		StylePart* AddPart(const StylePart& part);
-
-		int GetPartCount();
-		StylePart* GetPart(int index);
 		StylePart* FindPart(int partId);
+		size_t GetPartCount();
+
+		PartIterator begin();
+		PartIterator end();
 
 		int32_t classID;
 		std::string className;

@@ -108,7 +108,7 @@ namespace libmsstyle
 		void UpdateSize(int size);
 		void UpdateEnum(int enumVal);
 		void UpdateBoolean(bool boolVal);
-		void UpdateColor(int r, int g, int b);
+		void UpdateColor(uint8_t r, uint8_t g, uint8_t b);
 		void UpdateRectangle(int left, int top, int right, int bottom);
 		void UpdateMargin(int left, int top, int right, int bottom);
 		void UpdatePosition(int x, int y);

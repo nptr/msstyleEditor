@@ -13,14 +13,18 @@ namespace libmsstyle
 	class StyleState
 	{
 	public:
+		typedef std::vector<StyleProperty*>::iterator PropertyIterator;
+
 		StyleState();
 		~StyleState();
 
 		StyleProperty* AddProperty(StyleProperty* prop);
-
-		void RemoveProperty(int index);
-		int GetPropertyCount() const;
 		StyleProperty* GetProperty(int index) const;
+		void RemoveProperty(int index);
+		size_t GetPropertyCount() const;
+
+		PropertyIterator begin();
+		PropertyIterator end();
 
 		int32_t stateID;
 		std::string stateName;

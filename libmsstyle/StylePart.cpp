@@ -8,40 +8,8 @@ namespace libmsstyle
 	class StylePart::Impl
 	{
 	public:
-		Impl()
-		{
-
-		}
-
-		StyleState* AddState(const StyleState& state)
-		{
-			auto it = m_states.insert(std::make_pair(state.stateID, state));
-			return &(it.first->second);
-		}
-
-
-		int GetStateCount()
-		{
-			return m_states.size();
-		}
-
-
-		StyleState* GetState(int index)
-		{
-			return &(m_states.at(index));
-		}
-
-		StyleState* FindState(int stateId)
-		{
-			const auto& res = m_states.find(stateId);
-			if (res != m_states.end())
-				return &(res->second);
-			else return nullptr;
-		}
-
 		std::unordered_map<int32_t, StyleState> m_states;
 	};
-
 
 
 	StylePart::StylePart()
@@ -49,32 +17,36 @@ namespace libmsstyle
 	{
 	}
 
-
 	StylePart::~StylePart()
 	{
 	}
 
-
 	StyleState* StylePart::AddState(const StyleState& state)
 	{
-		return impl->AddState(state);
+		auto it = impl->m_states.insert(std::make_pair(state.stateID, state));
+		return &(it.first->second);
 	}
 
-
-	int StylePart::GetStateCount()
+	StyleState* StylePart::FindState(int stateId) const
 	{
-		return impl->GetStateCount();
+		const auto& res = impl->m_states.find(stateId);
+		if (res != impl->m_states.end())
+			return &(res->second);
+		else return nullptr;
 	}
 
-
-	StyleState* StylePart::GetState(int index)
+	size_t StylePart::GetStateCount() const
 	{
-		return impl->GetState(index);
+		return impl->m_states.size();
 	}
 
-	StyleState* StylePart::FindState(int stateId)
+	StylePart::StateIterator StylePart::begin()
 	{
-		return impl->FindState(stateId);
+		return impl->m_states.begin();
 	}
 
+	StylePart::StateIterator StylePart::end()
+	{
+		return impl->m_states.end();
+	}
 }

@@ -5,7 +5,7 @@
 #include <string>
 #include <codecvt>
 
-#include "libmsstyle/VisualStyle.h"
+#include "libmsstyle\VisualStyle.h"
 
 std::string WStringToUTF8(const std::wstring& str)
 {
@@ -58,28 +58,23 @@ void Exporter::ExportLogicalStructure(const std::string& path, libmsstyle::Visua
 
 	//const std::unordered_map<int32_t, libmsstyle::StyleClass*>* classes = style.GetClasses();
 
-	for (int ci = 0; ci < style.GetClassCount(); ++ci)
+	for (auto& cls : style)
 	{
-		libmsstyle::StyleClass* cls = style.GetClass(ci);
-		txt.append("Class: "); txt.append(cls->className);
+		txt.append("Class: "); txt.append(cls.second.className);
 		txt.append("\n");
 
-		for (int pi = 0; pi < cls->GetPartCount(); ++pi)
+		for (auto& part : cls.second)
 		{
-			libmsstyle::StylePart* part = cls->GetPart(pi);
-			txt.append("\tPart: "); txt.append(part->partName);
+			txt.append("\tPart: "); txt.append(part.second.partName);
 			txt.append("\n");
 
-			for (int si = 0; si < part->GetStateCount(); ++si)
+			for (auto& state : part.second)
 			{
-				libmsstyle::StyleState* state = part->GetState(si);
-				txt.append("\t\tState: "); txt.append(state->stateName);
+				txt.append("\t\tState: "); txt.append(state.second.stateName);
 				txt.append("\n");
 
-				for (int pri = 0; pri < state->GetPropertyCount(); ++pri)
+				for (auto& prop : state.second)
 				{
-					libmsstyle::StyleProperty* prop = state->GetProperty(pri);
-
 					sprintf(buffer, "\t\t\tProp %s (%s) (%s)"
 						, prop->LookupName()
 						, prop->LookupTypeName()

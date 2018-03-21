@@ -36,7 +36,7 @@ namespace libmsstyle
 			return &(m_classes.at(index));
 		}
 
-		int GetClassCount()
+		size_t GetClassCount()
 		{
 			return m_classes.size();
 		}
@@ -158,6 +158,7 @@ namespace libmsstyle
 					if (result == m_classes.end())
 					{
 						printf("No class with id: %d\r\n", tmpProp->classID);
+						continue;
 					}
 					else cls = &(result->second);
 
@@ -301,14 +302,9 @@ namespace libmsstyle
 		}
 	}
 
-	int VisualStyle::GetClassCount()
+	size_t VisualStyle::GetClassCount()
 	{
 		return impl->GetClassCount();
-	}
-
-	StyleClass* VisualStyle::GetClass(int index)
-	{
-		return impl->GetClass(index);
 	}
 
 	Platform VisualStyle::GetCompatiblePlatform() const
@@ -349,5 +345,15 @@ namespace libmsstyle
 	void VisualStyle::Save(const std::string& path)
 	{
 		impl->Save(path);
+	}
+
+	VisualStyle::ClassIterator VisualStyle::begin()
+	{
+		return impl->m_classes.begin();
+	}
+
+	VisualStyle::ClassIterator VisualStyle::end()
+	{
+		return impl->m_classes.end();
 	}
 }

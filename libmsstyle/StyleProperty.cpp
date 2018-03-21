@@ -136,7 +136,7 @@ namespace libmsstyle
 		variants.booltype.boolvalue = boolVal;
 	}
 
-	void StyleProperty::UpdateColor(int r, int g, int b)
+	void StyleProperty::UpdateColor(uint8_t r, uint8_t g, uint8_t b)
 	{
 		variants.colortype.r = r;
 		variants.colortype.g = g;
@@ -238,7 +238,7 @@ namespace libmsstyle
 					, *(&variants.intlist.firstint + 1)
 					, *(&variants.intlist.firstint + 2));
 			}
-			else sprintf(textbuffer, "Len: %d, Values omitted");
+			else sprintf(textbuffer, "Len: %d, Values omitted", variants.intlist.numints);
 			return std::string(textbuffer);
 		} break;
 		default:

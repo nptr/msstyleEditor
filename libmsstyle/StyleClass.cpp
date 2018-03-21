@@ -8,35 +8,6 @@ namespace libmsstyle
 	class StyleClass::Impl
 	{
 	public:
-		Impl()
-		{
-
-		}
-
-		StylePart* AddPart(const StylePart& part)
-		{
-			auto it = m_parts.insert(std::make_pair(part.partID, part));
-			return &(it.first->second);
-		}
-
-		int GetPartCount()
-		{
-			return m_parts.size();
-		}
-
-		StylePart* GetPart(int index)
-		{
-			return &(m_parts.at(index));
-		}
-
-		StylePart* FindPart(int partId)
-		{
-			const auto res = m_parts.find(partId);
-			if (res != m_parts.end())
-				return &(res->second);
-			else return nullptr;
-		}
-
 		std::unordered_map<int32_t, StylePart> m_parts;
 	};
 
@@ -53,22 +24,30 @@ namespace libmsstyle
 
 	StylePart* StyleClass::AddPart(const StylePart& part)
 	{
-		return impl->AddPart(part);
-	}
-
-	int StyleClass::GetPartCount()
-	{
-		return impl->GetPartCount();
-	}
-
-	StylePart* StyleClass::GetPart(int index)
-	{
-		return impl->GetPart(index);
+		auto it = impl->m_parts.insert(std::make_pair(part.partID, part));
+		return &(it.first->second);
 	}
 
 	StylePart* StyleClass::FindPart(int partId)
 	{
-		return impl->FindPart(partId);
+		const auto res = impl->m_parts.find(partId);
+		if (res != impl->m_parts.end())
+			return &(res->second);
+		else return nullptr;
 	}
 
+	size_t StyleClass::GetPartCount()
+	{
+		return impl->m_parts.size();
+	}
+
+	StyleClass::PartIterator StyleClass::begin()
+	{
+		return impl->m_parts.begin();
+	}
+
+	StyleClass::PartIterator StyleClass::end()
+	{
+		return impl->m_parts.end();
+	}
 }

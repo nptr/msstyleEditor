@@ -16,7 +16,9 @@
 
 #include <shlobj.h> // SHGetKnownFolderPath()
 
-#include "libmsstyle/VisualStyle.h"
+#include "libmsstyle\VisualStyle.h"
+#include "libmsstyle\StylePart.h"
+
 #include "Exporter.h"
 #include "UxthemeUndocumented.h"
 
@@ -286,7 +288,7 @@ void MainWindow::OnClassViewTreeSelChanged(wxTreeEvent& event)
 			type = StyleResourceType::IMAGE;
 		else if (selectedImageProp->GetTypeID() == IDENTIFIER::DISKSTREAM)
 			type = StyleResourceType::ATLAS;
-		else type == StyleResourceType::NONE;
+		else type = StyleResourceType::NONE;
 
 		std::string file = currentStyle->GetQueuedResourceUpdate(selectedImageProp->variants.imagetype.imageID, type);
 		if (!file.empty())
@@ -574,14 +576,10 @@ bool ContainsProperty(const SearchProperties& search, wxTreeItemData* treeItemDa
 
 	StylePart* part = partData->GetMsStylePart();
 	
-	for (int stateIx = 0; stateIx < part->GetStateCount(); ++stateIx)
+	for (auto& state : *part)
 	{
-		const StyleState* state = part->GetState(stateIx);
-
-		for (int propIx = 0; propIx < state->GetPropertyCount(); ++propIx)
+		for (auto& prop : state.second)
 		{
-			const StyleProperty* prop = state->GetProperty(propIx);
-
 			// if its a property of the desired type, do a comparison
 			if (prop->typeID != search.type)
 				continue;
@@ -796,67 +794,52 @@ void MainWindow::CloseStyle()
 
 void MainWindow::FillClassView()
 {
-	try
+	classView->Freeze();
+	classView->DeleteAllItems();
+	wxTreeItemId rootNode = classView->AddRoot(wxT("[StyleName]"));
+
+	// Add classes
+	for (auto& cls : *currentStyle)
 	{
-		classView->Freeze();
-		classView->DeleteAllItems();
-		wxTreeItemId rootNode = classView->AddRoot(wxT("[StyleName]"));
+		wxTreeItemId classNode = classView->AppendItem(rootNode, cls.second.className, -1, -1, static_cast<wxTreeItemData*>(new PropClassTreeItemData(&cls.second)));
 
-		// Add classes
-		for (int ci = 0; ci < currentStyle->GetClassCount(); ++ci)
+		// Add parts
+		for (auto& part : cls.second)
 		{
-			StyleClass* cls = currentStyle->GetClass(ci);
-			wxTreeItemId classNode = classView->AppendItem(rootNode, cls->className, -1, -1, static_cast<wxTreeItemData*>(new PropClassTreeItemData(cls)));
+			wxTreeItemId partNode = classView->AppendItem(classNode, part.second.partName, -1, -1, static_cast<wxTreeItemData*>(new PartTreeItemData(&part.second)));
 
-			// Add parts
-			for (int pi = 0; pi < cls->GetPartCount(); ++pi)
+			// Add images
+			for (auto& state : part.second)
 			{
-				StylePart* part = cls->GetPart(pi);
-				wxTreeItemId partNode = classView->AppendItem(classNode, part->partName, -1, -1, static_cast<wxTreeItemData*>(new PartTreeItemData(part)));
-
-				// Add images
-				for (int si = 0; si < part->GetStateCount(); ++si)
+				// Add properties
+				for (auto& prop : state.second)
 				{
-					StyleState* state = part->GetState(si);
-
-					// Add properties
-					for (int pri = 0; pri < state->GetPropertyCount(); ++pri)
+					// Add images
+					if (prop->typeID == IDENTIFIER::FILENAME || prop->typeID == IDENTIFIER::DISKSTREAM)
 					{
-						StyleProperty* prop = state->GetProperty(pri);
-
-						// Add images
-						if (prop->typeID == IDENTIFIER::FILENAME || prop->typeID == IDENTIFIER::DISKSTREAM)
-						{
-							const char* propName = prop->LookupName(); // propnames have to be looked up, but thats fast
-							classView->AppendItem(partNode, propName, -1, -1, static_cast<wxTreeItemData*>(new PropTreeItemData(prop)));
-						}
+						const char* propName = prop->LookupName(); // propnames have to be looked up, but thats fast
+						classView->AppendItem(partNode, propName, -1, -1, static_cast<wxTreeItemData*>(new PropTreeItemData(prop)));
 					}
 				}
 			}
-
 		}
 
-		classView->SortChildren(rootNode);
-		classView->Thaw();
 	}
-	catch (std::exception& ex)
-	{
-		int xx = 0;
-	}
+
+	classView->SortChildren(rootNode);
+	classView->Thaw();
 }
 
 void MainWindow::FillPropertyView(StylePart& part)
 {
 	propView->Clear();
 
-	for (int si = 0; si < part.GetStateCount(); ++si)
+	for (auto& state : part)
 	{
-		const StyleState* state = part.GetState(si);
-		wxPropertyCategory* category = new wxPropertyCategory(state->stateName);
+		wxPropertyCategory* category = new wxPropertyCategory(state.second.stateName);
 		
-		for (int pi = 0; pi < part.GetStateCount(); ++pi)
+		for (auto& prop : state.second)
 		{
-			StyleProperty* prop = state->GetProperty(pi);
 			category->AppendChild(GetWXPropertyFromMsStyleProperty(*prop));
 		}
 		

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "libmsstyle/StyleProperty.h"
+#include "libmsstyle\StyleProperty.h"
 
 #include <wx\wx.h>
 #include <wx\propgrid\property.h>
