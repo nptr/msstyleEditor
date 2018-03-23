@@ -16,6 +16,7 @@ namespace libmsstyle
 		StyleResource(const void* data, int size, int nameId, StyleResourceType type);
 		~StyleResource();
 
+		StyleResource& operator=(const StyleResource&);
 		bool operator==(const StyleResource& rhs) const;
 
 		int GetNameID() const;

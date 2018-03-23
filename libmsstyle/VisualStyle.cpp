@@ -3,9 +3,10 @@
 
 #include "VisualStyleEnums.h"
 #include "VisualStyleParts.h"
-#include "VisualStyleDefinitions.h"
 #include "VisualStyleStates.h"
+#include "VisualStyleDefinitions.h"
 #include <string.h>
+#include <fstream>
 using namespace libmsstyle;
 
 #define MSSTYLE_ARRAY_LENGTH(name) (sizeof(name) / sizeof(name[0]))
@@ -58,9 +59,124 @@ namespace libmsstyle
 			else throw std::runtime_error("Couldn't open file as PE resource!");
 		}
 
+		void SaveResources(UpdateHandle updateHandle)
+		{
+			for (auto& resource : m_resourceUpdates)
+			{
+				std::ifstream newImg(resource.second, std::ios::binary);
+				newImg.seekg(0, std::ios::end);
+				std::streampos size = newImg.tellg();
+				newImg.seekg(0, std::ios::beg);
+
+				if (size > UINT32_MAX)
+					throw std::runtime_error("Replacement file is to big!");
+
+				char* imgBuffer = new char[size];
+				newImg.read(imgBuffer, size);
+				newImg.close();
+
+				const char* resName;
+
+				switch (resource.first.GetType())
+				{
+				case StyleResourceType::IMAGE:
+					resName = "IMAGE";
+					break;
+				case StyleResourceType::ATLAS:
+					resName = "STREAM";
+					break;
+				default:
+					continue;
+				}
+
+				bool success = libmsstyle::UpdateStyleResource(updateHandle, resName,
+					resource.first.GetNameID(),
+					resource.first.GetData(),
+					resource.first.GetSize());
+				if (!success)
+				{
+					throw std::runtime_error("Could not update IMAGE/STREAM resource!");
+					delete[] imgBuffer;
+					return;
+				}
+
+				delete[] imgBuffer;
+			}
+		}
+
+		void SaveProperties(UpdateHandle updateHandle)
+		{
+			// assume that twice the size common properties require is enough
+			int estimatedSize = m_propsFound * 48 * 2;
+			char* data = new char[estimatedSize];
+			char* dataptr = data;
+
+			// for all classes
+			for (auto it = m_classes.begin(); it != m_classes.end(); ++it)
+			{
+				// for all parts
+				for (auto partIt = it->second.begin(); partIt != it->second.end(); ++partIt)
+				{
+					// for all states
+					for (auto stateIt = partIt->second.begin(); stateIt != partIt->second.end(); ++stateIt)
+					{
+						// for all properties
+						for (auto propIt = stateIt->second.begin(); propIt != stateIt->second.end(); ++propIt)
+						{
+							int propSize = (*propIt)->GetPropertySize();
+							memcpy(dataptr, &((*propIt)->nameID), propSize);
+							dataptr += propSize;
+
+							if (dataptr - data > estimatedSize)
+								throw std::runtime_error("I haven't allocated enough memory to save the file..sorry for that!");
+						}
+					}
+				}
+
+				// we would save the classnames in the CMAP resource
+				// but as long as we dont modify the classID of the
+				// properties, this shouldn't be necessary
+			}
+
+			LanguageId lid = GetFirstLanguageId(m_moduleHandle, "NORMAL", "VARIANT");
+			unsigned int length = static_cast<unsigned int>(dataptr - data);
+
+			if (!UpdateStyleResource(updateHandle, "VARIANT", "NORMAL", lid, data, length))
+			{
+				throw std::runtime_error("Could not update properties!");
+				return;
+			}
+		}
+
 		void Save(const std::string& path)
 		{
+			// if source != destination
+			if (path != m_stylePath)
+			{
+				// copy the source file and modify the new one
+				// since we cant create a file from scratch
+				const std::string& originalFile = m_stylePath;
+				std::ifstream src(originalFile, std::ios::binary);
 
+				const std::string& newFile = path;
+				std::ofstream dst(newFile, std::ios::binary);
+				dst << src.rdbuf();
+			}
+
+			UpdateHandle updHandle = libmsstyle::BeginUpdate(path);
+			if (updHandle == NULL)
+			{
+				throw std::runtime_error("Could not open the file for writing!");
+			}
+
+			SaveResources(updHandle);
+			SaveProperties(updHandle);
+
+			if (!libmsstyle::EndUpdate(updHandle))
+			{
+				throw std::runtime_error("Could not write the changes to the file!");
+				return;
+			}
 		}
 
 		Platform GetCompatiblePlatform() const

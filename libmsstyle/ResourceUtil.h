@@ -12,13 +12,20 @@ namespace libmsstyle
 	} Resource;
 
 	typedef void* ModuleHandle;
+	typedef void* UpdateHandle;
+	typedef unsigned short LanguageId;
 
-
-	ModuleHandle OpenModule(const std::string& module);
+	ModuleHandle OpenModule(const std::string& modulePath);
 	void CloseModule(ModuleHandle moduleHandle);
 
 	Resource GetResource(ModuleHandle moduleHandle, const char* name, const char* type);
 	Resource GetResource(ModuleHandle moduleHandle, int nameId, const char* type);
+	LanguageId GetFirstLanguageId(ModuleHandle moduleHandle, const char* name, const char* type);
 
+	UpdateHandle BeginUpdate(const std::string& modulePath);
+	bool UpdateStyleResource(UpdateHandle, const char* type, const char* name, LanguageId lid, const char* data, unsigned int length);
+	bool UpdateStyleResource(UpdateHandle, const char* type, const char* name, const char* data, unsigned int length);
+	bool UpdateStyleResource(UpdateHandle, const char* type, int nameId, const char* data, unsigned int length);
+	bool EndUpdate(UpdateHandle updateHandle);
 }
 

@@ -34,4 +34,48 @@ namespace libmsstyle
 	{
 		return GetResource(moduleHandle, MAKEINTRESOURCEA(nameId), type);
 	}
+
+	BOOL LanguageCallback(
+		_In_opt_ HMODULE hModule,
+		_In_ LPCSTR lpType,
+		_In_ LPCSTR lpName,
+		_In_ WORD wLanguage,
+		_In_ LONG_PTR lParam)
+	{
+		LanguageId* langId = (LanguageId*)lParam;
+		*langId = wLanguage;
+		return FALSE; // stop, i just need the first result
+	}
+
+	LanguageId GetFirstLanguageId(ModuleHandle moduleHandle, const char* name, const char* type)
+	{
+		LanguageId langId = 0;
+		EnumResourceLanguagesA(static_cast<HMODULE>(moduleHandle), type, name, (ENUMRESLANGPROCA)&LanguageCallback, (LONG_PTR)&langId);
+		return langId;
+	}
+
+	UpdateHandle BeginUpdate(const std::string& modulePath)
+	{
+		return BeginUpdateResourceA(modulePath.c_str(), FALSE);
+	}
+
+	bool UpdateStyleResource(UpdateHandle updateHandle, const char* type, const char* name, LanguageId lid, const char* data, unsigned int length)
+	{
+		return UpdateResourceA(updateHandle, type, name, (WORD)lid, (LPVOID)data, length) != 0;
+	}
+
+	bool UpdateStyleResource(UpdateHandle updateHandle, const char* type, const char* name, const char* data, unsigned int length)
+	{
+		return UpdateResourceA(updateHandle, type, name, MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL), (LPVOID)data, length) != 0;
+	}
+
+	bool UpdateStyleResource(UpdateHandle updateHandle, const char* type, int nameId, const char* data, unsigned int length)
+	{
+		return UpdateResourceA(updateHandle, type, MAKEINTRESOURCEA(nameId), MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL), (LPVOID)data, length) != 0;
+	}
+
+	bool EndUpdate(UpdateHandle updateHandle)
+	{
+		return EndUpdateResourceA(updateHandle, FALSE) != 0;
+	}
 }

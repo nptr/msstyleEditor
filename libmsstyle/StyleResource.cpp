@@ -47,7 +47,22 @@ namespace libmsstyle
 		if (impl)
 		{
 			delete impl;
+			impl = nullptr;
 		}
+	}
+
+	StyleResource& StyleResource::operator=(const StyleResource& other)
+	{
+		if (&other == this)
+			return *this;
+
+		// use others data, but dont copy the impl ptr!
+		impl->m_data = other.impl->m_data;
+		impl->m_size = other.impl->m_size;
+		impl->m_name = other.impl->m_name;
+		impl->m_type = other.impl->m_type;
+
+		return *this;
 	}
 
 	bool StyleResource::operator==(const StyleResource& rhs) const
