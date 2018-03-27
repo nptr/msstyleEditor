@@ -5,6 +5,9 @@
 #include "VisualStyleParts.h"
 #include "VisualStyleStates.h"
 #include "VisualStyleDefinitions.h"
+
+#include "PropertyReader.h"
+
 #include <string.h>
 #include <fstream>
 using namespace libmsstyle;
@@ -112,40 +115,50 @@ namespace libmsstyle
 			char* dataptr = data;
 
 			// for all classes
-			for (auto it = m_classes.begin(); it != m_classes.end(); ++it)
+			//for (auto it = m_classes.begin(); it != m_classes.end(); ++it)
+			//{
+			//	// for all parts
+			//	for (auto partIt = it->second.begin(); partIt != it->second.end(); ++partIt)
+			//	{
+			//		// for all states
+			//		for (auto stateIt = partIt->second.begin(); stateIt != partIt->second.end(); ++stateIt)
+			//		{
+			//			// for all properties
+			//			for (auto propIt = stateIt->second.begin(); propIt != stateIt->second.end(); ++propIt)
+			//			{
+			//				int propSize = (*propIt)->GetPropertySize();
+			//				memcpy(dataptr, &((*propIt)->nameID), propSize);
+			//				dataptr += propSize;
+
+			//				if (dataptr - data > estimatedSize)
+			//					throw std::runtime_error("I haven't allocated enough memory to save the file..sorry for that!");
+			//			}
+			//		}
+			//	}
+
+			//	// we would save the classnames in the CMAP resource
+			//	// but as long as we dont modify the classID of the
+			//	// properties, this shouldn't be necessary
+			//}
+
+			for (auto& prop : m_origOrder)
 			{
-				// for all parts
-				for (auto partIt = it->second.begin(); partIt != it->second.end(); ++partIt)
-				{
-					// for all states
-					for (auto stateIt = partIt->second.begin(); stateIt != partIt->second.end(); ++stateIt)
-					{
-						// for all properties
-						for (auto propIt = stateIt->second.begin(); propIt != stateIt->second.end(); ++propIt)
-						{
-							int propSize = (*propIt)->GetPropertySize();
-							memcpy(dataptr, &((*propIt)->nameID), propSize);
-							dataptr += propSize;
+				int propSize = prop->GetRegularPropertySize();
+				memcpy(dataptr, &(prop->header), propSize);
+				dataptr += propSize;
 
-							if (dataptr - data > estimatedSize)
-								throw std::runtime_error("I haven't allocated enough memory to save the file..sorry for that!");
-						}
-					}
-				}
-
-				// we would save the classnames in the CMAP resource
-				// but as long as we dont modify the classID of the
-				// properties, this shouldn't be necessary
+				if (dataptr - data > estimatedSize)
+					throw std::runtime_error("I haven't allocated enough memory to save the file..sorry for that!");
 			}
 
-			LanguageId lid = GetFirstLanguageId(m_moduleHandle, "NORMAL", "VARIANT");
-			unsigned int length = static_cast<unsigned int>(dataptr - data);
-
-			if (!UpdateStyleResource(updateHandle, "VARIANT", "NORMAL", lid, data, length))
-			{
-				throw std::runtime_error("Could not update properties!");
-				return;
-			}
+			//LanguageId lid = GetFirstLanguageId(m_moduleHandle, "NORMAL", "VARIANT");
+			//unsigned int length = static_cast<unsigned int>(dataptr - data);
+			// 
+			//if (!UpdateStyleResource(updateHandle, "VARIANT", "NORMAL", lid, data, length))
+			//{
+			//	throw std::runtime_error("Could not update properties!");
+			//	return;
+			//}
 		}
 
 		void Save(const std::string& path)
@@ -195,13 +208,13 @@ namespace libmsstyle
 
 			if (prop.GetTypeID() == IDENTIFIER::FILENAME)
 			{
-				r = libmsstyle::GetResource(m_moduleHandle, prop.variants.imagetype.imageID, "IMAGE");
-				return StyleResource(r.data, r.size, prop.nameID , StyleResourceType::IMAGE);
+				r = libmsstyle::GetResource(m_moduleHandle, prop.data.imagetype.imageID, "IMAGE");
+				return StyleResource(r.data, r.size, prop.header.nameID, StyleResourceType::IMAGE);
 			}
 			else if (prop.GetTypeID() == IDENTIFIER::DISKSTREAM)
 			{
-				r = libmsstyle::GetResource(m_moduleHandle, prop.variants.imagetype.imageID, "STREAM");
-				return StyleResource(r.data, r.size, prop.nameID, StyleResourceType::ATLAS);
+				r = libmsstyle::GetResource(m_moduleHandle, prop.data.imagetype.imageID, "STREAM");
+				return StyleResource(r.data, r.size, prop.header.nameID, StyleResourceType::ATLAS);
 			}
 
 			return StyleResource(nullptr, 0, 0, StyleResourceType::IMAGE);
@@ -258,22 +271,32 @@ namespace libmsstyle
 
 		void LoadProperties(Resource propResource)
 		{
-			StyleProperty* prevprop;
+			libmsstyle::rw::PropertyReader reader(m_classes.size());
+
 			StyleProperty* tmpProp;
 			const char* dataPtr = static_cast<const char*>(propResource.data);
+			const char* endPtr = dataPtr + propResource.size;
 
-			while ((dataPtr - propResource.data) < propResource.size)
+			while (dataPtr < endPtr)
 			{
-				tmpProp = (StyleProperty*)dataPtr;
-				if (tmpProp->IsPropertyValid())
+				StyleProperty* tmpProp = new StyleProperty();
+				dataPtr = reader.ReadNextProperty(dataPtr, endPtr, tmpProp);
+				if (!tmpProp->IsPropertyValid())
 				{
+					delete tmpProp;
+					return;
+				}
+				else
+				{
+					m_origOrder.push_back(tmpProp);
+
 					// See if we have created a "Style Class" object already for
 					// this classID that we can use. If not, create one.
 					StyleClass* cls;
-					const auto& result = m_classes.find(tmpProp->classID);
+					const auto& result = m_classes.find(tmpProp->header.classID);
 					if (result == m_classes.end())
 					{
-						printf("No class with id: %d\r\n", tmpProp->classID);
+						printf("No class with id: %d\r\n", tmpProp->header.classID);
 						continue;
 					}
 					else cls = &(result->second);
@@ -282,20 +305,20 @@ namespace libmsstyle
 					// See if we have created a "Style Part" object for this
 					// partID inside the current "Style Class". If not, create one.
 					lookup::PartList partInfo = lookup::FindParts(cls->className.c_str(), m_stylePlatform);
-					StylePart* part = cls->FindPart(tmpProp->partID);
+					StylePart* part = cls->FindPart(tmpProp->header.partID);
 					if (part == nullptr)
 					{
 						StylePart newPart;
-						newPart.partID = tmpProp->partID;
+						newPart.partID = tmpProp->header.partID;
 
-						if (tmpProp->partID < partInfo.numParts)
+						if (tmpProp->header.partID < partInfo.numParts)
 						{
-							newPart.partName = partInfo.parts[tmpProp->partID].partName;
+							newPart.partName = partInfo.parts[tmpProp->header.partID].partName;
 						}
 						else
 						{
-							char txt[16];
-							sprintf(txt, "Part %d", tmpProp->partID);
+							char txt[160];
+							sprintf(txt, "Part %d", tmpProp->header.partID);
 							newPart.partName = std::string(txt);
 						}
 
@@ -305,27 +328,27 @@ namespace libmsstyle
 
 					// See if we have created a "Style State" object for this
 					// stateID inside the current "Style Part". If not, create one.
-					StyleState* state = part->FindState(tmpProp->stateID);
+					StyleState* state = part->FindState(tmpProp->header.stateID);
 					if (state == nullptr)
 					{
 						StyleState newState;
-						newState.stateID = tmpProp->stateID;
+						newState.stateID = tmpProp->header.stateID;
 
-						if (tmpProp->partID < partInfo.numParts &&
-							tmpProp->stateID < partInfo.parts[tmpProp->partID].numStates)
+						if (tmpProp->header.partID < partInfo.numParts &&
+							tmpProp->header.stateID < partInfo.parts[tmpProp->header.partID].numStates)
 						{
-							newState.stateName = partInfo.parts[tmpProp->partID].states[tmpProp->stateID].stateName;
+							newState.stateName = partInfo.parts[tmpProp->header.partID].states[tmpProp->header.stateID].stateName;
 						}
 						else
 						{
-							if (tmpProp->stateID == 0)
+							if (tmpProp->header.stateID == 0)
 							{
 								newState.stateName = "Common";
 							}
 							else
 							{
-								char txt[16];
-								sprintf(txt, "State %d", tmpProp->stateID);
+								char txt[160];
+								sprintf(txt, "State %d", tmpProp->header.stateID);
 								newState.stateName = std::string(txt);
 							}
 						}
@@ -333,33 +356,8 @@ namespace libmsstyle
 						state = part->AddState(newState);
 					}
 
-
-					// problem: i saved just ptrs before. now i need real data!!
 					state->AddProperty(tmpProp);
 					m_propsFound++;
-					prevprop = tmpProp;
-					// the sizes are known, so jump right to the next prop
-					dataPtr += tmpProp->GetPropertySize();
-				}
-				else
-				{
-					// Look one integer back, just in case.
-					// Main focus is looking forward tho..
-					StyleProperty* findback = (StyleProperty*)(dataPtr - 4);
-					if (findback->IsPropertyValid())
-					{
-						dataPtr -= 4;
-					}
-					else
-					{
-						StyleProperty* prop;
-
-						do
-						{
-							dataPtr += 4;
-							prop = (StyleProperty*)(dataPtr);
-						} while (!prop->IsPropertyValid() && (dataPtr - (const char*)propResource.data < propResource.size));
-					}
 				}
 			}
 		}
@@ -395,6 +393,7 @@ namespace libmsstyle
 		std::string m_stylePath;
 		std::unordered_map<int32_t, StyleClass> m_classes;
 		std::unordered_map<StyleResource, std::string, ResourceHasher> m_resourceUpdates;
+		std::vector<StyleProperty*> m_origOrder;
 	};
 
 

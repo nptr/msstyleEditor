@@ -290,17 +290,17 @@ void MainWindow::OnClassViewTreeSelChanged(wxTreeEvent& event)
 			type = StyleResourceType::ATLAS;
 		else type = StyleResourceType::NONE;
 
-		std::string file = currentStyle->GetQueuedResourceUpdate(selectedImageProp->variants.imagetype.imageID, type);
+		std::string file = currentStyle->GetQueuedResourceUpdate(selectedImageProp->data.imagetype.imageID, type);
 		if (!file.empty())
 		{
 			wxString tmpFile(file);
 			ShowImageFromFile(tmpFile);
-			statusBar->SetStatusText(wxString::Format("Image ID: %d*", propData->GetMSStyleProp()->variants.imagetype.imageID));
+			statusBar->SetStatusText(wxString::Format("Image ID: %d*", propData->GetMSStyleProp()->data.imagetype.imageID));
 		}
 		else
 		{
 			ShowImageFromResource(propData->GetMSStyleProp());
-			statusBar->SetStatusText(wxString::Format("Image ID: %d", propData->GetMSStyleProp()->variants.imagetype.imageID));
+			statusBar->SetStatusText(wxString::Format("Image ID: %d", propData->GetMSStyleProp()->data.imagetype.imageID));
 		}
 
 		return;
@@ -315,25 +315,25 @@ void MainWindow::OnPropertyGridChanging(wxPropertyGridEvent& event)
 	StyleProperty* styleProp = (StyleProperty*)tmpProp->GetClientData();
 
 	// Update Data. TODO: Check data for validity!
-	if (styleProp->typeID == IDENTIFIER::FILENAME)
-		styleProp->variants.imagetype.imageID = event.GetValidationInfo().GetValue().GetInteger();
-	else if (styleProp->typeID == IDENTIFIER::INT)
-		styleProp->variants.inttype.value = event.GetValidationInfo().GetValue().GetInteger();
-	else if (styleProp->typeID == IDENTIFIER::SIZE)
-		styleProp->variants.sizetype.size = event.GetValidationInfo().GetValue().GetInteger();
-	else if (styleProp->typeID == IDENTIFIER::ENUM)
-		styleProp->variants.enumtype.enumvalue = event.GetValidationInfo().GetValue().GetInteger();
-	else if (styleProp->typeID == IDENTIFIER::BOOL)
-		styleProp->variants.booltype.boolvalue = event.GetValidationInfo().GetValue().GetBool();
-	else if (styleProp->typeID == IDENTIFIER::COLOR)
+	if (styleProp->header.typeID == IDENTIFIER::FILENAME)
+		styleProp->data.imagetype.imageID = event.GetValidationInfo().GetValue().GetInteger();
+	else if (styleProp->header.typeID == IDENTIFIER::INT)
+		styleProp->data.inttype.value = event.GetValidationInfo().GetValue().GetInteger();
+	else if (styleProp->header.typeID == IDENTIFIER::SIZE)
+		styleProp->data.sizetype.size = event.GetValidationInfo().GetValue().GetInteger();
+	else if (styleProp->header.typeID == IDENTIFIER::ENUM)
+		styleProp->data.enumtype.enumvalue = event.GetValidationInfo().GetValue().GetInteger();
+	else if (styleProp->header.typeID == IDENTIFIER::BOOL)
+		styleProp->data.booltype.boolvalue = event.GetValidationInfo().GetValue().GetBool();
+	else if (styleProp->header.typeID == IDENTIFIER::COLOR)
 	{
 		wxAny value = event.GetValidationInfo().GetValue();
 		wxColor color = value.As<wxColour>();
-		styleProp->variants.colortype.r = color.Red();
-		styleProp->variants.colortype.g = color.Green();
-		styleProp->variants.colortype.b = color.Blue();
+		styleProp->data.colortype.r = color.Red();
+		styleProp->data.colortype.g = color.Green();
+		styleProp->data.colortype.b = color.Blue();
 	}
-	else if (styleProp->typeID == IDENTIFIER::RECT || styleProp->typeID == IDENTIFIER::MARGINS)
+	else if (styleProp->header.typeID == IDENTIFIER::RECT || styleProp->header.typeID == IDENTIFIER::MARGINS)
 	{
 		int l, t, r, b;
 		if (sscanf(event.GetValidationInfo().GetValue().GetString().mb_str(), "%d, %d, %d, %d", &l, &t, &r, &b) != 4)
@@ -345,13 +345,13 @@ void MainWindow::OnPropertyGridChanging(wxPropertyGridEvent& event)
 		else
 		{
 			//margins and rect have the same memory layout
-			styleProp->variants.recttype.left = l;
-			styleProp->variants.recttype.top = t;
-			styleProp->variants.recttype.right = r;
-			styleProp->variants.recttype.bottom = b;
+			styleProp->data.recttype.left = l;
+			styleProp->data.recttype.top = t;
+			styleProp->data.recttype.right = r;
+			styleProp->data.recttype.bottom = b;
 		}
 	}
-	else if (styleProp->typeID == IDENTIFIER::POSITION)
+	else if (styleProp->header.typeID == IDENTIFIER::POSITION)
 	{
 		int x, y;
 		if (sscanf(event.GetValidationInfo().GetValue().GetString().mb_str(), "%d, %d", &x, &y) != 4)
@@ -362,13 +362,13 @@ void MainWindow::OnPropertyGridChanging(wxPropertyGridEvent& event)
 		}
 		else
 		{
-			styleProp->variants.positiontype.x;
-			styleProp->variants.positiontype.y;
+			styleProp->data.positiontype.x;
+			styleProp->data.positiontype.y;
 		}
 	}
-	else if (styleProp->typeID == IDENTIFIER::FONT)
+	else if (styleProp->header.typeID == IDENTIFIER::FONT)
 	{
-		styleProp->variants.fonttype.fontID = event.GetValidationInfo().GetValue().GetInteger();
+		styleProp->data.fonttype.fontID = event.GetValidationInfo().GetValue().GetInteger();
 	}
 }
 
@@ -420,7 +420,7 @@ void MainWindow::OnImageReplaceClicked(wxCommandEvent& event)
 		tp = StyleResourceType::ATLAS;
 	else tp = StyleResourceType::NONE;
 
-	currentStyle->QueueResourceUpdate(selectedImageProp->variants.imagetype.imageID, tp, openFileDialog.GetPath().ToStdString());
+	currentStyle->QueueResourceUpdate(selectedImageProp->data.imagetype.imageID, tp, openFileDialog.GetPath().ToStdString());
 }
 
 void MainWindow::OnImageViewContextMenuTriggered(wxContextMenuEvent& event)
@@ -581,18 +581,18 @@ bool ContainsProperty(const SearchProperties& search, wxTreeItemData* treeItemDa
 		for (auto& prop : state.second)
 		{
 			// if its a property of the desired type, do a comparison
-			if (prop->typeID != search.type)
+			if (prop->header.typeID != search.type)
 				continue;
 
 			// comparison
-			switch (prop->typeID)
+			switch (prop->header.typeID)
 			{
 				case IDENTIFIER::POSITION:
 				{
 					char propPos[32];
 					sprintf(propPos, "%d,%d",
-						prop->variants.positiontype.x,
-						prop->variants.positiontype.y);
+						prop->data.positiontype.x,
+						prop->data.positiontype.y);
 
 					std::string tmp = search.value;
 					tmp.erase(std::remove_if(tmp.begin(), tmp.end(), std::isspace), tmp.end());
@@ -604,9 +604,9 @@ bool ContainsProperty(const SearchProperties& search, wxTreeItemData* treeItemDa
 				{
 					char propColor[32];
 					sprintf(propColor, "%d,%d,%d",
-						prop->variants.colortype.r,
-						prop->variants.colortype.g,
-						prop->variants.colortype.b);
+						prop->data.colortype.r,
+						prop->data.colortype.g,
+						prop->data.colortype.b);
 
 					std::string tmp = search.value;
 					tmp.erase(std::remove_if(tmp.begin(), tmp.end(), std::isspace), tmp.end());
@@ -618,10 +618,10 @@ bool ContainsProperty(const SearchProperties& search, wxTreeItemData* treeItemDa
 				{
 					char propMargin[32];
 					sprintf(propMargin, "%d,%d,%d,%d",
-						prop->variants.margintype.left,
-						prop->variants.margintype.top,
-						prop->variants.margintype.right,
-						prop->variants.margintype.bottom);
+						prop->data.margintype.left,
+						prop->data.margintype.top,
+						prop->data.margintype.right,
+						prop->data.margintype.bottom);
 
 					std::string tmp = search.value;
 					tmp.erase(std::remove_if(tmp.begin(), tmp.end(), std::isspace), tmp.end());
@@ -633,10 +633,10 @@ bool ContainsProperty(const SearchProperties& search, wxTreeItemData* treeItemDa
 				{
 					char propRect[32];
 					sprintf(propRect, "%d,%d,%d,%d",
-						prop->variants.recttype.left,
-						prop->variants.recttype.top,
-						prop->variants.recttype.right,
-						prop->variants.recttype.bottom);
+						prop->data.recttype.left,
+						prop->data.recttype.top,
+						prop->data.recttype.right,
+						prop->data.recttype.bottom);
 
 					std::string tmp = search.value;
 					tmp.erase(std::remove_if(tmp.begin(), tmp.end(), std::isspace), tmp.end());
@@ -649,7 +649,7 @@ bool ContainsProperty(const SearchProperties& search, wxTreeItemData* treeItemDa
 					try
 					{
 						int size = std::stoi(search.value);
-						if (size == prop->variants.sizetype.size)
+						if (size == prop->data.sizetype.size)
 							return true;
 					}
 					catch (...) {}
@@ -815,7 +815,7 @@ void MainWindow::FillClassView()
 				for (auto& prop : state.second)
 				{
 					// Add images
-					if (prop->typeID == IDENTIFIER::FILENAME || prop->typeID == IDENTIFIER::DISKSTREAM)
+					if (prop->header.typeID == IDENTIFIER::FILENAME || prop->header.typeID == IDENTIFIER::DISKSTREAM)
 					{
 						const char* propName = prop->LookupName(); // propnames have to be looked up, but thats fast
 						classView->AppendItem(partNode, propName, -1, -1, static_cast<wxTreeItemData*>(new PropTreeItemData(prop)));

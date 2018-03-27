@@ -28,7 +28,7 @@ namespace libmsstyle
 		{ 215, "BITMAPREF" },
 		{ 216, "FLOAT" },
 		{ 217, "FLOATLIST" },
-		{ 401, "COLORSCHEMES" },
+		{ 401, "COLORSCHEMES" }, // begin propery names
 		{ 402, "SIZES" },
 		{ 403, "CHARSET" },
 		{ 600, "NAME" },

@@ -14,11 +14,11 @@ wxPGProperty* GetWXPropertyFromMsStyleProperty(StyleProperty& prop)
 	char* str = new char[32];
 	const char* propName = prop.LookupName();
 
-	switch (prop.typeID)
+	switch (prop.header.typeID)
 	{
 	case IDENTIFIER::FILENAME:
 	{
-		wxIntProperty* p = new wxIntProperty(propName, *wxPGProperty::sm_wxPG_LABEL, prop.variants.imagetype.imageID);
+		wxIntProperty* p = new wxIntProperty(propName, *wxPGProperty::sm_wxPG_LABEL, prop.data.imagetype.imageID);
 		p->SetClientData(const_cast<void*>(static_cast<const void*>(&prop)));
 		return p;
 	}
@@ -29,12 +29,12 @@ wxPGProperty* GetWXPropertyFromMsStyleProperty(StyleProperty& prop)
 		
 		if (cp != nullptr)
 		{
-			p = new wxEnumProperty(propName, *wxPGProperty::sm_wxPG_LABEL, *cp, prop.variants.enumtype.enumvalue);
+			p = new wxEnumProperty(propName, *wxPGProperty::sm_wxPG_LABEL, *cp, prop.data.enumtype.enumvalue);
 			delete cp;
 		}
 		else
 		{
-			p = new wxIntProperty(propName, *wxPGProperty::sm_wxPG_LABEL, prop.variants.enumtype.enumvalue);
+			p = new wxIntProperty(propName, *wxPGProperty::sm_wxPG_LABEL, prop.data.enumtype.enumvalue);
 		}
 
 		p->SetClientData(&prop);
@@ -42,71 +42,71 @@ wxPGProperty* GetWXPropertyFromMsStyleProperty(StyleProperty& prop)
 	}
 	case IDENTIFIER::SIZE:
 	{
-		wxIntProperty* p = new wxIntProperty(propName, *wxPGProperty::sm_wxPG_LABEL, prop.variants.sizetype.size);
+		wxIntProperty* p = new wxIntProperty(propName, *wxPGProperty::sm_wxPG_LABEL, prop.data.sizetype.size);
 		p->SetClientData(&prop);
 		return p;
 	}
 	case IDENTIFIER::COLOR:
 	{
-		wxColourProperty* p = new wxColourProperty(propName, *wxPGProperty::sm_wxPG_LABEL, wxColor(prop.variants.colortype.r, prop.variants.colortype.g, prop.variants.colortype.b));
+		wxColourProperty* p = new wxColourProperty(propName, *wxPGProperty::sm_wxPG_LABEL, wxColor(prop.data.colortype.r, prop.data.colortype.g, prop.data.colortype.b));
 		p->SetClientData(&prop);
 		return p;
 	}
 	case IDENTIFIER::INT:
 	{
-		wxIntProperty* p = new wxIntProperty(propName, *wxPGProperty::sm_wxPG_LABEL, prop.variants.inttype.value);
+		wxIntProperty* p = new wxIntProperty(propName, *wxPGProperty::sm_wxPG_LABEL, prop.data.inttype.value);
 		p->SetClientData(&prop);
 		return p;
 	}
 	case IDENTIFIER::BOOL:
 	{
-		wxIntProperty* p = new wxIntProperty(propName, *wxPGProperty::sm_wxPG_LABEL, prop.variants.booltype.boolvalue);
+		wxIntProperty* p = new wxIntProperty(propName, *wxPGProperty::sm_wxPG_LABEL, prop.data.booltype.boolvalue);
 		p->SetClientData(&prop);
 		return p;
 	}
 	case IDENTIFIER::MARGINS:
 	{
-		sprintf(str, "%d, %d, %d, %d", prop.variants.margintype.left, prop.variants.margintype.top, prop.variants.margintype.right, prop.variants.margintype.bottom);
+		sprintf(str, "%d, %d, %d, %d", prop.data.margintype.left, prop.data.margintype.top, prop.data.margintype.right, prop.data.margintype.bottom);
 		wxStringProperty* p = new wxStringProperty(propName, *wxPGProperty::sm_wxPG_LABEL, str);
 		p->SetClientData(&prop);
 		return p;
 	}
 	case IDENTIFIER::RECT:
 	{
-		sprintf(str, "%d, %d, %d, %d", prop.variants.recttype.left, prop.variants.recttype.top, prop.variants.recttype.right, prop.variants.recttype.bottom);
+		sprintf(str, "%d, %d, %d, %d", prop.data.recttype.left, prop.data.recttype.top, prop.data.recttype.right, prop.data.recttype.bottom);
 		wxStringProperty* p = new wxStringProperty(propName, *wxPGProperty::sm_wxPG_LABEL, str);
 		p->SetClientData(&prop);
 		return p;
 	}
 	case IDENTIFIER::POSITION:
 	{
-		sprintf(str, "%d, %d", prop.variants.positiontype.x, prop.variants.positiontype.y);
+		sprintf(str, "%d, %d", prop.data.positiontype.x, prop.data.positiontype.y);
 		wxStringProperty* p = new wxStringProperty(propName, *wxPGProperty::sm_wxPG_LABEL, str);
 		p->SetClientData(&prop);
 		return p;
 	}
 	case IDENTIFIER::FONT:
 	{
-		wxIntProperty* p = new wxIntProperty("FONT (ID)", *wxPGProperty::sm_wxPG_LABEL, prop.variants.fonttype.fontID);
+		wxIntProperty* p = new wxIntProperty("FONT (ID)", *wxPGProperty::sm_wxPG_LABEL, prop.data.fonttype.fontID);
 		p->SetClientData(&prop);
 		return p;
 	}
 	case IDENTIFIER::STRING:
 	{
-		wxStringProperty* p = new wxStringProperty(propName, *wxPGProperty::sm_wxPG_LABEL, &prop.variants.texttype.firstchar);
+		wxStringProperty* p = new wxStringProperty(propName, *wxPGProperty::sm_wxPG_LABEL, &prop.data.texttype.firstchar);
 		p->SetClientData(&prop);
 		return p;
 	}
 	case IDENTIFIER::INTLIST:
 	{
-		if (prop.variants.intlist.numints >= 3)
+		if (prop.data.intlist.numints >= 3)
 		{
-			sprintf(str, "%d, %d, %d, .. (%d)", prop.variants.intlist.numints
-				, *(&prop.variants.intlist.firstint + 0)
-				, *(&prop.variants.intlist.firstint + 1)
-				, *(&prop.variants.intlist.firstint + 2));
+			sprintf(str, "%d, %d, %d, .. (%d)", prop.data.intlist.numints
+				, *(&prop.data.intlist.firstint + 0)
+				, *(&prop.data.intlist.firstint + 1)
+				, *(&prop.data.intlist.firstint + 2));
 		}
-		else sprintf(str, "Len: %d, Values omitted", prop.variants.intlist.numints);
+		else sprintf(str, "Len: %d, Values omitted", prop.data.intlist.numints);
 		wxStringProperty* p = new wxStringProperty(propName, *wxPGProperty::sm_wxPG_LABEL, str);
 		p->SetClientData(&prop);
 		return p;
@@ -122,7 +122,7 @@ wxPGChoices* GetEnumsFromMsStyleProperty(libmsstyle::StyleProperty& prop)
 {
 	wxPGChoices* choices = new wxPGChoices();
 
-	libmsstyle::lookup::EnumList result = libmsstyle::lookup::FindEnums(prop.nameID);
+	libmsstyle::lookup::EnumList result = libmsstyle::lookup::FindEnums(prop.header.nameID);
 	if (result.enums == nullptr || result.numEnums == 0)
 		return nullptr;
 

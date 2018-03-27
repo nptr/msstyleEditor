@@ -10,7 +10,6 @@
     <ClInclude Include="ResourceUtil.h" />
     <ClInclude Include="StyleClass.h" />
     <ClInclude Include="StylePart.h" />
-    <ClInclude Include="StyleProperty.h" />
     <ClInclude Include="StyleState.h" />
     <ClInclude Include="VisualStyle.h" />
     <ClInclude Include="StringConvert.h" />
@@ -20,12 +19,14 @@
     <ClInclude Include="Lookup.h" />
     <ClInclude Include="VisualStyleDefinitions.h" />
     <ClInclude Include="StyleResource.h" />
+    <ClInclude Include="PropertyReader.h" />
+    <ClInclude Include="PropertyWriter.h" />
+    <ClInclude Include="StyleProperty.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ResourceUtil.cpp" />
     <ClCompile Include="StyleClass.cpp" />
     <ClCompile Include="StylePart.cpp" />
-    <ClCompile Include="StyleProperty.cpp" />
     <ClCompile Include="StyleState.cpp" />
     <ClCompile Include="VisualStyle.cpp" />
     <ClCompile Include="VisualStyleEnums.cpp" />
@@ -34,5 +35,8 @@
     <ClCompile Include="Lookup.cpp" />
     <ClCompile Include="VisualStyleDefinitions.cpp" />
     <ClCompile Include="StyleResource.cpp" />
+    <ClCompile Include="PropertyReader.cpp" />
+    <ClCompile Include="PropertyWriter.cpp" />
+    <ClCompile Include="StyleProperty.cpp" />
   </ItemGroup>
 </Project>

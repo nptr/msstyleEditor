@@ -8,43 +8,52 @@ using namespace libmsstyle;
 
 namespace libmsstyle
 {
-
-	bool StyleProperty::IsPropertyValid()
+	bool StyleProperty::IsPropertyValid() const
 	{
 		// Not a known type
-		if (typeID < 200 || typeID >= IDENTIFIER::COLORSCHEMES)
+		if (header.typeID < 200 || header.typeID >= IDENTIFIER::COLORSCHEMES)
 			return false;
 
 		// Some color and font props use an type id as name id.
 		// They seem to contain valid data, so ill include them.
-		if (nameID == IDENTIFIER::COLOR &&
-			typeID == IDENTIFIER::COLOR)
+		if (header.nameID == IDENTIFIER::COLOR &&
+			header.typeID == IDENTIFIER::COLOR)
 			return true;
-		if (nameID == IDENTIFIER::FONT &&
-			typeID == IDENTIFIER::FONT)
+		if (header.nameID == IDENTIFIER::FONT &&
+			header.typeID == IDENTIFIER::FONT)
 			return true;
-		if (nameID == IDENTIFIER::DISKSTREAM &&
-			typeID == IDENTIFIER::DISKSTREAM)
+		if (header.nameID == IDENTIFIER::DISKSTREAM &&
+			header.typeID == IDENTIFIER::DISKSTREAM)
 			return true;
-		if (nameID == IDENTIFIER::STREAM &&
-			typeID == IDENTIFIER::STREAM)
+		if (header.nameID == IDENTIFIER::STREAM &&
+			header.typeID == IDENTIFIER::STREAM)
 			return true;
 
 		// Not sure where the line for valid name ids is.
-		if (nameID < IDENTIFIER::COLORSCHEMES)
+		if (header.nameID < IDENTIFIER::COLORSCHEMES)
 			return false;
 
 		// Not a known class
-		if (classID > 8002)
+		if (header.classID > 8002)
 			return false;
 
 		return true;
 	}
 
-
-	int StyleProperty::GetPropertySize()
+	bool StyleProperty::IsNameMatchingType() const
 	{
-		switch (typeID)
+		// lookup typemap if prop exists in there
+		return true;
+	}
+
+	bool StyleProperty::IsContentMatchingType() const
+	{
+		return true;
+	}
+
+	int StyleProperty::GetRegularPropertySize() const
+	{
+		switch (header.typeID)
 		{
 		case IDENTIFIER::FILENAME:
 		case IDENTIFIER::DISKSTREAM:
@@ -69,11 +78,11 @@ namespace libmsstyle
 			return 40;
 		case IDENTIFIER::INTLIST:
 			// header, reserved, numints, intlist, nullterminator
-			return 20 + 12 + 4 + variants.intlist.numints * sizeof(int32_t);
+			return 20 + 12 + 4 + data.intlist.numints * sizeof(int32_t);
 		case IDENTIFIER::STRING:
 			// string length in bytes including the null terminator
-			return 20 + 8 + 4 + variants.texttype.sizeInBytes;
-			// return 20 + 8 + 4 + (wcslen(&prop.variants.texttype.firstchar) + 1) * sizeof(wchar_t);
+			return 20 + 8 + 4 + data.texttype.sizeInBytes;
+			// return 20 + 8 + 4 + (wcslen(&prop.data.texttype.firstchar) + 1) * sizeof(wchar_t);
 		case 225: // Unknown or wrong prop, since Win7 ?
 		case 241: // Unknown or wrong prop, since Win10 ?
 			return 40;
@@ -82,22 +91,27 @@ namespace libmsstyle
 		}
 	}
 
+	int StyleProperty::GetPropertySizeAsFound() const
+	{
+		return sizeof(PropertyHeader) + bytesAfterHeader;
+	}
+
 
 	IDENTIFIER StyleProperty::GetTypeID() const
 	{
-		return static_cast<IDENTIFIER>(typeID);
+		return static_cast<IDENTIFIER>(header.typeID);
 	}
 
 
 	IDENTIFIER StyleProperty::GetNameID() const
 	{
-		return static_cast<IDENTIFIER>(nameID);
+		return static_cast<IDENTIFIER>(header.nameID);
 	}
 
 
 	const char* StyleProperty::LookupName() const
 	{
-		auto ret = libmsstyle::PROPERTY_MAP.find(nameID);
+		auto ret = libmsstyle::PROPERTY_MAP.find(header.nameID);
 		if (ret != libmsstyle::PROPERTY_MAP.end())
 			return ret->second;
 		else return "UNKNOWN";
@@ -105,7 +119,7 @@ namespace libmsstyle
 
 	const char* StyleProperty::LookupTypeName() const
 	{
-		auto ret = libmsstyle::PROPERTY_MAP.find(typeID);
+		auto ret = libmsstyle::PROPERTY_MAP.find(header.typeID);
 		if (ret != libmsstyle::PROPERTY_MAP.end())
 			return ret->second;
 		else return "UNKNOWN";
@@ -113,132 +127,133 @@ namespace libmsstyle
 
 	void StyleProperty::UpdateImageLink(int imageID)
 	{
-		variants.imagetype.imageID = imageID;
+		data.imagetype.imageID = imageID;
 	}
 
 	void StyleProperty::UpdateInteger(int intVal)
 	{
-		variants.inttype.value = intVal;
+		data.inttype.value = intVal;
 	}
 
 	void StyleProperty::UpdateSize(int size)
 	{
-		variants.sizetype.size = size;
+		data.sizetype.size = size;
 	}
 
 	void StyleProperty::UpdateEnum(int enumVal)
 	{
-		variants.enumtype.enumvalue = enumVal;
+		data.enumtype.enumvalue = enumVal;
 	}
 
 	void StyleProperty::UpdateBoolean(bool boolVal)
 	{
-		variants.booltype.boolvalue = boolVal;
+		data.booltype.boolvalue = boolVal;
 	}
 
 	void StyleProperty::UpdateColor(uint8_t r, uint8_t g, uint8_t b)
 	{
-		variants.colortype.r = r;
-		variants.colortype.g = g;
-		variants.colortype.b = b;
+		data.colortype.r = r;
+		data.colortype.g = g;
+		data.colortype.b = b;
 	}
 
 	void StyleProperty::UpdateRectangle(int left, int top, int right, int bottom)
 	{
-		variants.recttype.left = left;
-		variants.recttype.top = top;
-		variants.recttype.right = right;
-		variants.recttype.bottom = bottom;
+		data.recttype.left = left;
+		data.recttype.top = top;
+		data.recttype.right = right;
+		data.recttype.bottom = bottom;
 	}
 
 	void StyleProperty::UpdateMargin(int left, int top, int right, int bottom)
 	{
-		variants.margintype.left = left;
-		variants.margintype.top = top;
-		variants.margintype.right = right;
-		variants.margintype.bottom = bottom;
+		data.margintype.left = left;
+		data.margintype.top = top;
+		data.margintype.right = right;
+		data.margintype.bottom = bottom;
 	}
 
 	void StyleProperty::UpdatePosition(int x, int y)
 	{
-		variants.positiontype.x = x;
-		variants.positiontype.y = y;
+		data.positiontype.x = x;
+		data.positiontype.y = y;
 	}
 
 	void StyleProperty::UpdateFont(int fontID)
 	{
-		variants.fonttype.fontID = fontID;
+		data.fonttype.fontID = fontID;
 	}
 
 	std::string StyleProperty::GetValueAsString() const
 	{
 		char textbuffer[64];
-		switch (typeID)
+		switch (header.typeID)
 		{
 		case IDENTIFIER::ENUM:
 		{
-			const char* enumStr = lookup::GetEnumAsString(nameID, variants.enumtype.enumvalue);
+			const char* enumStr = lookup::GetEnumAsString(header.nameID, data.enumtype.enumvalue);
 			if (enumStr != nullptr)
 				return std::string(enumStr);
 			else return std::string("UNKNOWN ENUM");
 		} break;
 		case IDENTIFIER::STRING:
 		{
-			return WideToUTF8(&variants.texttype.firstchar);
+			return WideToUTF8(&data.texttype.firstchar);
 		} break;
 		case IDENTIFIER::INT:
 		{
-			return std::to_string(variants.inttype.value);
+			return std::to_string(data.inttype.value);
 		} break;
 		case IDENTIFIER::BOOL:
 		{
-			if (variants.booltype.boolvalue > 0)
+			if (data.booltype.boolvalue > 0)
 				return std::string("true");
 			else return std::string("false");
 		} break;
 		case IDENTIFIER::COLOR:
 		{
-			sprintf(textbuffer, "%d, %d, %d", variants.colortype.r, variants.colortype.g, variants.colortype.b);
+			sprintf(textbuffer, "%d, %d, %d", data.colortype.r, data.colortype.g, data.colortype.b);
 			return std::string(textbuffer);
 		} break;
 		case IDENTIFIER::MARGINS:
 		{
-			sprintf(textbuffer, "%d, %d, %d, %d", variants.margintype.left, variants.margintype.top, variants.margintype.right, variants.margintype.bottom);
+			sprintf(textbuffer, "%d, %d, %d, %d", data.margintype.left, data.margintype.top, data.margintype.right, data.margintype.bottom);
 			return std::string(textbuffer);
 		} break;
 		case IDENTIFIER::FILENAME:
+		case IDENTIFIER::DISKSTREAM:
 		{
-			return std::to_string(variants.imagetype.imageID);
+			return std::to_string(data.imagetype.imageID);
 		} break;
 		case IDENTIFIER::SIZE:
 		{
-			return std::to_string(variants.sizetype.size);
+			return std::to_string(data.sizetype.size);
 		} break;
 		case IDENTIFIER::POSITION:
 		{
-			sprintf(textbuffer, "%d, %d", variants.positiontype.x, variants.positiontype.y);
+			sprintf(textbuffer, "%d, %d", data.positiontype.x, data.positiontype.y);
 			return std::string(textbuffer);
 		} break;
 		case IDENTIFIER::RECT:
 		{
-			sprintf(textbuffer, "%d, %d, %d, %d", variants.recttype.left, variants.recttype.top, variants.recttype.right, variants.recttype.bottom);
+			sprintf(textbuffer, "%d, %d, %d, %d", data.recttype.left, data.recttype.top, data.recttype.right, data.recttype.bottom);
 			return std::string(textbuffer);
 		} break;
 		case IDENTIFIER::FONT:
 		{
 			// todo: lookup resource id?
-			return std::to_string(variants.fonttype.fontID);
+			return std::to_string(data.fonttype.fontID);
 		} break;
 		case IDENTIFIER::INTLIST:
 		{
-			if (variants.intlist.numints >= 3)
+			if (data.intlist.numints >= 3)
 			{
-				sprintf(textbuffer, "Len: %d, Values: %d, %d, %d, ...", variants.intlist.numints
-					, *(&variants.intlist.firstint + 0)
-					, *(&variants.intlist.firstint + 1)
-					, *(&variants.intlist.firstint + 2));
+				sprintf(textbuffer, "Len: %d, Values: %d, %d, %d, ...", data.intlist.numints
+					, *(&data.intlist.firstint + 0)
+					, *(&data.intlist.firstint + 1)
+					, *(&data.intlist.firstint + 2));
 			}
-			else sprintf(textbuffer, "Len: %d, Values omitted", variants.intlist.numints);
+			else sprintf(textbuffer, "Len: %d, Values omitted", data.intlist.numints);
 			return std::string(textbuffer);
 		} break;
 		default:
