@@ -198,7 +198,7 @@ namespace libmsstyle
 		} break;
 		case IDENTIFIER::STRING:
 		{
-			return WideToUTF8(&data.texttype.firstchar);
+			return WideToUTF8(text);
 		} break;
 		case IDENTIFIER::INT:
 		{

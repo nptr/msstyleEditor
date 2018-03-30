@@ -10,6 +10,7 @@ namespace libmsstyle
 	{
 		class PropertyWriter
 		{
+		public:
 			char* WriteProperty(char* dest, StyleProperty& prop);
 		};
 	}

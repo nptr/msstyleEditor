@@ -37,28 +37,24 @@ namespace libmsstyle
 			}
 			else
 			{
-				size_t remainingBytes = end - cursor;
+				// Copying the data bytes. There may not be enough data to completely
+				// fill the PropertyData because of short-properties. Take what we get.
+				size_t bytesUntilNext = 0;
+				const char* scanCursor = cursor;
+				while (!IsValidHeader(scanCursor) && scanCursor < end)
+				{
+					bytesUntilNext++;
+					scanCursor++;
+				}
 
-				// Copying the most impartant bytes. The PropertyData struct may overlap
-				// with the next property though, when it's in a short-format.
-				// I don't mind the overlapped data, so ill copy tho whole thing, but
-				// depending on the property type, the cursor is advanced differently
-				// so i dont miss the overlapping property.
-				memcpy(&(prop->data), cursor, std::min(sizeof(PropertyData), remainingBytes));
-				
-				// DEBUG: Scan for a header, instead of jumping
-				//const char* debugCursor = cursor;
-				//for (int i = 0; i < 24; ++i, ++debugCursor)
-				//{
-				//	if (IsValidHeader(debugCursor))
-				//	{
-				//		char textbuffer[64];
-				//		sprintf(textbuffer, "next header %d bytes after data\n", i);
-				//		OutputDebugStringA(textbuffer);
-				//	}
-				//}
 
-				// Copy overlength data, and determine the real length of the property.
+				// Note that im not incrementing the cursor, because i still need it
+				// at the beginning of the data section in the following switch-case.
+				memcpy(&(prop->data), cursor, std::min(sizeof(PropertyData), bytesUntilNext));
+				prop->bytesAfterHeader = bytesUntilNext;
+
+
+				// Copy overlength data (integer list, string properties ...)
 				switch (prop->header.typeID)
 				{
 					case IDENTIFIER::INTLIST:
@@ -91,25 +87,20 @@ namespace libmsstyle
 
 						prop->bytesAfterHeader = 12 + prop->data.texttype.sizeInBytes;
 					} break;
+					case IDENTIFIER::FILENAME:
+					case IDENTIFIER::DISKSTREAM:
+					case IDENTIFIER::FONT:
 					case IDENTIFIER::INT:
 					case IDENTIFIER::BOOL:
 					case IDENTIFIER::COLOR:
 					case IDENTIFIER::MARGINS:
-					case IDENTIFIER::FILENAME:
 					case IDENTIFIER::SIZE:
 					case IDENTIFIER::POSITION:
 					case IDENTIFIER::RECT:
-					case IDENTIFIER::FONT:
 					default:
 					{
-						int bytesAfterHeader = 0;
-						while (!IsValidHeader(cursor) && cursor < end)
-						{
-							bytesAfterHeader++;
-							cursor++;
-						}
-
-						prop->bytesAfterHeader = bytesAfterHeader;
+						// Finally increment the cursor
+						cursor += prop->bytesAfterHeader;
 					}
 				}
 

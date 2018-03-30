@@ -7,6 +7,7 @@
 #include "VisualStyleDefinitions.h"
 
 #include "PropertyReader.h"
+#include "PropertyWriter.h"
 
 #include <string.h>
 #include <fstream>
@@ -33,6 +34,14 @@ namespace libmsstyle
 			: m_propsFound(0)
 			, m_moduleHandle(0)
 		{
+		}
+
+		~Impl()
+		{
+			for (auto& prop : m_origOrder)
+			{
+				delete prop;
+			}
 		}
 
 		StyleClass* GetClass(int index)
@@ -141,24 +150,23 @@ namespace libmsstyle
 			//	// properties, this shouldn't be necessary
 			//}
 
+			libmsstyle::rw::PropertyWriter writer;
 			for (auto& prop : m_origOrder)
 			{
-				int propSize = prop->GetRegularPropertySize();
-				memcpy(dataptr, &(prop->header), propSize);
-				dataptr += propSize;
+				dataptr = writer.WriteProperty(dataptr, *prop);
 
-				if (dataptr - data > estimatedSize)
+				if (dataptr-data > estimatedSize)
 					throw std::runtime_error("I haven't allocated enough memory to save the file..sorry for that!");
 			}
 
-			//LanguageId lid = GetFirstLanguageId(m_moduleHandle, "NORMAL", "VARIANT");
-			//unsigned int length = static_cast<unsigned int>(dataptr - data);
-			// 
-			//if (!UpdateStyleResource(updateHandle, "VARIANT", "NORMAL", lid, data, length))
-			//{
-			//	throw std::runtime_error("Could not update properties!");
-			//	return;
-			//}
+			LanguageId lid = GetFirstLanguageId(m_moduleHandle, "NORMAL", "VARIANT");
+			unsigned int length = static_cast<unsigned int>(dataptr - data);
+			 
+			if (!UpdateStyleResource(updateHandle, "VARIANT", "NORMAL", lid, data, length))
+			{
+				throw std::runtime_error("Could not update properties!");
+				return;
+			}
 		}
 
 		void Save(const std::string& path)
@@ -273,7 +281,6 @@ namespace libmsstyle
 		{
 			libmsstyle::rw::PropertyReader reader(m_classes.size());
 
-			StyleProperty* tmpProp;
 			const char* dataPtr = static_cast<const char*>(propResource.data);
 			const char* endPtr = dataPtr + propResource.size;
 
@@ -296,8 +303,7 @@ namespace libmsstyle
 					const auto& result = m_classes.find(tmpProp->header.classID);
 					if (result == m_classes.end())
 					{
-						printf("No class with id: %d\r\n", tmpProp->header.classID);
-						continue;
+						throw std::runtime_error("Found property with unknown class ID");
 					}
 					else cls = &(result->second);
 

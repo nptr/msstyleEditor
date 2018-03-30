@@ -28,29 +28,35 @@ namespace libmsstyle
 		struct
 		{
 			int32_t fontID;		// for MAKEINTRESOURCE() too?
-			char reserved[16];
+			int32_t important1;
+			int32_t important2;
 		}fonttype;
 		struct
 		{
-			char reserved[12];
+			int32_t shortFlag;
+			char reserved[8];
 			int32_t value;
 			char reserved2[4];
 		}inttype;
 		struct
 		{
-			char reserved[12];
+			int32_t shortFlag;
+			char reserved[8];
 			int32_t size;
 			char reserved2[4];
 		}sizetype;
 		struct
 		{
-			char reserved[12];
+			int32_t shortFlag; // 0x7C
+			int32_t alwaysZero;
+			int32_t anUnknownValue; // 0x04
 			int32_t boolvalue;
 			char reserved2[4];
 		}booltype;
 		struct
 		{
-			char reserved[12];
+			int32_t shortFlag;
+			char reserved[8];
 			unsigned char r;
 			unsigned char g;
 			unsigned char b;
@@ -58,7 +64,9 @@ namespace libmsstyle
 		}colortype;
 		struct
 		{
-			char reserved[12];
+			int32_t shortFlag; // 0x73, 0x76, 0x77, 0x7B
+			int32_t alwaysZero;
+			int32_t anUnknownValue; // 0x10
 			int32_t left;
 			int32_t top;
 			int32_t right;
@@ -66,7 +74,9 @@ namespace libmsstyle
 		}recttype;
 		struct
 		{
-			char reserved[12];
+			int32_t shortFlag; // same as rect i guess
+			int32_t alwaysZero;
+			int32_t anUnknownValue; // same as rect i guess
 			int32_t left;
 			int32_t top;
 			int32_t right;
@@ -74,19 +84,22 @@ namespace libmsstyle
 		}margintype;
 		struct
 		{
-			char reserved[12];
+			int32_t shortFlag;
+			char reserved[8];
 			int32_t enumvalue;
 			char reserved2[4];
 		}enumtype;
 		struct
 		{
-			char reserved[12];
+			int32_t shortFlag;
+			char reserved[8];
 			int32_t x;
 			int32_t y;
 		}positiontype;
 		struct // INTLIST struct (uxtheme.h)
 		{
-			char reserved[12];
+			int32_t shortFlag;
+			char reserved[8];
 			int32_t numints;
 			int32_t firstint;
 		}intlist;
