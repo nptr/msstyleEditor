@@ -66,8 +66,6 @@ namespace libmsstyle
 		{ 1208, "MENUBARWIDTH" },
 		{ 1209, "MENUBARHEIGHT" },
 		{ 1210, "PADDEDBORDERWIDTH" },
-		{ 1201, "FIRSTSIZE" },
-		{ 1210, "LASTSIZE" },
 		{ 1301, "MINCOLORDEPTH" },
 		{ 1301, "FIRSTINT" },
 		{ 1301, "LASTINT" },
@@ -256,6 +254,11 @@ namespace libmsstyle
 		{ 5004, "CUSTOMSPLITRECT" },
 		{ 5005, "ANIMATIONBUTTONRECT" },
 		{ 5006, "ANIMATIONDURATION" },
+		{ 5111, "????" },
+		{ 5112, "????" },
+		{ 5128, "????" },
+		{ 5129, "????" },
+		{ 5130, "????" },
 		{ 6000, "TRANSITIONDURATIONS" },
 		{ 7001, "SCALEDBACKGROUND" },
 		{ 8000, "ATLASIMAGE" },
@@ -283,5 +286,6 @@ namespace libmsstyle
 		{ 215, "BITMAPREF" },
 		{ 216, "FLOAT" },
 		{ 217, "FLOATLIST" },
+		{ 241, "????" },
 	};
 }
