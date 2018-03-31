@@ -18,17 +18,15 @@ namespace libmsstyle
 
 		const char* PropertyReader::ReadNextProperty(const char* source, const char* end, StyleProperty* prop)
 		{
-			const size_t PSEUDOHEADERSIZE = 12;
-
 			const char* cursor = source;
-			while (!IsValidHeader(cursor))
+			while (!IsProbablyValidHeader(cursor))
 				cursor += 1;
 
-			if (cursor - source >= 32)
+			int diff = cursor - source;
+			if (diff > 0)
 			{
-				char textbuffer[64];
-				const StyleProperty* tmp = reinterpret_cast<const StyleProperty*>(source);
-				sprintf(textbuffer, "Skip? Name: %d, Type: %d\r\n", tmp->header.nameID, tmp->header.typeID);
+				char textbuffer[21];
+				sprintf(textbuffer, "Skipped %d bytes!\r\n", diff);
 				OutputDebugStringA(textbuffer);
 			}
 
@@ -37,43 +35,79 @@ namespace libmsstyle
 			cursor += sizeof(PropertyHeader);
 
 
-			// We should be able to do 12 more bytes at once. Thats the minimal
-			// property data size ive found so far. This completes the 32 byte props.
-			memcpy(&(prop->data), cursor, PSEUDOHEADERSIZE);
-			prop->bytesAfterHeader = PSEUDOHEADERSIZE;
-
-			// Here, we could either check the type, the shortFlag, and jump
-			// appropriately, or just scan to be more generic. Both approaches
-			// have its ups and downs. Scan:
-			size_t bytesUntilNext = 0;
-			const char* scanCursor = cursor + PSEUDOHEADERSIZE;
-			while (!IsValidHeader(scanCursor) && scanCursor < end)
-			{
-				bytesUntilNext++;
-				scanCursor++;
-			}
-
-
-			// If there is data left (most of the time),
-			// copy just enough to fill the PropertyData struct
-			// This completes the 40 & 48 byte props.
-			if (bytesUntilNext > 0)
-			{
-				size_t toCopy = std::min(sizeof(PropertyData) - PSEUDOHEADERSIZE, bytesUntilNext);
-				char* dataPlusPSHDR = reinterpret_cast<char*>(&prop->data) + PSEUDOHEADERSIZE;
-
-				memcpy(dataPlusPSHDR, cursor + PSEUDOHEADERSIZE, toCopy);
-				prop->bytesAfterHeader += toCopy;
-			}
-
-			// Copy overlength data (integer list, string properties ...)
-			// and move the cursor from its position after the header to
-			// the end of the property.
+			// Copy the data
 			switch (prop->header.typeID)
 			{
+			// 32 bytes
+			case IDENTIFIER::FILENAME:
+			case IDENTIFIER::DISKSTREAM:
+			case IDENTIFIER::FONT:
+			{
+				memcpy(&(prop->data), cursor, 12);
+				cursor += 12;
+				prop->bytesAfterHeader += 12;
+			} break;
+			// 40 bytes
+			case IDENTIFIER::INT:
+			case IDENTIFIER::SIZE:
+			case IDENTIFIER::BOOL:
+			case IDENTIFIER::COLOR:
+			case IDENTIFIER::ENUM:
+			case IDENTIFIER::POSITION:
+			case IDENTIFIER::UNKNOWN_241:
+			{
+				memcpy(&(prop->data), cursor, 12);
+				cursor += 12;
+				prop->bytesAfterHeader += 12;
+
+				// Copy the rest if not a short prop
+				if (prop->data.booltype.shortFlag == 0)
+				{
+					char* dataPlusPSHDR = reinterpret_cast<char*>(&prop->data) + 12;
+					memcpy(dataPlusPSHDR, cursor, 8);
+					cursor += 8;
+					prop->bytesAfterHeader += 8;
+				}
+			} break;
+			// 48 bytes
+			case IDENTIFIER::RECT:
+			case IDENTIFIER::MARGINS:
+			{
+				memcpy(&(prop->data), cursor, 12);
+				cursor += 12;
+				prop->bytesAfterHeader += 12;
+
+				// Copy the rest if not a short prop
+				if (prop->data.recttype.shortFlag == 0)
+				{
+					char* dataPlusPSHDR = reinterpret_cast<char*>(&prop->data) + 12;
+					memcpy(dataPlusPSHDR, cursor, 16);
+					cursor += 16;
+					prop->bytesAfterHeader += 16;
+				}
+			} break;
+			// Arbitrary
 			case IDENTIFIER::INTLIST:
 			{
-				cursor += PSEUDOHEADERSIZE + 4;
+				// There was an intlist, without short indicator
+				// immediately followed by a property instead of
+				// "numints" + list data. It ended exactly on a
+				// 8byte boundary.
+				if (IsProbablyValidHeader(cursor+12))
+				{
+					memcpy(&(prop->data), cursor, 12);
+					cursor += 12;
+					prop->bytesAfterHeader += 12;
+					OutputDebugStringA("Bad INTLIST!!!!\r\n");
+					break;
+				}
+				else
+				{
+					memcpy(&(prop->data), cursor, 16);
+					cursor += 16;
+					prop->bytesAfterHeader += 16;
+				}
+
 				int32_t numValues = prop->data.intlist.numints;
 
 				prop->intlist.reserve(numValues);
@@ -84,11 +118,14 @@ namespace libmsstyle
 					cursor += sizeof(int32_t);
 				}
 
-				prop->bytesAfterHeader += 4 + (numValues * sizeof(int32_t));
+				prop->bytesAfterHeader += prop->data.intlist.numints * sizeof(int32_t);
 			} break;
 			case IDENTIFIER::STRING:
 			{
-				cursor += PSEUDOHEADERSIZE;
+				memcpy(&(prop->data), cursor, 12);
+				cursor += 12;
+				prop->bytesAfterHeader += 12;
+
 				int32_t szLen = prop->data.texttype.sizeInBytes / 2;
 
 				prop->text.reserve(szLen);
@@ -101,20 +138,12 @@ namespace libmsstyle
 
 				prop->bytesAfterHeader += prop->data.texttype.sizeInBytes;
 			} break;
-			case IDENTIFIER::FILENAME:
-			case IDENTIFIER::DISKSTREAM:
-			case IDENTIFIER::FONT:
-			case IDENTIFIER::INT:
-			case IDENTIFIER::BOOL:
-			case IDENTIFIER::COLOR:
-			case IDENTIFIER::MARGINS:
-			case IDENTIFIER::SIZE:
-			case IDENTIFIER::POSITION:
-			case IDENTIFIER::RECT:
 			default:
 			{
-				cursor += prop->bytesAfterHeader;
-			}
+				char textbuffer[64];
+				sprintf(textbuffer, "Unknown Type: %d\r\n", prop->header.typeID);
+				OutputDebugStringA(textbuffer);
+			} break;
 			}
 
 			char textbuffer[64];
@@ -136,12 +165,11 @@ namespace libmsstyle
 		}
 
 
-		bool PropertyReader::IsValidHeader(const char* source)
+		bool PropertyReader::IsProbablyValidHeader(const char* source)
 		{
 			const PropertyHeader* header = reinterpret_cast<const PropertyHeader*>(source);
 
-			// Not a known type
-			if (header->typeID < 200 || header->typeID > IDENTIFIER::FLOATLIST)
+			if (header->typeID < IDENTIFIER::ENUM || header->typeID >= IDENTIFIER::COLORSCHEMES)
 				return false;
 
 			// Some color and font props use an type id as name id.
@@ -179,15 +207,6 @@ namespace libmsstyle
 			// Not a known class
 			if (header->classID < 0 ||
 				header->classID > m_numClasses)
-				return false;
-
-			// Last resort - map lookup
-			// Problem: As long as the type is known, i could have handled
-			// the property. With this check, im sacrificing forward compatiblity.
-			// But some properties contain values that just look like a new prop header
-			// and with this check
-			auto& result = PROPERTY_MAP.find(header->nameID);
-			if (result == PROPERTY_MAP.end())
 				return false;
 
 			return true;

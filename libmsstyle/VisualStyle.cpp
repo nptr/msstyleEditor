@@ -280,13 +280,14 @@ namespace libmsstyle
 		void LoadProperties(Resource propResource)
 		{
 			libmsstyle::rw::PropertyReader reader(m_classes.size());
-
+			const char* prevPtr = 0;
 			const char* dataPtr = static_cast<const char*>(propResource.data);
 			const char* endPtr = dataPtr + propResource.size;
 
 			while (dataPtr < endPtr)
 			{
 				StyleProperty* tmpProp = new StyleProperty();
+				prevPtr = dataPtr;
 				dataPtr = reader.ReadNextProperty(dataPtr, endPtr, tmpProp);
 				if (!tmpProp->IsPropertyValid())
 				{

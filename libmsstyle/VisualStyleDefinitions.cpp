@@ -28,6 +28,7 @@ namespace libmsstyle
 		{ 215, "BITMAPREF" },
 		{ 216, "FLOAT" },
 		{ 217, "FLOATLIST" },
+		{ 241, "UNKNOWN_241" },
 		{ 401, "COLORSCHEMES" }, // begin propery names
 		{ 402, "SIZES" },
 		{ 403, "CHARSET" },
@@ -254,11 +255,12 @@ namespace libmsstyle
 		{ 5004, "CUSTOMSPLITRECT" },
 		{ 5005, "ANIMATIONBUTTONRECT" },
 		{ 5006, "ANIMATIONDURATION" },
-		{ 5111, "????" },
-		{ 5112, "????" },
-		{ 5128, "????" },
-		{ 5129, "????" },
-		{ 5130, "????" },
+		/* Unknown props found in Win10 styles */
+		{ 5111, "UNKNOWN_5111" },
+		{ 5112, "UNKNOWN_5112" },
+		{ 5128, "UNKNOWN_5128" },
+		{ 5129, "UNKNOWN_5129" },
+		{ 5130, "UNKNOWN_5130" },
 		{ 6000, "TRANSITIONDURATIONS" },
 		{ 7001, "SCALEDBACKGROUND" },
 		{ 8000, "ATLASIMAGE" },
@@ -286,6 +288,6 @@ namespace libmsstyle
 		{ 215, "BITMAPREF" },
 		{ 216, "FLOAT" },
 		{ 217, "FLOATLIST" },
-		{ 241, "????" },
+		{ 241, "UNKNOWN_241" },
 	};
 }

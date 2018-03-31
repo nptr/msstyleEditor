@@ -115,6 +115,7 @@ namespace libmsstyle
 	{
 	public:
 		StyleProperty()
+			: bytesAfterHeader(0)
 		{
 			memset(&header, 0, sizeof(PropertyHeader));
 			memset(&data, 0, sizeof(PropertyData));
