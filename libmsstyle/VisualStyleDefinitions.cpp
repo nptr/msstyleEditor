@@ -67,6 +67,8 @@ namespace libmsstyle
 		{ 1208, "MENUBARWIDTH" },
 		{ 1209, "MENUBARHEIGHT" },
 		{ 1210, "PADDEDBORDERWIDTH" },
+		{ 1201, "FIRSTSIZE" },
+		{ 1210, "LASTSIZE" },
 		{ 1301, "MINCOLORDEPTH" },
 		{ 1301, "FIRSTINT" },
 		{ 1301, "LASTINT" },

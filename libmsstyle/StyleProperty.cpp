@@ -119,8 +119,8 @@ namespace libmsstyle
 
 	const char* StyleProperty::LookupTypeName() const
 	{
-		auto ret = libmsstyle::PROPERTY_MAP.find(header.typeID);
-		if (ret != libmsstyle::PROPERTY_MAP.end())
+		auto ret = libmsstyle::DATATYPE_MAP.find(header.typeID);
+		if (ret != libmsstyle::DATATYPE_MAP.end())
 			return ret->second;
 		else return "UNKNOWN";
 	}

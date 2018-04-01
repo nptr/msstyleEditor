@@ -6,6 +6,8 @@
 #include <wx\propgrid\property.h>
 #include <wx\propgrid\advprops.h>
 
+wxMenu* BuildPropertyMenu(int idbase);
+
 wxPGProperty* GetWXPropertyFromMsStyleProperty(libmsstyle::StyleProperty& prop);
 wxPGChoices* GetEnumsFromMsStyleProperty(libmsstyle::StyleProperty& prop);
 

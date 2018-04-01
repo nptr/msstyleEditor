@@ -9,6 +9,34 @@
 
 using namespace libmsstyle;
 
+wxMenu* BuildPropertyMenu(int idbase)
+{
+	int ID_BASE_PROP = idbase;
+	wxMenu* createPropMenu = new wxMenu();
+
+	wxMenu* enums = new wxMenu();
+	for (int i = IDENTIFIER::BORDERTYPE; i <= IDENTIFIER::TRUESIZESCALINGTYPE; ++i)
+	{
+		enums->Append(ID_BASE_PROP + i, libmsstyle::lookup::FindPropertyName(i));
+	}
+
+	wxMenu* margins = new wxMenu();
+	margins->Append(ID_BASE_PROP + IDENTIFIER::SIZINGMARGINS, lookup::FindPropertyName(IDENTIFIER::SIZINGMARGINS));
+	margins->Append(ID_BASE_PROP + IDENTIFIER::CONTENTMARGINS, lookup::FindPropertyName(IDENTIFIER::CONTENTMARGINS));
+	margins->Append(ID_BASE_PROP + IDENTIFIER::CAPTIONMARGINS, lookup::FindPropertyName(IDENTIFIER::CAPTIONMARGINS));
+
+	wxMenu* colors = new wxMenu();
+	for (int i = IDENTIFIER::FIRSTCOLOR; i <= IDENTIFIER::LASTCOLOR; ++i)
+	{
+		colors->Append(ID_BASE_PROP + i, libmsstyle::lookup::FindPropertyName(i));
+	}
+
+	createPropMenu->AppendSubMenu(enums, "Enums");
+	createPropMenu->AppendSubMenu(margins, "Margins");
+	createPropMenu->AppendSubMenu(colors, "Colors");
+	return createPropMenu;
+}
+
 wxPGProperty* GetWXPropertyFromMsStyleProperty(StyleProperty& prop)
 {
 	char* str = new char[32];

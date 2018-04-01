@@ -300,5 +300,21 @@ namespace libmsstyle
 			}
 			else return nullptr;
 		}
+
+		const char* FindPropertyName(int nameID)
+		{
+			auto ret = libmsstyle::PROPERTY_MAP.find(nameID);
+			if (ret != libmsstyle::PROPERTY_MAP.end())
+				return ret->second;
+			else return "UNKNOWN";
+		}
+
+		const char* FindTypeName(int typeID)
+		{
+			auto ret = libmsstyle::DATATYPE_MAP.find(typeID);
+			if (ret != libmsstyle::DATATYPE_MAP.end())
+				return ret->second;
+			else return "UNKNOWN";
+		}
 	}
 }

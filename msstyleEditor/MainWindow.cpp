@@ -98,13 +98,7 @@ MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, c
 
 	statusBar = this->CreateStatusBar(1);
 
-	imageViewMenu = new wxMenu();
-	imageViewMenu->AppendRadioItem(ID_BG_WHITE, wxT("White"));
-	imageViewMenu->AppendRadioItem(ID_BG_GREY, wxT("Light Grey"))->Check();
-	imageViewMenu->AppendRadioItem(ID_BG_BLACK, wxT("Black"));
-	imageViewMenu->AppendRadioItem(ID_BG_CHESS, wxT("Chessboard"));
-
-	// Menu Event Handler
+	// Main Menu Event Handler
 	Connect(ID_FOPEN, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnFileOpenMenuClicked));
 	Connect(ID_FSAVE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnFileSaveMenuClicked));
 	Connect(ID_EXPORT_TREE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnExportLogicalStructure));
@@ -119,16 +113,36 @@ MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, c
 	Connect(ID_THEMEFOLDER, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnOpenThemeFolder));
 	Connect(ID_FIND, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnOpenSearchDlg));
 
-	// Image View Context Menu
-	imageView->Connect(wxEVT_CONTEXT_MENU, wxContextMenuEventHandler(MainWindow::OnImageViewContextMenuTriggered), NULL, this);
-	Connect(ID_BG_WHITE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnImageViewBgWhite));
-	Connect(ID_BG_GREY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnImageViewBgGrey));
-	Connect(ID_BG_BLACK, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnImageViewBgBlack));
-	Connect(ID_BG_CHESS, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnImageViewBgChess));
+	//
+	// Image View  & Context Menu
+	//
+	imageViewMenu = new wxMenu();
+	imageViewMenu->AppendRadioItem(ID_BG_WHITE, wxT("White"));
+	imageViewMenu->AppendRadioItem(ID_BG_GREY, wxT("Light Grey"))->Check();
+	imageViewMenu->AppendRadioItem(ID_BG_BLACK, wxT("Black"));
+	imageViewMenu->AppendRadioItem(ID_BG_CHESS, wxT("Chessboard"));
 
+	imageView->Connect(wxEVT_CONTEXT_MENU, wxContextMenuEventHandler(MainWindow::OnImageViewContextMenuTriggered), NULL, this);
+	Connect(ID_BG_WHITE, ID_BG_CHESS, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnImageViewBgSelect));
+
+	//
 	// Treeview & Property Grid
+	//
+	wxMenu* createPropMenuMargins = new wxMenu();
+	wxMenu* createPropMenuColors = new wxMenu();
+	wxMenu* createPropMenuEnums = new wxMenu();
+
+	wxMenu* createPropMenu = BuildPropertyMenu(1234);
+
+	propContextMenu = new wxMenu();
+	propContextMenu->AppendSubMenu(createPropMenu, "Create");
+	propContextMenu->Append(ID_PROP_DELETE, "Delete");
+
 	Connect(wxEVT_COMMAND_TREE_SEL_CHANGED, wxTreeEventHandler(MainWindow::OnClassViewTreeSelChanged), NULL, this);
+	Connect(ID_PROP_DELETE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnPropertyGridItemDelete));
+	//Connect(wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnPropertyGridItemCreate));
 	propView->Connect(wxEVT_PG_CHANGING, wxPropertyGridEventHandler(MainWindow::OnPropertyGridChanging), NULL, this);	
+	propView->Connect(wxEVT_CONTEXT_MENU, wxContextMenuEventHandler(MainWindow::OnPropertyGridItemRightClick), NULL, this);
 	propView->SetCaptionBackgroundColour(wxColour(0xE0E0E0));
 	propView->SetCaptionTextColour(wxColour(0x202020)); // BGR
 	propView->SetBackgroundColour(*wxWHITE);
@@ -372,6 +386,36 @@ void MainWindow::OnPropertyGridChanging(wxPropertyGridEvent& event)
 	}
 }
 
+void MainWindow::OnPropertyGridItemRightClick(wxContextMenuEvent& event)
+{
+	if (currentStyle == nullptr)
+		return;
+	
+	wxPGProperty* prop = propView->GetItemAtY(propView->ScreenToClient(event.GetPosition()).y);
+	if (prop != nullptr)
+	{
+		propView->SelectProperty(prop);
+		//propContextMenu->FindItem(ID_PROP_CREATE)->Enable(false);
+		propContextMenu->FindItem(ID_PROP_DELETE)->Enable(true);
+	}
+	else
+	{
+		//propContextMenu->FindItem(ID_PROP_CREATE)->Enable(true);
+		propContextMenu->FindItem(ID_PROP_DELETE)->Enable(false);
+	}
+	propView->PopupMenu(propContextMenu, propView->ScreenToClient(event.GetPosition()));
+}
+
+void  MainWindow::OnPropertyGridItemCreate(wxCommandEvent& event)
+{
+	wxMessageBox("CREATE", "Export Image", wxICON_ERROR);
+}
+
+void  MainWindow::OnPropertyGridItemDelete(wxCommandEvent& event)
+{
+	wxMessageBox("DELETE", "Export Image", wxICON_ERROR);
+}
+
 void MainWindow::OnImageExportClicked(wxCommandEvent& event)
 {
 	if (selectedImage.GetSize() == 0 || selectedImage.GetData() == 0 || selectedImageProp == nullptr)
@@ -428,25 +472,27 @@ void MainWindow::OnImageViewContextMenuTriggered(wxContextMenuEvent& event)
 	imageView->PopupMenu(imageViewMenu, imageView->ScreenToClient(event.GetPosition()));
 }
 
-void MainWindow::OnImageViewBgWhite(wxCommandEvent& event)
+void MainWindow::OnImageViewBgSelect(wxCommandEvent& event)
 {
-	imageView->SetBackgroundStyle(ImageViewCtrl::BackgroundStyle::White);
+	switch (event.GetId())
+	{
+	case ID_BG_WHITE:
+		imageView->SetBackgroundStyle(ImageViewCtrl::BackgroundStyle::White);
+		break;
+	case ID_BG_GREY:
+		imageView->SetBackgroundStyle(ImageViewCtrl::BackgroundStyle::LightGrey);
+		break;
+	case ID_BG_BLACK:
+		imageView->SetBackgroundStyle(ImageViewCtrl::BackgroundStyle::Black);
+		break;
+	case ID_BG_CHESS:
+		imageView->SetBackgroundStyle(ImageViewCtrl::BackgroundStyle::Chessboard);
+		break;
+	default:
+		break;
+	}
 }
 
-void MainWindow::OnImageViewBgGrey(wxCommandEvent& event)
-{
-	imageView->SetBackgroundStyle(ImageViewCtrl::BackgroundStyle::LightGrey);
-}
-
-void MainWindow::OnImageViewBgBlack(wxCommandEvent& event)
-{
-	imageView->SetBackgroundStyle(ImageViewCtrl::BackgroundStyle::Black);
-}
-
-void MainWindow::OnImageViewBgChess(wxCommandEvent& event)
-{
-	imageView->SetBackgroundStyle(ImageViewCtrl::BackgroundStyle::Chessboard);
-}
 
 void MainWindow::OnHelpClicked(wxCommandEvent& event)
 {

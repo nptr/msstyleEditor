@@ -15,24 +15,25 @@ class MainWindow : public wxFrame, public ISearchDialogListener
 {
 private:
 	// The IDs for the menu items
-	const int ID_FOPEN = 444;
-	const int ID_FSAVE = 445;
-	const int ID_IEXPORT = 446;
-	const int ID_IREPLACE = 447;
-	const int ID_ABOUT = 448;
-	const int ID_HELP = 449;
-	const int ID_EXPAND_TREE = 450;
-	const int ID_COLLAPSE_TREE = 451;
-	const int ID_RESOURCEDLG = 452;
-	const int ID_THEMEFOLDER = 453;
-	const int ID_BG_WHITE = 454;
-	const int ID_BG_GREY = 455;
-	const int ID_BG_BLACK = 456;
-	const int ID_BG_CHESS = 457;
-	const int ID_EXPORT_TREE = 458;
-	const int ID_THEME_APPLY = 459;
-
-	const int ID_FIND = 460;
+	static const int ID_FOPEN = 444;
+	static const int ID_FSAVE = 445;
+	static const int ID_IEXPORT = 446;
+	static const int ID_IREPLACE = 447;
+	static const int ID_ABOUT = 448;
+	static const int ID_HELP = 449;
+	static const int ID_EXPAND_TREE = 450;
+	static const int ID_COLLAPSE_TREE = 451;
+	static const int ID_RESOURCEDLG = 452;
+	static const int ID_THEMEFOLDER = 453;
+	static const int ID_BG_WHITE = 454;
+	static const int ID_BG_GREY = 455;
+	static const int ID_BG_BLACK = 456;
+	static const int ID_BG_CHESS = 457;
+	static const int ID_EXPORT_TREE = 458;
+	static const int ID_THEME_APPLY = 459;
+	static const int ID_FIND = 460;
+	static const int ID_PROP_CREATE = 461;
+	static const int ID_PROP_DELETE = 462;
 
 	libmsstyle::VisualStyle* currentStyle;
 
@@ -44,6 +45,7 @@ protected:
 	ImageViewCtrl* imageView;
 	wxPropertyGrid* propView;
 	wxMenu* imageViewMenu;
+	wxMenu* propContextMenu;
 	wxMenuBar* mainmenu;
 	wxMenu* fileMenu;
 	wxMenu* themeMenu;
@@ -57,6 +59,9 @@ protected:
 	void OnFileSaveMenuClicked(wxCommandEvent& event);
 	void OnClassViewTreeSelChanged(wxTreeEvent& event);
 	void OnPropertyGridChanging(wxPropertyGridEvent& event);
+	void OnPropertyGridItemRightClick(wxContextMenuEvent& event);
+	void OnPropertyGridItemDelete(wxCommandEvent& event);
+	void OnPropertyGridItemCreate(wxCommandEvent& event);
 	void OnImageExportClicked(wxCommandEvent& event);
 	void OnImageReplaceClicked(wxCommandEvent& event);
 	void OnAboutClicked(wxCommandEvent& event);
@@ -67,10 +72,7 @@ protected:
 	void OnOpenThemeFolder(wxCommandEvent& event);
 	void OnOpenSearchDlg(wxCommandEvent& event);
 	void OnImageViewContextMenuTriggered(wxContextMenuEvent& event);
-	void OnImageViewBgWhite(wxCommandEvent& event);
-	void OnImageViewBgGrey(wxCommandEvent& event);
-	void OnImageViewBgBlack(wxCommandEvent& event);
-	void OnImageViewBgChess(wxCommandEvent& event);
+	void OnImageViewBgSelect(wxCommandEvent& event);
 	void OnExportLogicalStructure(wxCommandEvent& event);
 	void OnThemeApply(wxCommandEvent& event);
 
