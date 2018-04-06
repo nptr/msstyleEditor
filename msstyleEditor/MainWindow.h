@@ -35,6 +35,8 @@ private:
 	static const int ID_PROP_CREATE = 461;
 	static const int ID_PROP_DELETE = 462;
 
+	static const int ID_PROP_BASE = 2000;
+
 	libmsstyle::VisualStyle* currentStyle;
 
 	libmsstyle::StyleResource selectedImage;

@@ -167,6 +167,7 @@
     <ClCompile Include="CustomTreeItemData.cpp" />
     <ClCompile Include="SearchDialog.cpp" />
     <ClCompile Include="UiHelper.cpp" />
+    <ClCompile Include="wxPropertyCategoryToolbar.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AboutDialog.h" />
@@ -181,6 +182,7 @@
     <ClInclude Include="SearchDialogListener.h" />
     <ClInclude Include="UiHelper.h" />
     <ClInclude Include="UxthemeUndocumented.h" />
+    <ClInclude Include="wxPropertyCategoryToolbar.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="msstyleEditor.rc" />

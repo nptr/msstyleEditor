@@ -22,10 +22,13 @@
 #include "Exporter.h"
 #include "UxthemeUndocumented.h"
 
+#include "wxPropertyCategoryToolbar.h"
+
 using namespace libmsstyle;
 
 
-MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style) : wxFrame(parent, id, title, pos, size, style)
+MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style) 
+	: wxFrame(parent, id, title, pos, size, style)
 {	
 	this->SetSizeHints(wxSize(900, 600), wxDefaultSize);
 	this->SetBackgroundColour(wxSystemSettings::GetColour(wxSystemColour::wxSYS_COLOUR_LISTBOX));
@@ -132,7 +135,7 @@ MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, c
 	wxMenu* createPropMenuColors = new wxMenu();
 	wxMenu* createPropMenuEnums = new wxMenu();
 
-	wxMenu* createPropMenu = BuildPropertyMenu(1234);
+	wxMenu* createPropMenu = BuildPropertyMenu(ID_PROP_BASE);
 
 	propContextMenu = new wxMenu();
 	propContextMenu->AppendSubMenu(createPropMenu, "Create");
@@ -140,14 +143,13 @@ MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, c
 
 	Connect(wxEVT_COMMAND_TREE_SEL_CHANGED, wxTreeEventHandler(MainWindow::OnClassViewTreeSelChanged), NULL, this);
 	Connect(ID_PROP_DELETE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnPropertyGridItemDelete));
-	//Connect(wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnPropertyGridItemCreate));
+	Connect(wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnPropertyGridItemCreate));
 	propView->Connect(wxEVT_PG_CHANGING, wxPropertyGridEventHandler(MainWindow::OnPropertyGridChanging), NULL, this);	
 	propView->Connect(wxEVT_CONTEXT_MENU, wxContextMenuEventHandler(MainWindow::OnPropertyGridItemRightClick), NULL, this);
 	propView->SetCaptionBackgroundColour(wxColour(0xE0E0E0));
 	propView->SetCaptionTextColour(wxColour(0x202020)); // BGR
 	propView->SetBackgroundColour(*wxWHITE);
 	propView->SetMarginColour(*wxWHITE);
-
 	// Make sure selected image struct is 0
 	currentStyle = nullptr;
 
@@ -328,6 +330,9 @@ void MainWindow::OnPropertyGridChanging(wxPropertyGridEvent& event)
 	wxPGProperty* tmpProp = event.GetProperty();
 	StyleProperty* styleProp = (StyleProperty*)tmpProp->GetClientData();
 
+	if (!styleProp)
+		return;
+
 	// Update Data. TODO: Check data for validity!
 	if (styleProp->header.typeID == IDENTIFIER::FILENAME)
 		styleProp->data.imagetype.imageID = event.GetValidationInfo().GetValue().GetInteger();
@@ -406,12 +411,22 @@ void MainWindow::OnPropertyGridItemRightClick(wxContextMenuEvent& event)
 	propView->PopupMenu(propContextMenu, propView->ScreenToClient(event.GetPosition()));
 }
 
-void  MainWindow::OnPropertyGridItemCreate(wxCommandEvent& event)
+void MainWindow::OnPropertyGridItemCreate(wxCommandEvent& event)
 {
-	wxMessageBox("CREATE", "Export Image", wxICON_ERROR);
+	int propNameId = event.GetId() - ID_PROP_BASE;
+	if (propNameId > 0)
+	{
+		wxTreeItemId item = classView->GetSelection();
+		if (item.IsOk())
+		{
+			wxTreeItemData* data = classView->GetItemData(item);
+		}
+		wxMessageBox(lookup::FindPropertyName(propNameId), "Export Image", wxICON_ERROR);
+	}
+	else event.Skip();
 }
 
-void  MainWindow::OnPropertyGridItemDelete(wxCommandEvent& event)
+void MainWindow::OnPropertyGridItemDelete(wxCommandEvent& event)
 {
 	wxMessageBox("DELETE", "Export Image", wxICON_ERROR);
 }
@@ -879,16 +894,14 @@ void MainWindow::FillClassView()
 void MainWindow::FillPropertyView(StylePart& part)
 {
 	propView->Clear();
-
 	for (auto& state : part)
 	{
-		wxPropertyCategory* category = new wxPropertyCategory(state.second.stateName);
-		
+		wxPropertyCategoryToolbar* category = new wxPropertyCategoryToolbar(propView->GetPanel(), state.second.stateName);
+
 		for (auto& prop : state.second)
 		{
 			category->AppendChild(GetWXPropertyFromMsStyleProperty(*prop));
 		}
-		
 		propView->Append(category);
 	}
 }

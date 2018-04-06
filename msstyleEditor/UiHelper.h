@@ -2,9 +2,9 @@
 
 #include "libmsstyle\StyleProperty.h"
 
-#include <wx\wx.h>
-#include <wx\propgrid\property.h>
-#include <wx\propgrid\advprops.h>
+class wxMenu;
+class wxPGProperty;
+class wxPGChoices;
 
 wxMenu* BuildPropertyMenu(int idbase);
 

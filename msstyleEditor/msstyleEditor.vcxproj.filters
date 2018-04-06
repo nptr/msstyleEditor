@@ -27,6 +27,7 @@
     <ClCompile Include="CustomTreeItemData.cpp" />
     <ClCompile Include="Exporter.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="wxPropertyCategoryToolbar.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AboutDialog.h">
@@ -55,6 +56,7 @@
     <ClInclude Include="Exporter.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="UxthemeUndocumented.h" />
+    <ClInclude Include="wxPropertyCategoryToolbar.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="msstyleEditor.rc" />
