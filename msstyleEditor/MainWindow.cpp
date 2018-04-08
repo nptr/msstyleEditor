@@ -1,6 +1,7 @@
 #include "MainWindow.h"
 #include "AboutDialog.h"
 #include "HelpDialog.h"
+#include "AddPropertyDialog.h"
 
 #include "CustomFileDropTarget.h"
 #include "CustomTreeItemData.h"
@@ -142,10 +143,11 @@ MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, c
 	propContextMenu->Append(ID_PROP_DELETE, "Delete");
 
 	Connect(wxEVT_COMMAND_TREE_SEL_CHANGED, wxTreeEventHandler(MainWindow::OnClassViewTreeSelChanged), NULL, this);
-	Connect(ID_PROP_DELETE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnPropertyGridItemDelete));
-	Connect(wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnPropertyGridItemCreate));
+
 	propView->Connect(wxEVT_PG_CHANGING, wxPropertyGridEventHandler(MainWindow::OnPropertyGridChanging), NULL, this);	
 	propView->Connect(wxEVT_CONTEXT_MENU, wxContextMenuEventHandler(MainWindow::OnPropertyGridItemRightClick), NULL, this);
+	propView->Connect(wxPropertyCategoryToolbar::ID_ADD_PROP, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainWindow::OnPropertyGridItemCreate));
+	propView->Connect(wxPropertyCategoryToolbar::ID_REMOVE_PROP, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainWindow::OnPropertyGridItemDelete));
 	propView->SetCaptionBackgroundColour(wxColour(0xE0E0E0));
 	propView->SetCaptionTextColour(wxColour(0x202020)); // BGR
 	propView->SetBackgroundColour(*wxWHITE);
@@ -413,22 +415,19 @@ void MainWindow::OnPropertyGridItemRightClick(wxContextMenuEvent& event)
 
 void MainWindow::OnPropertyGridItemCreate(wxCommandEvent& event)
 {
-	int propNameId = event.GetId() - ID_PROP_BASE;
-	if (propNameId > 0)
-	{
-		wxTreeItemId item = classView->GetSelection();
-		if (item.IsOk())
-		{
-			wxTreeItemData* data = classView->GetItemData(item);
-		}
-		wxMessageBox(lookup::FindPropertyName(propNameId), "Export Image", wxICON_ERROR);
-	}
-	else event.Skip();
+	wxPropertyCategoryToolbar* src = dynamic_cast<wxPropertyCategoryToolbar*>(event.GetEventObject());
+	
+	AddPropertyDialog propDlg(this);
+	propDlg.ShowModal();
 }
 
 void MainWindow::OnPropertyGridItemDelete(wxCommandEvent& event)
 {
-	wxMessageBox("DELETE", "Export Image", wxICON_ERROR);
+	// docs: ...returns the identifier of the button which was clicked...
+	if (wxMessageBox("Remove property: <NAME> with value: <VALUE>?", "Remove Property", wxYES_NO) == wxYES)
+	{
+		wxMessageBox("Removed!");
+	}
 }
 
 void MainWindow::OnImageExportClicked(wxCommandEvent& event)
@@ -897,7 +896,6 @@ void MainWindow::FillPropertyView(StylePart& part)
 	for (auto& state : part)
 	{
 		wxPropertyCategoryToolbar* category = new wxPropertyCategoryToolbar(propView->GetPanel(), state.second.stateName);
-
 		for (auto& prop : state.second)
 		{
 			category->AppendChild(GetWXPropertyFromMsStyleProperty(*prop));

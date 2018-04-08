@@ -62,8 +62,8 @@ protected:
 	void OnClassViewTreeSelChanged(wxTreeEvent& event);
 	void OnPropertyGridChanging(wxPropertyGridEvent& event);
 	void OnPropertyGridItemRightClick(wxContextMenuEvent& event);
-	void OnPropertyGridItemDelete(wxCommandEvent& event);
-	void OnPropertyGridItemCreate(wxCommandEvent& event);
+	void OnPropertyGridItemDelete(wxCommandEvent& container);
+	void OnPropertyGridItemCreate(wxCommandEvent& container);
 	void OnImageExportClicked(wxCommandEvent& event);
 	void OnImageReplaceClicked(wxCommandEvent& event);
 	void OnAboutClicked(wxCommandEvent& event);

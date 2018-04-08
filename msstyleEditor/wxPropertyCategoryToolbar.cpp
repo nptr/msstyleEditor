@@ -67,11 +67,15 @@ wxPropertyCategoryToolbar::wxPropertyCategoryToolbar(wxWindow* parent, const wxS
 	: wxPropertyCategory(label, name)
 	, m_addButton(new wxButton(parent, wxID_ANY, wxT("+")))
 	, m_removeButton(new wxButton(parent, wxID_ANY, wxT("-")))
+	, m_myParent(parent)
 {
 	m_addButton->Hide();
 	m_addButton->SetForegroundColour(*wxBLACK);
+	m_addButton->Bind(wxEVT_BUTTON, &wxPropertyCategoryToolbar::AddHandlerWrapper, this);
+
 	m_removeButton->Hide();
 	m_removeButton->SetForegroundColour(*wxRED);
+	m_removeButton->Bind(wxEVT_BUTTON, &wxPropertyCategoryToolbar::RemoveHandlerWrapper, this);
 }
 
 wxPropertyCategoryToolbar::~wxPropertyCategoryToolbar()
@@ -83,4 +87,18 @@ wxPropertyCategoryToolbar::~wxPropertyCategoryToolbar()
 wxPGCellRenderer* wxPropertyCategoryToolbar::GetCellRenderer(int column) const
 {
 	return &m_renderer;
+}
+
+void wxPropertyCategoryToolbar::AddHandlerWrapper(wxCommandEvent& event)
+{
+	wxCommandEvent evt(wxEVT_COMMAND_BUTTON_CLICKED, ID_ADD_PROP);
+	evt.SetEventObject(this);
+	wxPostEvent(m_myParent, evt);
+}
+
+void wxPropertyCategoryToolbar::RemoveHandlerWrapper(wxCommandEvent& event)
+{
+	wxCommandEvent evt(wxEVT_COMMAND_BUTTON_CLICKED, ID_REMOVE_PROP);
+	evt.SetEventObject(this);
+	wxPostEvent(m_myParent, evt);
 }

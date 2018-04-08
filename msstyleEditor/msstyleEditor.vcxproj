@@ -159,6 +159,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AboutDialog.cpp" />
+    <ClCompile Include="AddPropertyDialog.cpp" />
     <ClCompile Include="Exporter.cpp" />
     <ClCompile Include="HelpDialog.cpp" />
     <ClCompile Include="ImageViewCtrl.cpp" />
@@ -171,6 +172,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AboutDialog.h" />
+    <ClInclude Include="AddPropertyDialog.h" />
     <ClInclude Include="CustomFileDropTarget.h" />
     <ClInclude Include="Exporter.h" />
     <ClInclude Include="HelpDialog.h" />

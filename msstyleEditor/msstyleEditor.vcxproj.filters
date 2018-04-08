@@ -28,6 +28,9 @@
     <ClCompile Include="Exporter.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="wxPropertyCategoryToolbar.cpp" />
+    <ClCompile Include="AddPropertyDialog.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AboutDialog.h">
@@ -57,6 +60,9 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="UxthemeUndocumented.h" />
     <ClInclude Include="wxPropertyCategoryToolbar.h" />
+    <ClInclude Include="AddPropertyDialog.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="msstyleEditor.rc" />
