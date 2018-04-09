@@ -8,7 +8,7 @@
 //#include <vsstyle.h>
 //#include <vssym32.h>
 // https://github.com/res2k/theme-explorer/blob/master/src/db.c
-
+// https://msdn.microsoft.com/en-us/library/windows/desktop/bb773213(v=vs.85).aspx
 // maps nicely
 // https://msdn.microsoft.com/de-de/library/system.windows.forms.visualstyles(v=vs.110).aspx
 // System.Windows.Forms.Visualstyles.dll !!
@@ -16,12 +16,21 @@
 namespace libmsstyle
 {
 
+	struct PropertyInfo
+	{
+		const char* name;
+		int type;
+		const char* description;
+	};
+
 	/////////////////////////////////////////////////////////////////////////////
 	// The following maps are used for finding the name to an ID
 	/////////////////////////////////////////////////////////////////////////////
 
 	// This map hold all known properties and datatypes
 	extern const std::unordered_map<int, const char*> PROPERTY_MAP;
+
+	extern const std::unordered_map<int, PropertyInfo> PROPERTY_INFO_MAP;
 
 	extern const std::unordered_map<int, const char*> DATATYPE_MAP;
 
