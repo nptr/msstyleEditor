@@ -1,16 +1,39 @@
 #include "AddPropertyDialog.h"
 #include "libmsstyle\VisualStyleDefinitions.h"
 
+using namespace libmsstyle;
+
 const char* typeNameArray[] =
 {
 	"Enum",
-	"Margin",
-	"Color"
+	"Bool",
+	"Color",
+	"Margin"
+};
+
+const int typeIdArray[] =
+{
+	200,
+	203,
+	204,
+	205
+};
+
+class wxPropertyClientData : public wxClientData
+{
+public:
+	wxPropertyClientData() : m_data() { }
+	wxPropertyClientData(const PropertyInfo &data) : m_data(data) { }
+	void SetData(const PropertyInfo &data) { m_data = data; }
+	const PropertyInfo& GetData() const { return m_data; }
+
+private:
+	PropertyInfo m_data;
 };
 
 AddPropertyDialog::AddPropertyDialog(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style) : wxDialog(parent, id, title, pos, size, style)
 {
-	this->SetSizeHints(wxDefaultSize, wxDefaultSize);
+	this->SetSizeHints(size, size);
 
 	wxBoxSizer* bSizer13;
 	bSizer13 = new wxBoxSizer(wxVERTICAL);
@@ -20,6 +43,7 @@ AddPropertyDialog::AddPropertyDialog(wxWindow* parent, wxWindowID id, const wxSt
 
 	m_staticText5 = new wxStaticText(this, wxID_ANY, wxT("Type:"), wxDefaultPosition, wxDefaultSize, 0);
 	m_staticText5->Wrap(-1);
+	m_staticText5->SetMaxSize(wxSize(120, -1));
 	bSizer16->Add(m_staticText5, 1, wxTOP | wxRIGHT | wxLEFT, 5);
 
 	m_staticText6 = new wxStaticText(this, wxID_ANY, wxT("Property:"), wxDefaultPosition, wxDefaultSize, 0);
@@ -36,9 +60,11 @@ AddPropertyDialog::AddPropertyDialog(wxWindow* parent, wxWindowID id, const wxSt
 	typeBoxChoices.Add(typeNameArray[0]);
 	typeBoxChoices.Add(typeNameArray[1]);
 	typeBoxChoices.Add(typeNameArray[2]);
-
+	typeBoxChoices.Add(typeNameArray[3]);
 	typeBox = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, typeBoxChoices, 0);
 	typeBox->SetSelection(0);
+	typeBox->SetMaxSize(wxSize(120, -1));
+
 	bSizer14->Add(typeBox, 1, wxALL, 5);
 
 	wxArrayString propBoxChoices;
@@ -49,8 +75,8 @@ AddPropertyDialog::AddPropertyDialog(wxWindow* parent, wxWindowID id, const wxSt
 
 	bSizer13->Add(bSizer14, 0, wxEXPAND, 5);
 
-	descriptionLabel = new wxStaticText(this, wxID_ANY, wxT("Description:"), wxDefaultPosition, wxDefaultSize, 0);
-	descriptionLabel->Wrap(-1);
+	descriptionLabel = new wxStaticText(this, wxID_ANY, wxT("Description:"), wxDefaultPosition, wxDefaultSize, wxST_NO_AUTORESIZE);
+	descriptionLabel->Wrap(300);
 	bSizer13->Add(descriptionLabel, 1, wxALL | wxEXPAND, 5);
 
 	m_staticLine = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL);
@@ -69,16 +95,38 @@ AddPropertyDialog::AddPropertyDialog(wxWindow* parent, wxWindowID id, const wxSt
 	typeBox->Connect(wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler(AddPropertyDialog::OnTypeSelectionChanged), NULL, this);
 	propBox->Connect(wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler(AddPropertyDialog::OnPropertySelectionChanged), NULL, this);
 	okButton->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(AddPropertyDialog::OnOkClicked), NULL, this);
+
+	OnTypeSelectionChanged(wxCommandEvent());
 }
 
 void AddPropertyDialog::OnTypeSelectionChanged(wxCommandEvent& event)
 {
-	event.Skip();
+	propBox->Clear();
+
+	int selectedIndex = typeBox->GetSelection();
+	if (selectedIndex < 0)
+		return;
+
+	int typeId = typeIdArray[selectedIndex];
+	for (auto& it = PROPERTY_INFO_MAP.begin(); it != PROPERTY_INFO_MAP.end(); ++it)
+	{
+		if (typeId == it->second.type)
+		{
+			propBox->Append(it->second.name, new wxPropertyClientData(it->second));
+		}
+	}
+
+	propBox->Select(0);
 }
 
 void AddPropertyDialog::OnPropertySelectionChanged(wxCommandEvent& event)
 {
-	event.Skip();
+	int selectedIndex = propBox->GetSelection();
+	if (selectedIndex < 0)
+		return;
+
+	wxPropertyClientData* cd = static_cast<wxPropertyClientData*>(propBox->GetClientObject(selectedIndex));
+	descriptionLabel->SetLabel(wxString("Description: ") + cd->GetData().description);
 }
 
 void AddPropertyDialog::OnOkClicked(wxCommandEvent& event)

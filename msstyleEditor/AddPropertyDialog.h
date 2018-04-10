@@ -35,7 +35,7 @@ protected:
 
 public:
 
-	AddPropertyDialog(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Choose a property"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(260, 180), long style = wxDEFAULT_DIALOG_STYLE);
+	AddPropertyDialog(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Choose a property"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(320, 200), long style = wxDEFAULT_DIALOG_STYLE);
 	~AddPropertyDialog();
 
 };

@@ -2132,7 +2132,7 @@
             <property name="minimum_size"></property>
             <property name="name">AddPropertyDialog</property>
             <property name="pos"></property>
-            <property name="size">260,180</property>
+            <property name="size">320,200</property>
             <property name="style">wxDEFAULT_DIALOG_STYLE</property>
             <property name="subclass"></property>
             <property name="title">Choose a property</property>
@@ -2225,7 +2225,7 @@
                                 <property name="label">Type:</property>
                                 <property name="max_size"></property>
                                 <property name="maximize_button">0</property>
-                                <property name="maximum_size"></property>
+                                <property name="maximum_size">120,-1</property>
                                 <property name="min_size"></property>
                                 <property name="minimize_button">0</property>
                                 <property name="minimum_size"></property>
@@ -2402,7 +2402,7 @@
                                 <property name="id">wxID_ANY</property>
                                 <property name="max_size"></property>
                                 <property name="maximize_button">0</property>
-                                <property name="maximum_size"></property>
+                                <property name="maximum_size">120,-1</property>
                                 <property name="min_size"></property>
                                 <property name="minimize_button">0</property>
                                 <property name="minimum_size"></property>
@@ -2595,14 +2595,14 @@
                         <property name="resize">Resizable</property>
                         <property name="show">1</property>
                         <property name="size"></property>
-                        <property name="style"></property>
+                        <property name="style">wxST_NO_AUTORESIZE</property>
                         <property name="subclass"></property>
                         <property name="toolbar_pane">0</property>
                         <property name="tooltip"></property>
                         <property name="window_extra_style"></property>
                         <property name="window_name"></property>
                         <property name="window_style"></property>
-                        <property name="wrap">-1</property>
+                        <property name="wrap">300</property>
                         <event name="OnChar"></event>
                         <event name="OnEnterWindow"></event>
                         <event name="OnEraseBackground"></event>
