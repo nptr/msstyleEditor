@@ -23,11 +23,16 @@ class wxPropertyClientData : public wxClientData
 {
 public:
 	wxPropertyClientData() : m_data() { }
-	wxPropertyClientData(const PropertyInfo &data) : m_data(data) { }
-	void SetData(const PropertyInfo &data) { m_data = data; }
-	const PropertyInfo& GetData() const { return m_data; }
+	wxPropertyClientData(int nameId, const PropertyInfo &data)
+		: m_nameId(nameId)
+		, m_data(data)
+	{}
+
+	int GetNameID() const { return m_nameId; }
+	const PropertyInfo& GetPropInfo() const { return m_data; }
 
 private:
+	int m_nameId;
 	PropertyInfo m_data;
 };
 
@@ -71,8 +76,6 @@ AddPropertyDialog::AddPropertyDialog(wxWindow* parent, wxWindowID id, const wxSt
 	propBox = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, propBoxChoices, 0);
 	propBox->SetSelection(0);
 	bSizer14->Add(propBox, 1, wxALL, 5);
-
-
 	bSizer13->Add(bSizer14, 0, wxEXPAND, 5);
 
 	descriptionLabel = new wxStaticText(this, wxID_ANY, wxT("Description:"), wxDefaultPosition, wxDefaultSize, wxST_NO_AUTORESIZE);
@@ -88,10 +91,8 @@ AddPropertyDialog::AddPropertyDialog(wxWindow* parent, wxWindowID id, const wxSt
 
 	this->SetSizer(bSizer13);
 	this->Layout();
-
 	this->Centre(wxBOTH);
 
-	// Connect Events
 	typeBox->Connect(wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler(AddPropertyDialog::OnTypeSelectionChanged), NULL, this);
 	propBox->Connect(wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler(AddPropertyDialog::OnPropertySelectionChanged), NULL, this);
 	okButton->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(AddPropertyDialog::OnOkClicked), NULL, this);
@@ -112,7 +113,7 @@ void AddPropertyDialog::OnTypeSelectionChanged(wxCommandEvent& event)
 	{
 		if (typeId == it->second.type)
 		{
-			propBox->Append(it->second.name, new wxPropertyClientData(it->second));
+			propBox->Append(it->second.name, new wxPropertyClientData(it->first, it->second));
 		}
 	}
 
@@ -126,19 +127,34 @@ void AddPropertyDialog::OnPropertySelectionChanged(wxCommandEvent& event)
 		return;
 
 	wxPropertyClientData* cd = static_cast<wxPropertyClientData*>(propBox->GetClientObject(selectedIndex));
-	descriptionLabel->SetLabel(wxString("Description: ") + cd->GetData().description);
+	descriptionLabel->SetLabel(wxString("Description: ") + cd->GetPropInfo().description);
 }
 
 void AddPropertyDialog::OnOkClicked(wxCommandEvent& event)
 {
-	event.Skip();
+	EndModal(wxID_OK);
+}
+
+int AddPropertyDialog::ShowModal(StyleProperty& prop)
+{
+	int ret = wxDialog::ShowModal();
+	if (ret == wxID_OK)
+	{
+		int selectedIndex = propBox->GetSelection();
+		if (selectedIndex < 0)
+			return wxID_CANCEL;
+
+		wxPropertyClientData* cd = static_cast<wxPropertyClientData*>(propBox->GetClientObject(selectedIndex));
+		prop.header.typeID = cd->GetPropInfo().type;
+		prop.header.nameID = cd->GetNameID();
+	}
+
+	return ret;
 }
 
 AddPropertyDialog::~AddPropertyDialog()
 {
-	// Disconnect Events
 	typeBox->Disconnect(wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler(AddPropertyDialog::OnTypeSelectionChanged), NULL, this);
 	propBox->Disconnect(wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler(AddPropertyDialog::OnPropertySelectionChanged), NULL, this);
 	okButton->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(AddPropertyDialog::OnOkClicked), NULL, this);
-
 }

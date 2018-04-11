@@ -2,17 +2,17 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-PropClassTreeItemData::PropClassTreeItemData(libmsstyle::StyleClass* classPtr)
+ClassTreeItemData::ClassTreeItemData(libmsstyle::StyleClass* classPtr)
 {
 	propClass = classPtr;
 }
 
 
-PropClassTreeItemData::~PropClassTreeItemData()
+ClassTreeItemData::~ClassTreeItemData()
 {
 }
 
-libmsstyle::StyleClass* PropClassTreeItemData::GetClass()
+libmsstyle::StyleClass* ClassTreeItemData::GetClass()
 {
 	return propClass;
 }
@@ -29,7 +29,7 @@ PartTreeItemData::~PartTreeItemData()
 
 }
 
-libmsstyle::StylePart* PartTreeItemData::GetMsStylePart()
+libmsstyle::StylePart* PartTreeItemData::GetPart()
 {
 	return part;
 }
@@ -46,7 +46,7 @@ PropTreeItemData::~PropTreeItemData()
 
 }
 
-libmsstyle::StyleProperty* PropTreeItemData::GetMSStyleProp()
+libmsstyle::StyleProperty* PropTreeItemData::GetProperty()
 {
 	return property;
 }

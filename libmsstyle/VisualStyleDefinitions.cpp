@@ -451,7 +451,7 @@ namespace libmsstyle
 		{ 3602, { "CONTENTMARGINS", 205, "The margins that define where content may be placed within a part. " } },
 		{ 3603, { "CAPTIONMARGINS", 205, "The margins that define where caption text may be placed within a part." } },
 		// COLOR
-		{ 3801, { "BORDERCOLOR", 204, "	The color of the border associated with the part and state." } },
+		{ 3801, { "BORDERCOLOR", 204, "The color of the border associated with the part and state." } },
 		{ 3802, { "FILLCOLOR", 204, "The color of the background fill associated with the part and state." } },
 		{ 3803, { "TEXTCOLOR", 204, "" } },
 		{ 3804, { "EDGELIGHTCOLOR", 204, "The light color of the edge associated with this part and state." } },

@@ -11,6 +11,7 @@
 #include "libmsstyle\VisualStyle.h"
 #include "SearchDialog.h"
 
+
 class MainWindow : public wxFrame, public ISearchDialogListener
 {
 private:
@@ -35,12 +36,22 @@ private:
 	static const int ID_PROP_CREATE = 461;
 	static const int ID_PROP_DELETE = 462;
 
-	static const int ID_PROP_BASE = 2000;
-
 	libmsstyle::VisualStyle* currentStyle;
-
 	libmsstyle::StyleResource selectedImage;
 	const libmsstyle::StyleProperty* selectedImageProp;
+
+	struct SelectionModel
+	{
+		SelectionModel()
+			: ClassId(-1)
+			, PartId(-1)
+			, StateId(-1)
+		{}
+
+		int ClassId;
+		int PartId;
+		int StateId;
+	} selection;
 
 protected:
 	wxTreeCtrl* classView;
@@ -61,7 +72,6 @@ protected:
 	void OnFileSaveMenuClicked(wxCommandEvent& event);
 	void OnClassViewTreeSelChanged(wxTreeEvent& event);
 	void OnPropertyGridChanging(wxPropertyGridEvent& event);
-	void OnPropertyGridItemRightClick(wxContextMenuEvent& event);
 	void OnPropertyGridItemDelete(wxCommandEvent& container);
 	void OnPropertyGridItemCreate(wxCommandEvent& container);
 	void OnImageExportClicked(wxCommandEvent& event);

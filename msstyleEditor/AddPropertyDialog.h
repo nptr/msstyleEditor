@@ -13,6 +13,7 @@
 #include <wx/statline.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
+#include "libmsstyle/StyleProperty.h"
 
 
 class AddPropertyDialog : public wxDialog
@@ -32,10 +33,10 @@ protected:
 	virtual void OnPropertySelectionChanged(wxCommandEvent& event);
 	virtual void OnOkClicked(wxCommandEvent& event);
 
-
 public:
 
 	AddPropertyDialog(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Choose a property"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(320, 200), long style = wxDEFAULT_DIALOG_STYLE);
 	~AddPropertyDialog();
 
+	int ShowModal(libmsstyle::StyleProperty& prop);
 };

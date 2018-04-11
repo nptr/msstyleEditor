@@ -28,7 +28,7 @@
 using namespace libmsstyle;
 
 
-MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style) 
+MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
 	: wxFrame(parent, id, title, pos, size, style)
 {	
 	this->SetSizeHints(wxSize(900, 600), wxDefaultSize);
@@ -132,20 +132,9 @@ MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, c
 	//
 	// Treeview & Property Grid
 	//
-	wxMenu* createPropMenuMargins = new wxMenu();
-	wxMenu* createPropMenuColors = new wxMenu();
-	wxMenu* createPropMenuEnums = new wxMenu();
-
-	wxMenu* createPropMenu = BuildPropertyMenu(ID_PROP_BASE);
-
-	propContextMenu = new wxMenu();
-	propContextMenu->AppendSubMenu(createPropMenu, "Create");
-	propContextMenu->Append(ID_PROP_DELETE, "Delete");
-
 	Connect(wxEVT_COMMAND_TREE_SEL_CHANGED, wxTreeEventHandler(MainWindow::OnClassViewTreeSelChanged), NULL, this);
 
 	propView->Connect(wxEVT_PG_CHANGING, wxPropertyGridEventHandler(MainWindow::OnPropertyGridChanging), NULL, this);	
-	propView->Connect(wxEVT_CONTEXT_MENU, wxContextMenuEventHandler(MainWindow::OnPropertyGridItemRightClick), NULL, this);
 	propView->Connect(wxPropertyCategoryToolbar::ID_ADD_PROP, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainWindow::OnPropertyGridItemCreate));
 	propView->Connect(wxPropertyCategoryToolbar::ID_REMOVE_PROP, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainWindow::OnPropertyGridItemDelete));
 	propView->SetCaptionBackgroundColour(wxColour(0xE0E0E0));
@@ -279,9 +268,16 @@ void MainWindow::OnClassViewTreeSelChanged(wxTreeEvent& event)
 	statusBar->SetStatusText(wxEmptyString);
 
 	// Class Node
-	PropClassTreeItemData* classData = dynamic_cast<PropClassTreeItemData*>(treeItemData);
+	ClassTreeItemData* classData = dynamic_cast<ClassTreeItemData*>(treeItemData);
 	if (classData != nullptr)
 	{
+		// Track selection
+		selection.ClassId = classData->GetClass()->classID;
+		selection.PartId = -1;
+		selection.StateId = -1;
+
+		// Update UI
+		propView->Clear();
 		return;
 	}
 
@@ -289,7 +285,18 @@ void MainWindow::OnClassViewTreeSelChanged(wxTreeEvent& event)
 	PartTreeItemData* partData = dynamic_cast<PartTreeItemData*>(treeItemData);
 	if (partData != nullptr)
 	{
-		StylePart* part = partData->GetMsStylePart();
+		StylePart* part = partData->GetPart();
+
+		// Track selection
+		classData = dynamic_cast<ClassTreeItemData*>(
+			classView->GetItemData(
+			classView->GetItemParent(treeItemID)));
+
+		selection.ClassId = classData->GetClass()->classID;
+		selection.PartId = part->partID;
+		selection.StateId = -1;
+
+		// Update UI
 		statusBar->SetStatusText(wxString::Format("Part ID: %d", part->partID));
 		FillPropertyView(*part);
 		return;
@@ -299,8 +306,23 @@ void MainWindow::OnClassViewTreeSelChanged(wxTreeEvent& event)
 	PropTreeItemData* propData = dynamic_cast<PropTreeItemData*>(treeItemData);
 	if (propData != nullptr)
 	{
-		selectedImageProp = propData->GetMSStyleProp();
+		selectedImageProp = propData->GetProperty();
 		
+		// Track selection
+		partData = dynamic_cast<PartTreeItemData*>(
+			classView->GetItemData(
+			classView->GetItemParent(treeItemID)));
+		
+		classData = dynamic_cast<ClassTreeItemData*>(
+			classView->GetItemData(
+			classView->GetItemParent(
+			classView->GetItemParent(treeItemID))));
+
+		selection.ClassId = classData->GetClass()->classID;
+		selection.PartId = partData->GetPart()->partID;
+		selection.StateId = -1;
+		
+		// Update UI
 		StyleResourceType type;
 		if (selectedImageProp->GetTypeID() == IDENTIFIER::FILENAME)
 			type = StyleResourceType::IMAGE;
@@ -313,12 +335,12 @@ void MainWindow::OnClassViewTreeSelChanged(wxTreeEvent& event)
 		{
 			wxString tmpFile(file);
 			ShowImageFromFile(tmpFile);
-			statusBar->SetStatusText(wxString::Format("Image ID: %d*", propData->GetMSStyleProp()->data.imagetype.imageID));
+			statusBar->SetStatusText(wxString::Format("Image ID: %d*", selectedImageProp->data.imagetype.imageID));
 		}
 		else
 		{
-			ShowImageFromResource(propData->GetMSStyleProp());
-			statusBar->SetStatusText(wxString::Format("Image ID: %d", propData->GetMSStyleProp()->data.imagetype.imageID));
+			ShowImageFromResource(selectedImageProp);
+			statusBar->SetStatusText(wxString::Format("Image ID: %d", selectedImageProp->data.imagetype.imageID));
 		}
 
 		return;
@@ -393,32 +415,23 @@ void MainWindow::OnPropertyGridChanging(wxPropertyGridEvent& event)
 	}
 }
 
-void MainWindow::OnPropertyGridItemRightClick(wxContextMenuEvent& event)
-{
-	if (currentStyle == nullptr)
-		return;
-	
-	wxPGProperty* prop = propView->GetItemAtY(propView->ScreenToClient(event.GetPosition()).y);
-	if (prop != nullptr)
-	{
-		propView->SelectProperty(prop);
-		//propContextMenu->FindItem(ID_PROP_CREATE)->Enable(false);
-		propContextMenu->FindItem(ID_PROP_DELETE)->Enable(true);
-	}
-	else
-	{
-		//propContextMenu->FindItem(ID_PROP_CREATE)->Enable(true);
-		propContextMenu->FindItem(ID_PROP_DELETE)->Enable(false);
-	}
-	propView->PopupMenu(propContextMenu, propView->ScreenToClient(event.GetPosition()));
-}
-
 void MainWindow::OnPropertyGridItemCreate(wxCommandEvent& event)
 {
 	wxPropertyCategoryToolbar* src = dynamic_cast<wxPropertyCategoryToolbar*>(event.GetEventObject());
 	
+	libmsstyle::StyleProperty prop;
+	// prop.header.classID = from tree
+	// prop.header.partID = from tree
+	// prop.header.stateID = from prop view
+
 	AddPropertyDialog propDlg(this);
-	propDlg.ShowModal();
+	if (propDlg.ShowModal(prop) == wxID_OK)
+	{
+		//auto treeItemID = classView->GetSelection()
+		//auto treeItemData = classView->GetItemData(treeItemID);
+		// add prop to style
+		// add to prop view
+	}
 }
 
 void MainWindow::OnPropertyGridItemDelete(wxCommandEvent& event)
@@ -634,7 +647,7 @@ bool ContainsProperty(const SearchProperties& search, wxTreeItemData* treeItemDa
 	if (partData == nullptr)
 		return false;
 
-	StylePart* part = partData->GetMsStylePart();
+	StylePart* part = partData->GetPart();
 	
 	for (auto& state : *part)
 	{
@@ -727,7 +740,7 @@ bool ContainsName(const std::string& str, wxTreeItemData* treeItemData)
 		return false;
 
 	// Class Node
-	PropClassTreeItemData* classData = dynamic_cast<PropClassTreeItemData*>(treeItemData);
+	ClassTreeItemData* classData = dynamic_cast<ClassTreeItemData*>(treeItemData);
 	if (classData != nullptr)
 	{
 		return ContainsStringInvariant(classData->GetClass()->className, str);
@@ -737,14 +750,14 @@ bool ContainsName(const std::string& str, wxTreeItemData* treeItemData)
 	PartTreeItemData* partData = dynamic_cast<PartTreeItemData*>(treeItemData);
 	if (partData != nullptr)
 	{
-		return ContainsStringInvariant(partData->GetMsStylePart()->partName, str);
+		return ContainsStringInvariant(partData->GetPart()->partName, str);
 	}
 
 	// Image Node
 	PropTreeItemData* propData = dynamic_cast<PropTreeItemData*>(treeItemData);
 	if (propData != nullptr)
 	{
-		const char* name = propData->GetMSStyleProp()->LookupName();
+		const char* name = propData->GetProperty()->LookupName();
 		if (name == nullptr)
 			return false;
 		else return ContainsStringInvariant(std::string(name), str);
@@ -861,7 +874,7 @@ void MainWindow::FillClassView()
 	// Add classes
 	for (auto& cls : *currentStyle)
 	{
-		wxTreeItemId classNode = classView->AppendItem(rootNode, cls.second.className, -1, -1, static_cast<wxTreeItemData*>(new PropClassTreeItemData(&cls.second)));
+		wxTreeItemId classNode = classView->AppendItem(rootNode, cls.second.className, -1, -1, static_cast<wxTreeItemData*>(new ClassTreeItemData(&cls.second)));
 
 		// Add parts
 		for (auto& part : cls.second)

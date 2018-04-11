@@ -6,8 +6,6 @@ class wxMenu;
 class wxPGProperty;
 class wxPGChoices;
 
-wxMenu* BuildPropertyMenu(int idbase);
-
 wxPGProperty* GetWXPropertyFromMsStyleProperty(libmsstyle::StyleProperty& prop);
 wxPGChoices* GetEnumsFromMsStyleProperty(libmsstyle::StyleProperty& prop);
 
