@@ -3,7 +3,6 @@
 #include "VisualStyleDefinitions.h"
 
 #include <algorithm>
-#include <Windows.h>
 
 #undef min
 
@@ -16,7 +15,7 @@ namespace libmsstyle
 		{
 		}
 
-		const char* PropertyReader::ReadNextProperty(const char* source, const char* end, StyleProperty* prop)
+		PropertyReader::Result PropertyReader::ReadNextProperty(const char* source, const char* end, const char** out_next, StyleProperty* prop)
 		{
 			const char* cursor = source;
 			while (!IsProbablyValidHeader(cursor))
@@ -25,9 +24,15 @@ namespace libmsstyle
 			int diff = cursor - source;
 			if (diff > 0)
 			{
-				char textbuffer[21];
-				sprintf(textbuffer, "Skipped %d bytes!\r\n", diff);
-				OutputDebugStringA(textbuffer);
+				*out_next = cursor;
+				return Result::SkippedBytes;
+			}
+
+			int dstAddr = reinterpret_cast<int>(cursor);
+			bool propAligned = dstAddr % 8 == 0 ? true : false;
+			if (!propAligned)
+			{
+				// todo:
 			}
 
 			// Copy the property header
@@ -89,17 +94,23 @@ namespace libmsstyle
 			// Arbitrary
 			case IDENTIFIER::INTLIST:
 			{
-				// There was an intlist, without short indicator
+				// There was an intlist, without short indicator,
 				// immediately followed by a property instead of
 				// "numints" + list data. It ended exactly on a
 				// 8byte boundary.
-				if (IsProbablyValidHeader(cursor+12))
+
+				// I encountered an INTLIST prop, that had the
+				// short indicator NOT set, but still ended right
+				// after. That shouldn't be allowed from my understanding.
+				// I'll try to handle that soemhow...
+				if (IsProbablyValidHeader(cursor + 12))
 				{
 					memcpy(&(prop->data), cursor, 12);
 					cursor += 12;
 					prop->bytesAfterHeader += 12;
-					OutputDebugStringA("Bad INTLIST!!!!\r\n");
-					break;
+					
+					*out_next = cursor;
+					return Result::BadProperty;
 				}
 				else
 				{
@@ -140,28 +151,20 @@ namespace libmsstyle
 			} break;
 			default:
 			{
-				char textbuffer[64];
-				sprintf(textbuffer, "Unknown Type: %d\r\n", prop->header.typeID);
-				OutputDebugStringA(textbuffer);
+				// Unknown property. What we can do is blindly copy the assumend
+				// minimum of data every propert has, and let the next call skip.
+				// Todo: scan for the next prop, and copy everything in between?
+				memcpy(&(prop->data), cursor, 12);
+				cursor += 12;
+				prop->bytesAfterHeader += 12;
+
+				*out_next = cursor;
+				return Result::UnknownProp;
 			} break;
 			}
 
-			char textbuffer[64];
-			if (prop->GetRegularPropertySize() < prop->GetPropertySizeAsFound())
-			{
-				sprintf(textbuffer, "next header %d bytes after data - bigger\n", prop->bytesAfterHeader);
-			}
-			if (prop->GetRegularPropertySize() > prop->GetPropertySizeAsFound())
-			{
-				sprintf(textbuffer, "next header %d bytes after data - smaller\n", prop->bytesAfterHeader);
-			}
-			if (prop->GetRegularPropertySize() == prop->GetPropertySizeAsFound())
-			{
-				sprintf(textbuffer, "next header %d bytes after data - exact\n", prop->bytesAfterHeader);
-			}
-			OutputDebugStringA(textbuffer);
-
-			return cursor;
+			*out_next = cursor;
+			return Result::Ok;
 		}
 
 

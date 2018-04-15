@@ -24,6 +24,19 @@ namespace libmsstyle
 			m_properties.erase(m_properties.begin() + index);
 		}
 
+		void RemoveProperty(const StyleProperty* prop)
+		{
+			for (auto& it = m_properties.begin(); it != m_properties.end(); ++it)
+			{
+				if (*it == prop)
+				{
+					delete *it;
+					m_properties.erase(it);
+					return;
+				}
+			}
+		}
+
 		size_t GetPropertyCount() const
 		{
 			return m_properties.size();
@@ -62,6 +75,11 @@ namespace libmsstyle
 	void StyleState::RemoveProperty(int index)
 	{
 		impl->RemoveProperty(index);
+	}
+
+	void StyleState::RemoveProperty(const StyleProperty* prop)
+	{
+		impl->RemoveProperty(prop);
 	}
 
 	size_t StyleState::GetPropertyCount() const

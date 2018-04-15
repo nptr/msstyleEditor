@@ -11,6 +11,8 @@
 
 #include <string.h>
 #include <fstream>
+#include <Windows.h>
+
 using namespace libmsstyle;
 
 #define MSSTYLE_ARRAY_LENGTH(name) (sizeof(name) / sizeof(name[0]))
@@ -22,8 +24,8 @@ namespace libmsstyle
 		std::size_t operator()(const StyleResource& r) const
 		{
 			return ((std::hash<int>()(r.GetNameID())
-				  ^ (std::hash<int>()(r.GetType()) << 1)) >> 1)
-				  ^ (std::hash<int>()(r.GetSize()) << 1);
+				^ (std::hash<int>()(r.GetType()) << 1)) >> 1)
+				^ (std::hash<int>()(r.GetSize()) << 1);
 		}
 	};
 
@@ -42,6 +44,18 @@ namespace libmsstyle
 			{
 				delete prop;
 			}
+		}
+
+		void Log(const char* format, ...)
+		{
+			char textbuffer[64];
+
+			va_list args;
+			va_start(args, format);
+			vsnprintf(textbuffer, 64, format, args);
+			va_end(args);
+
+			OutputDebugStringA(textbuffer);
 		}
 
 		StyleClass* GetClass(int index)
@@ -116,52 +130,25 @@ namespace libmsstyle
 			}
 		}
 
-		void SaveProperties(UpdateHandle updateHandle)
+		void SavePropertiesOriginalOrder(UpdateHandle updateHandle)
 		{
 			// assume that twice the size common properties require is enough
 			int estimatedSize = m_propsFound * 48 * 2;
 			char* data = new char[estimatedSize];
 			char* dataptr = data;
 
-			// for all classes
-			//for (auto it = m_classes.begin(); it != m_classes.end(); ++it)
-			//{
-			//	// for all parts
-			//	for (auto partIt = it->second.begin(); partIt != it->second.end(); ++partIt)
-			//	{
-			//		// for all states
-			//		for (auto stateIt = partIt->second.begin(); stateIt != partIt->second.end(); ++stateIt)
-			//		{
-			//			// for all properties
-			//			for (auto propIt = stateIt->second.begin(); propIt != stateIt->second.end(); ++propIt)
-			//			{
-			//				int propSize = (*propIt)->GetPropertySize();
-			//				memcpy(dataptr, &((*propIt)->nameID), propSize);
-			//				dataptr += propSize;
-
-			//				if (dataptr - data > estimatedSize)
-			//					throw std::runtime_error("I haven't allocated enough memory to save the file..sorry for that!");
-			//			}
-			//		}
-			//	}
-
-			//	// we would save the classnames in the CMAP resource
-			//	// but as long as we dont modify the classID of the
-			//	// properties, this shouldn't be necessary
-			//}
-
 			libmsstyle::rw::PropertyWriter writer;
 			for (auto& prop : m_origOrder)
 			{
 				dataptr = writer.WriteProperty(dataptr, *prop);
 
-				if (dataptr-data > estimatedSize)
+				if (dataptr - data > estimatedSize)
 					throw std::runtime_error("I haven't allocated enough memory to save the file..sorry for that!");
 			}
 
 			LanguageId lid = GetFirstLanguageId(m_moduleHandle, "NORMAL", "VARIANT");
 			unsigned int length = static_cast<unsigned int>(dataptr - data);
-			 
+
 			if (!UpdateStyleResource(updateHandle, "VARIANT", "NORMAL", lid, data, length))
 			{
 				throw std::runtime_error("Could not update properties!");
@@ -169,7 +156,52 @@ namespace libmsstyle
 			}
 		}
 
-		void Save(const std::string& path)
+		void SavePropertiesHierachically(UpdateHandle updateHandle)
+		{
+			// assume that twice the size common properties require is enough
+			int estimatedSize = m_propsFound * 48 * 2;
+			char* data = new char[estimatedSize];
+			char* dataptr = data;
+
+			libmsstyle::rw::PropertyWriter writer;
+
+			// for all classes
+			for (auto it = m_classes.begin(); it != m_classes.end(); ++it)
+			{
+				// for all parts
+				for (auto partIt = it->second.begin(); partIt != it->second.end(); ++partIt)
+				{
+					// for all states
+					for (auto stateIt = partIt->second.begin(); stateIt != partIt->second.end(); ++stateIt)
+					{
+						// for all properties
+						for (auto propIt = stateIt->second.begin(); propIt != stateIt->second.end(); ++propIt)
+						{
+							dataptr = writer.WriteProperty(dataptr, *(*propIt));
+
+							if (dataptr - data > estimatedSize)
+								throw std::runtime_error("I haven't allocated enough memory to save the file..sorry for that!");
+						}
+					}
+				}
+
+				// we would save the classnames in the CMAP resource
+				// but as long as we dont modify the classID of the
+				// properties, this shouldn't be necessary
+			}
+
+			LanguageId lid = GetFirstLanguageId(m_moduleHandle, "NORMAL", "VARIANT");
+			unsigned int length = static_cast<unsigned int>(dataptr - data);
+
+			if (!UpdateStyleResource(updateHandle, "VARIANT", "NORMAL", lid, data, length))
+			{
+				throw std::runtime_error("Could not update properties!");
+				return;
+			}
+		}
+
+
+		void Save(const std::string& path, bool keepOrder)
 		{
 			// if source != destination
 			if (path != m_stylePath)
@@ -191,7 +223,11 @@ namespace libmsstyle
 			}
 
 			SaveResources(updHandle);
-			SaveProperties(updHandle);
+
+			if (!keepOrder)
+				SavePropertiesHierachically(updHandle);
+			else
+				SavePropertiesOriginalOrder(updHandle);
 
 			if (!libmsstyle::EndUpdate(updHandle))
 			{
@@ -246,7 +282,7 @@ namespace libmsstyle
 			StyleResource key(nullptr, 0, nameId, type);
 			m_resourceUpdates[key] = pathToNew;
 		}
-		
+
 
 		void LoadClassmap(Resource classResource)
 		{
@@ -280,92 +316,116 @@ namespace libmsstyle
 		void LoadProperties(Resource propResource)
 		{
 			libmsstyle::rw::PropertyReader reader(m_classes.size());
-			const char* prevPtr = 0;
-			const char* dataPtr = static_cast<const char*>(propResource.data);
-			const char* endPtr = dataPtr + propResource.size;
 
-			while (dataPtr < endPtr)
+			const char* start = static_cast<const char*>(propResource.data);
+			const char* end = start + propResource.size;
+			const char* current = start;
+			const char* next = start;
+			const StyleProperty* prev = 0;
+
+			while (current < end)
 			{
 				StyleProperty* tmpProp = new StyleProperty();
-				prevPtr = dataPtr;
-				dataPtr = reader.ReadNextProperty(dataPtr, endPtr, tmpProp);
-				if (!tmpProp->IsPropertyValid())
+				auto readResult = reader.ReadNextProperty(current, end, &next, tmpProp);
+
+				switch (readResult)
 				{
+				case rw::PropertyReader::Ok:
+					prev = reinterpret_cast<const StyleProperty*>(current);
+					break;
+				case rw::PropertyReader::SkippedBytes:
+					Log("Skipped %d bytes after prop [N: %d, T: %d]\r\n", next - current, prev->header.nameID, prev->header.typeID);
+					current = next;
+					continue;
+				case rw::PropertyReader::UnknownProp:
+					Log("Unknown property [N: %d, T: %d] @ 0x%08x\r\n", tmpProp->header.nameID, tmpProp->header.typeID, current - start);
+					current = next;
+					continue;
+				case rw::PropertyReader::BadProperty:
+					Log("Bad property [N: %d, T: %d] @ 0x%08x\r\n", tmpProp->header.nameID, tmpProp->header.typeID, current-start);
+					delete tmpProp;
+					throw std::runtime_error("bad prop");
+					return;
+				case rw::PropertyReader::End:
 					delete tmpProp;
 					return;
+				default:
+					throw std::runtime_error("unknown result");
+					return;
 				}
-				else
+
+				current = next;
+
+
+				m_origOrder.push_back(tmpProp);
+
+				// See if we have created a "Style Class" object already for
+				// this classID that we can use. If not, create one.
+				StyleClass* cls;
+				const auto& result = m_classes.find(tmpProp->header.classID);
+				if (result == m_classes.end())
 				{
-					m_origOrder.push_back(tmpProp);
+					throw std::runtime_error("Found property with unknown class ID");
+				}
+				else cls = &(result->second);
 
-					// See if we have created a "Style Class" object already for
-					// this classID that we can use. If not, create one.
-					StyleClass* cls;
-					const auto& result = m_classes.find(tmpProp->header.classID);
-					if (result == m_classes.end())
+
+				// See if we have created a "Style Part" object for this
+				// partID inside the current "Style Class". If not, create one.
+				lookup::PartList partInfo = lookup::FindParts(cls->className.c_str(), m_stylePlatform);
+				StylePart* part = cls->FindPart(tmpProp->header.partID);
+				if (part == nullptr)
+				{
+					StylePart newPart;
+					newPart.partID = tmpProp->header.partID;
+
+					if (tmpProp->header.partID < partInfo.numParts)
 					{
-						throw std::runtime_error("Found property with unknown class ID");
+						newPart.partName = partInfo.parts[tmpProp->header.partID].partName;
 					}
-					else cls = &(result->second);
-
-
-					// See if we have created a "Style Part" object for this
-					// partID inside the current "Style Class". If not, create one.
-					lookup::PartList partInfo = lookup::FindParts(cls->className.c_str(), m_stylePlatform);
-					StylePart* part = cls->FindPart(tmpProp->header.partID);
-					if (part == nullptr)
+					else
 					{
-						StylePart newPart;
-						newPart.partID = tmpProp->header.partID;
+						char txt[160];
+						sprintf(txt, "Part %d", tmpProp->header.partID);
+						newPart.partName = std::string(txt);
+					}
 
-						if (tmpProp->header.partID < partInfo.numParts)
+					part = cls->AddPart(newPart);
+				}
+
+
+				// See if we have created a "Style State" object for this
+				// stateID inside the current "Style Part". If not, create one.
+				StyleState* state = part->FindState(tmpProp->header.stateID);
+				if (state == nullptr)
+				{
+					StyleState newState;
+					newState.stateID = tmpProp->header.stateID;
+
+					if (tmpProp->header.partID < partInfo.numParts &&
+						tmpProp->header.stateID < partInfo.parts[tmpProp->header.partID].numStates)
+					{
+						newState.stateName = partInfo.parts[tmpProp->header.partID].states[tmpProp->header.stateID].stateName;
+					}
+					else
+					{
+						if (tmpProp->header.stateID == 0)
 						{
-							newPart.partName = partInfo.parts[tmpProp->header.partID].partName;
+							newState.stateName = "Common";
 						}
 						else
 						{
 							char txt[160];
-							sprintf(txt, "Part %d", tmpProp->header.partID);
-							newPart.partName = std::string(txt);
+							sprintf(txt, "State %d", tmpProp->header.stateID);
+							newState.stateName = std::string(txt);
 						}
-
-						part = cls->AddPart(newPart);
 					}
 
-
-					// See if we have created a "Style State" object for this
-					// stateID inside the current "Style Part". If not, create one.
-					StyleState* state = part->FindState(tmpProp->header.stateID);
-					if (state == nullptr)
-					{
-						StyleState newState;
-						newState.stateID = tmpProp->header.stateID;
-
-						if (tmpProp->header.partID < partInfo.numParts &&
-							tmpProp->header.stateID < partInfo.parts[tmpProp->header.partID].numStates)
-						{
-							newState.stateName = partInfo.parts[tmpProp->header.partID].states[tmpProp->header.stateID].stateName;
-						}
-						else
-						{
-							if (tmpProp->header.stateID == 0)
-							{
-								newState.stateName = "Common";
-							}
-							else
-							{
-								char txt[160];
-								sprintf(txt, "State %d", tmpProp->header.stateID);
-								newState.stateName = std::string(txt);
-							}
-						}
-
-						state = part->AddState(newState);
-					}
-
-					state->AddProperty(tmpProp);
-					m_propsFound++;
+					state = part->AddState(newState);
 				}
+
+				state->AddProperty(tmpProp);
+				m_propsFound++;
 			}
 		}
 
@@ -392,7 +452,7 @@ namespace libmsstyle
 			else return Platform::WIN7;
 		}
 
-		
+
 		int m_propsFound;
 		ModuleHandle m_moduleHandle;
 		Platform m_stylePlatform;
@@ -464,9 +524,9 @@ namespace libmsstyle
 		impl->Load(path);
 	}
 
-	void VisualStyle::Save(const std::string& path)
+	void VisualStyle::Save(const std::string& path, bool keepOrder)
 	{
-		impl->Save(path);
+		impl->Save(path, keepOrder);
 	}
 
 	VisualStyle::ClassIterator VisualStyle::begin()
@@ -477,5 +537,13 @@ namespace libmsstyle
 	VisualStyle::ClassIterator VisualStyle::end()
 	{
 		return impl->m_classes.end();
+	}
+
+	StyleClass* VisualStyle::FindClass(int id) const
+	{
+		const auto res = impl->m_classes.find(id);
+		if (res != impl->m_classes.end())
+			return &(res->second);
+		else return nullptr;
 	}
 }

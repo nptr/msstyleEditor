@@ -18,6 +18,7 @@ private:
 	// The IDs for the menu items
 	static const int ID_FOPEN = 444;
 	static const int ID_FSAVE = 445;
+	static const int ID_FSAVE_ORI = 545;
 	static const int ID_IEXPORT = 446;
 	static const int ID_IREPLACE = 447;
 	static const int ID_ABOUT = 448;

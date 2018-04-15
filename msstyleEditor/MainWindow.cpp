@@ -71,6 +71,8 @@ MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, c
 	fileMenu->Append(ID_FOPEN, wxT("&Open"));
 	fileMenu->Append(ID_FSAVE, wxT("&Save"));
 	fileMenu->Enable(ID_FSAVE, false);
+	fileMenu->Append(ID_FSAVE_ORI, wxT("&Save (keep order)"));
+	fileMenu->Enable(ID_FSAVE_ORI, false);
 
 	wxMenu* exportSubMenu = new wxMenu();
 	exportSubMenu->Append(ID_EXPORT_TREE, wxT("Style Info"));
@@ -105,6 +107,7 @@ MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, c
 	// Main Menu Event Handler
 	Connect(ID_FOPEN, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnFileOpenMenuClicked));
 	Connect(ID_FSAVE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnFileSaveMenuClicked));
+	Connect(ID_FSAVE_ORI, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnFileSaveMenuClicked));
 	Connect(ID_EXPORT_TREE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnExportLogicalStructure));
 	Connect(ID_THEME_APPLY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnThemeApply));
 
@@ -135,8 +138,8 @@ MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, c
 	Connect(wxEVT_COMMAND_TREE_SEL_CHANGED, wxTreeEventHandler(MainWindow::OnClassViewTreeSelChanged), NULL, this);
 
 	propView->Connect(wxEVT_PG_CHANGING, wxPropertyGridEventHandler(MainWindow::OnPropertyGridChanging), NULL, this);	
-	propView->Connect(wxPropertyCategoryToolbar::ID_ADD_PROP, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainWindow::OnPropertyGridItemCreate));
-	propView->Connect(wxPropertyCategoryToolbar::ID_REMOVE_PROP, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainWindow::OnPropertyGridItemDelete));
+	propView->Connect(wxPropertyCategoryToolbar::ID_ADD_PROP, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainWindow::OnPropertyGridItemCreate), NULL, this);
+	propView->Connect(wxPropertyCategoryToolbar::ID_REMOVE_PROP, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainWindow::OnPropertyGridItemDelete), NULL, this);
 	propView->SetCaptionBackgroundColour(wxColour(0xE0E0E0));
 	propView->SetCaptionTextColour(wxColour(0x202020)); // BGR
 	propView->SetBackgroundColour(*wxWHITE);
@@ -179,7 +182,10 @@ void MainWindow::OnFileSaveMenuClicked(wxCommandEvent& event)
 
 	try
 	{
-		currentStyle->Save(saveFileDialog.GetPath().ToStdString());
+		if (event.GetId() == ID_FSAVE)
+			currentStyle->Save(saveFileDialog.GetPath().ToStdString(), false);
+		if (event.GetId() == ID_FSAVE_ORI)
+			currentStyle->Save(saveFileDialog.GetPath().ToStdString(), true);
 	}
 	catch (std::runtime_error err)
 	{
@@ -417,29 +423,66 @@ void MainWindow::OnPropertyGridChanging(wxPropertyGridEvent& event)
 
 void MainWindow::OnPropertyGridItemCreate(wxCommandEvent& event)
 {
-	wxPropertyCategoryToolbar* src = dynamic_cast<wxPropertyCategoryToolbar*>(event.GetEventObject());
+	if (selection.ClassId < 0 ||
+		selection.PartId < 0 )
+	{
+		wxMessageBox("Internal error. lost track of state.");
+		return;
+	}
+
+	wxPropertyCategoryToolbar* category = dynamic_cast<wxPropertyCategoryToolbar*>(event.GetEventObject());
 	
-	libmsstyle::StyleProperty prop;
-	// prop.header.classID = from tree
-	// prop.header.partID = from tree
-	// prop.header.stateID = from prop view
+	libmsstyle::StyleProperty* prop = new StyleProperty();
+	prop->header.classID = selection.ClassId;
+	prop->header.partID = selection.PartId;
+	prop->header.stateID = ((StyleState*)category->GetClientData())->stateID;
 
 	AddPropertyDialog propDlg(this);
-	if (propDlg.ShowModal(prop) == wxID_OK)
+	if (propDlg.ShowModal(*prop) == wxID_OK)
 	{
-		//auto treeItemID = classView->GetSelection()
-		//auto treeItemData = classView->GetItemData(treeItemID);
-		// add prop to style
-		// add to prop view
+		StylePart* part = currentStyle->FindClass(selection.ClassId)
+									  ->FindPart(selection.PartId);
+
+		part->FindState(prop->header.stateID)->AddProperty(prop);
+		FillPropertyView(*part);
 	}
+	else delete prop;
 }
 
 void MainWindow::OnPropertyGridItemDelete(wxCommandEvent& event)
 {
-	// docs: ...returns the identifier of the button which was clicked...
-	if (wxMessageBox("Remove property: <NAME> with value: <VALUE>?", "Remove Property", wxYES_NO) == wxYES)
+	wxPGProperty* wxprop = propView->GetSelection();
+	if (wxprop == nullptr || wxprop->IsCategory())
 	{
-		wxMessageBox("Removed!");
+		wxMessageBox("No item selected!");
+		return;
+	}
+
+	if (selection.ClassId < 0 ||
+		selection.PartId < 0)
+	{
+		wxMessageBox("Internal error. Lost track of selection.", "Remove Property", wxICON_ERROR);
+		return;
+	}
+
+	StyleProperty* prop = static_cast<StyleProperty*>(wxprop->GetClientData());
+	if (prop->GetTypeID() == IDENTIFIER::FILENAME ||
+		prop->GetTypeID() == IDENTIFIER::DISKSTREAM)
+	{
+		wxMessageBox("Cannot remove image properties yet!", "Remove Property", wxICON_INFORMATION);
+		return;
+	}
+	
+	wxString msgText = wxString::Format("Remove property \"%s\" with value: \"%s\"?", prop->LookupName(), prop->GetValueAsString());
+	if (wxMessageBox(msgText, "Remove Property", wxYES_NO) == wxYES)
+	{
+		StylePart* part = currentStyle->FindClass(selection.ClassId)
+									  ->FindPart(selection.PartId);
+
+		// todo: cannot just remove any prop. image props are still used in the classview..
+		// also: there is still the vector with the props in their original order.
+		part->FindState(prop->header.stateID)->RemoveProperty(prop);
+		FillPropertyView(*part);
 	}
 }
 
@@ -841,6 +884,7 @@ void MainWindow::OpenStyle(const wxString& file)
 	imageMenu->Enable(ID_IEXPORT, true);
 	imageMenu->Enable(ID_IREPLACE, true);
 	fileMenu->Enable(ID_FSAVE, true);
+	fileMenu->Enable(ID_FSAVE_ORI, true);
 	themeMenu->Enable(ID_THEME_APPLY, true);
 	viewMenu->Enable(ID_RESOURCEDLG, true);
 
@@ -909,6 +953,7 @@ void MainWindow::FillPropertyView(StylePart& part)
 	for (auto& state : part)
 	{
 		wxPropertyCategoryToolbar* category = new wxPropertyCategoryToolbar(propView->GetPanel(), state.second.stateName);
+		category->SetClientData(&state);
 		for (auto& prop : state.second)
 		{
 			category->AppendChild(GetWXPropertyFromMsStyleProperty(*prop));

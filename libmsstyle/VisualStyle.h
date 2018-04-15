@@ -31,8 +31,10 @@ namespace libmsstyle
 		ClassIterator begin();
 		ClassIterator end();
 
+		StyleClass* FindClass(int id) const;
+
 		void Load(const std::string& path);
-		void Save(const std::string& path);
+		void Save(const std::string& path, bool keepOrder = false);
 
 		int GetPropertyCount() const;
 		Platform GetCompatiblePlatform() const;
