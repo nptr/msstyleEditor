@@ -20,6 +20,9 @@ namespace libmsstyle
 
 		StyleProperty* AddProperty(StyleProperty* prop);
 		StyleProperty* GetProperty(int index) const;
+		StyleProperty* FindPropertyByAddress(const StyleProperty* prop) const;
+		StyleProperty* FindPropertyByValue(const StyleProperty& prop) const;
+
 		void RemoveProperty(int index);
 		void RemoveProperty(const StyleProperty* prop);
 		size_t GetPropertyCount() const;

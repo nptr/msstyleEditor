@@ -121,6 +121,8 @@ namespace libmsstyle
 			memset(&data, 0, sizeof(PropertyData));
 		}
 
+		bool operator==(const StyleProperty& other) const;
+
 		PropertyHeader header;
 		PropertyData data;
 

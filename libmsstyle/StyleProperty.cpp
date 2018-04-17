@@ -125,6 +125,18 @@ namespace libmsstyle
 		else return "UNKNOWN";
 	}
 
+
+	bool StyleProperty::operator==(const StyleProperty& other) const
+	{
+		if (this->header.nameID == other.header.nameID &&
+			this->header.typeID == other.header.typeID)
+		{
+			return this->GetValueAsString() == other.GetValueAsString();
+		}
+		else return false;
+	}
+
+
 	void StyleProperty::UpdateImageLink(int imageID)
 	{
 		data.imagetype.imageID = imageID;

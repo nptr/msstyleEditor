@@ -12,6 +12,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libmsstyle", "libmsstyle\libmsstyle.vcxproj", "{223AE9F1-462F-47D5-82C4-3241520D0C8C}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libmsstyleTests", "libmsstyleTests\libmsstyleTests.vcxproj", "{48A9C9BC-870B-44AF-B615-60ECA0614B1D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -46,6 +48,16 @@ Global
 		{223AE9F1-462F-47D5-82C4-3241520D0C8C}.Release|Win32.Build.0 = Release|Win32
 		{223AE9F1-462F-47D5-82C4-3241520D0C8C}.Release|x64.ActiveCfg = Release|x64
 		{223AE9F1-462F-47D5-82C4-3241520D0C8C}.Release|x64.Build.0 = Release|x64
+		{48A9C9BC-870B-44AF-B615-60ECA0614B1D}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{48A9C9BC-870B-44AF-B615-60ECA0614B1D}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{48A9C9BC-870B-44AF-B615-60ECA0614B1D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{48A9C9BC-870B-44AF-B615-60ECA0614B1D}.Debug|Win32.Build.0 = Debug|Win32
+		{48A9C9BC-870B-44AF-B615-60ECA0614B1D}.Debug|x64.ActiveCfg = Debug|x64
+		{48A9C9BC-870B-44AF-B615-60ECA0614B1D}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{48A9C9BC-870B-44AF-B615-60ECA0614B1D}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{48A9C9BC-870B-44AF-B615-60ECA0614B1D}.Release|Win32.ActiveCfg = Release|Win32
+		{48A9C9BC-870B-44AF-B615-60ECA0614B1D}.Release|Win32.Build.0 = Release|Win32
+		{48A9C9BC-870B-44AF-B615-60ECA0614B1D}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

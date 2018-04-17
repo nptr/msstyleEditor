@@ -8,6 +8,29 @@ namespace libmsstyle
 {
 	const std::unordered_map<int, const char*> PROPERTY_MAP =
 	{
+		// Need those, because some props use a typeId as nameId..
+		{ 2, "DIBDATA" },
+		{ 8, "GLYPHDIBDATA" },
+		{ 200, "ENUM" },
+		{ 201, "STRING" },
+		{ 202, "INT" },
+		{ 203, "BOOL" },
+		{ 204, "COLOR" },
+		{ 205, "MARGINS" },
+		{ 206, "FILENAME" },
+		{ 207, "SIZE" },
+		{ 208, "POSITION" },
+		{ 209, "RECT" },
+		{ 210, "FONT" },
+		{ 211, "INTLIST" },
+		{ 212, "HBITMAP" },
+		{ 213, "IMAGEATLAS" }, // DISKSTREAM
+		{ 214, "STREAM" },
+		{ 215, "BITMAPREF" },
+		{ 216, "FLOAT" },
+		{ 217, "FLOATLIST" },
+		{ 241, "UNKNOWN_241" },
+
 		{ 401, "COLORSCHEMES" }, // begin propery names
 		{ 402, "SIZES" },
 		{ 403, "CHARSET" },

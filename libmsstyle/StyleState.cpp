@@ -19,6 +19,24 @@ namespace libmsstyle
 			return m_properties[m_properties.size() - 1];
 		}
 
+		StyleProperty* FindPropertyByAddress(const StyleProperty* prop) const
+		{
+			for (auto& it = m_properties.begin(); it != m_properties.end(); ++it)
+				if (prop == *it)
+					return *it;
+
+			return nullptr;
+		}
+
+		StyleProperty* FindPropertyByValue(const StyleProperty& prop) const
+		{
+			for (auto& it = m_properties.begin(); it != m_properties.end(); ++it)
+				if (prop == **it)
+					return *it;
+
+			return nullptr;
+		}
+
 		void RemoveProperty(int index)
 		{
 			m_properties.erase(m_properties.begin() + index);
@@ -70,6 +88,16 @@ namespace libmsstyle
 	StyleProperty* StyleState::GetProperty(int index) const
 	{
 		return impl->GetProperty(index);
+	}
+
+	StyleProperty* StyleState::FindPropertyByAddress(const StyleProperty* prop) const
+	{
+		return impl->FindPropertyByAddress(prop);
+	}
+
+	StyleProperty* StyleState::FindPropertyByValue(const StyleProperty& prop) const
+	{
+		return impl->FindPropertyByValue(prop);
 	}
 
 	void StyleState::RemoveProperty(int index)
