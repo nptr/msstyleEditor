@@ -28,6 +28,8 @@ bool SaveReloadCompareTest(libmsstyle::VisualStyle& s1)
 	libmsstyle::VisualStyle s2;
 	s2.Load(dstFile);
 
+	bool result = true;
+
 	// CHECK EVERY SINGLE CLASS, PART, STATE AND PROPERTY
 	// IF IT WAS SAVED AND IS AVAILABLE IN THE NEW STYLE
 
@@ -63,29 +65,39 @@ bool SaveReloadCompareTest(libmsstyle::VisualStyle& s1)
 								}
 								else
 								{
-									// state not found
+									result = false;
+									printfc(ERROR, "Missing property [N: %d, T: %d] in\r\n", (**prop).header.nameID, (**prop).header.typeID);
+									printfc(ERROR, "State %d: %s\r\n", state->second.stateID, state->second.stateName);
+									printfc(ERROR, "Part %d: %s\r\n", part->second.partID, part->second.partName);
+									printfc(ERROR, "Class %d: %s\r\n", cls->second.classID, cls->second.className);
 								}
 							}
 						}
 						else
 						{
-							// state not found
+							result = false;
+							printfc(ERROR, "Missing state %d: %s, in\r\n", state->second.stateID, state->second.stateName);
+							printfc(ERROR, "Part %d: %s\r\n", part->second.partID, part->second.partName);
+							printfc(ERROR, "Class %d: %s\r\n", cls->second.classID, cls->second.className);
 						}
 					}
 				}
 				else
 				{
-					// part not found
+					result = false;
+					printfc(ERROR, "Missing part %d: %s, in\r\n", part->second.partID, part->second.partName);
+					printfc(ERROR, "Class %d: %s\r\n", cls->second.classID, cls->second.className);
 				}
 			}
 		}
 		else
 		{
-			// class not found
+			result = false;
+			printfc(ERROR, "Missing class %d: %s\r\n", cls->second.classID, cls->second.className);
 		}
 	}
 
-	return true;
+	return result;
 }
 
 
@@ -93,35 +105,55 @@ int _tmain(int argc, _TCHAR* argv[])
 {
 	const char* INPUT_FILES[] =
 	{
-		"W7.msstyle",
-		"W8.msstyle",
-		"W81.msstyle",
-		"W10.msstyle",
+		"W7.msstyles",
+		"W8.msstyles",
+		"W81.msstyles",
+		"W10.msstyles",
 		NULL
 	};
 
-	const char** file = INPUT_FILES;
-	while (*file != NULL)
+	libmsstyle::Platform EXPECTED_PLATFORMS[] =
 	{
-		printfc(NORMAL, "%s\r\n", *file);
+		libmsstyle::Platform::WIN7,
+		libmsstyle::Platform::WIN8,
+		libmsstyle::Platform::WIN81,
+		libmsstyle::Platform::WIN10,
+	};
+
+	const char* file = NULL;
+	for (int i = 0; INPUT_FILES[i] != NULL; ++i)
+	{
+		file = INPUT_FILES[i];
+
+		printfc(NORMAL, "Testing with: %s\r\n", file);
 
 		libmsstyle::VisualStyle currentStyle;
+
+		//
+		// Save and Reload
+		//
 		try
 		{
-			currentStyle.Load(*file);
+			currentStyle.Load(file);
 
 			if (SaveReloadCompareTest(currentStyle))
-				printfc(OK, "%s - SaveReloadCompareTest - OK\r\n", *file);
-			else printfc(ERROR, "%s - SaveReloadCompareTest - FAILED\r\n", *file);
+				printfc(OK, "%s - SaveReloadCompareTest - OK\r\n", file);
+			else printfc(ERROR, "%s - SaveReloadCompareTest - FAILED\r\n", file);
 		}
 		catch (std::exception& ex)
 		{
-			printfc(ERROR, "ERROR - %s - %s\r\n", *file, ex.what());
+			printfc(ERROR, "ERROR - %s\r\n", ex.what());
 		}
 
-		file++;
+		//
+		// Platform Determination
+		//
+		if (currentStyle.GetCompatiblePlatform() == EXPECTED_PLATFORMS[i])
+			printfc(OK, "%s - DeterminePlatformTest - OK\r\n", file);
+		else printfc(ERROR, "%s - DeterminePlatformTest - FAILED\r\n", file);
 	}
 
+	getchar();
 	return 0;
 }
 

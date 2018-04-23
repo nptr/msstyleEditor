@@ -40,10 +40,13 @@ namespace libmsstyle
 
 		~Impl()
 		{
+			// TODO: this does not delete new props!! fix it
 			for (auto& prop : m_origOrder)
 			{
 				delete prop;
 			}
+
+			CloseModule(m_moduleHandle);
 		}
 
 		void Log(const char* format, ...)
@@ -229,9 +232,12 @@ namespace libmsstyle
 			else
 				SavePropertiesOriginalOrder(updHandle);
 
-			if (!libmsstyle::EndUpdate(updHandle))
+			int updateError = libmsstyle::EndUpdate(updHandle);
+			if (updateError)
 			{
-				throw std::runtime_error("Could not write the changes to the file!");
+				char message[48];
+				sprintf(message, "Could not write the changes to the file! ErrorCode: %d", updateError);
+				throw std::runtime_error(message);
 				return;
 			}
 		}

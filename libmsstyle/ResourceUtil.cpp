@@ -16,7 +16,7 @@ namespace libmsstyle
 
 	void CloseModule(ModuleHandle moduleHandle)
 	{
-
+		FreeLibrary(static_cast<HMODULE>(moduleHandle));
 	}
 
 	Resource GetResource(ModuleHandle moduleHandle, const char* name, const char* type)
@@ -74,8 +74,10 @@ namespace libmsstyle
 		return UpdateResourceA(updateHandle, type, MAKEINTRESOURCEA(nameId), MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL), (LPVOID)data, length) != 0;
 	}
 
-	bool EndUpdate(UpdateHandle updateHandle)
+	int EndUpdate(UpdateHandle updateHandle)
 	{
-		return EndUpdateResourceA(updateHandle, FALSE) != 0;
+		if (EndUpdateResourceA(updateHandle, FALSE) == TRUE)
+			return ERROR_SUCCESS;
+		else return GetLastError();
 	}
 }

@@ -26,6 +26,6 @@ namespace libmsstyle
 	bool UpdateStyleResource(UpdateHandle, const char* type, const char* name, LanguageId lid, const char* data, unsigned int length);
 	bool UpdateStyleResource(UpdateHandle, const char* type, const char* name, const char* data, unsigned int length);
 	bool UpdateStyleResource(UpdateHandle, const char* type, int nameId, const char* data, unsigned int length);
-	bool EndUpdate(UpdateHandle updateHandle);
+	int EndUpdate(UpdateHandle updateHandle);
 }
 
