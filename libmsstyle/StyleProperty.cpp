@@ -253,8 +253,7 @@ namespace libmsstyle
 		} break;
 		case IDENTIFIER::FONT:
 		{
-			// todo: lookup resource id?
-			return std::to_string(data.fonttype.fontID);
+			return lookup::FindFontName(data.fonttype.fontID);
 		} break;
 		case IDENTIFIER::INTLIST:
 		{

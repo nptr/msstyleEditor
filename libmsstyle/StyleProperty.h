@@ -27,7 +27,7 @@ namespace libmsstyle
 		}imagetype;
 		struct
 		{
-			int32_t fontID;		// for MAKEINTRESOURCE() too?
+			int32_t fontID;		// for MAKEINTRESOURCE(), load from  en-US/XXXX.msstyles.mui. Language may vary...
 			int32_t important1;
 			int32_t important2;
 		}fonttype;

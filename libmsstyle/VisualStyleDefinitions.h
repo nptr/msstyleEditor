@@ -34,6 +34,8 @@ namespace libmsstyle
 
 	extern const std::unordered_map<int, const char*> DATATYPE_MAP;
 
+	extern const std::unordered_map<int, const char*> FONT_MAP;
+
 	enum IDENTIFIER
 	{
 		DIBDATA = 2,

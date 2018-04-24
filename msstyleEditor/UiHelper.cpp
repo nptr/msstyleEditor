@@ -93,7 +93,19 @@ wxPGProperty* GetWXPropertyFromMsStyleProperty(StyleProperty& prop)
 	}
 	case IDENTIFIER::FONT:
 	{
-		wxIntProperty* p = new wxIntProperty("FONT (ID)", *wxPGProperty::sm_wxPG_LABEL, prop.data.fonttype.fontID);
+		wxPGChoices* cp = GetFontsFromMsStyleProperty(prop);
+		wxPGProperty* p;
+
+		if (cp != nullptr)
+		{
+			p = new wxEnumProperty(propName, *wxPGProperty::sm_wxPG_LABEL, *cp, prop.data.fonttype.fontID);
+			delete cp;
+		}
+		else
+		{
+			p = new wxIntProperty(propName, *wxPGProperty::sm_wxPG_LABEL, prop.data.fonttype.fontID);
+		}
+
 		p->SetClientData(&prop);
 		return p;
 	}
@@ -135,6 +147,18 @@ wxPGChoices* GetEnumsFromMsStyleProperty(libmsstyle::StyleProperty& prop)
 	for (int i = 0; i < result.numEnums; ++i)
 	{
 		choices->Add(result.enums[i].value, result.enums[i].key);
+	}
+
+	return choices;
+}
+
+wxPGChoices* GetFontsFromMsStyleProperty(libmsstyle::StyleProperty& prop)
+{
+	wxPGChoices* choices = new wxPGChoices();
+
+	for (auto it = libmsstyle::FONT_MAP.begin(); it != libmsstyle::FONT_MAP.end(); ++it)
+	{
+		choices->Add(it->second, it->first);
 	}
 
 	return choices;

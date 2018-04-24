@@ -4,6 +4,8 @@
 #include "VisualStyleEnums.h"
 #include "VisualStyleDefinitions.h"
 
+#include <string>
+
 namespace libmsstyle
 {
 	namespace lookup
@@ -26,5 +28,6 @@ namespace libmsstyle
 
 		const char* FindPropertyName(int nameID);
 		const char* FindTypeName(int typeID);
+		std::string FindFontName(int fontID);
 	}
 }
