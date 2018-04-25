@@ -145,8 +145,9 @@ int AddPropertyDialog::ShowModal(StyleProperty& prop)
 			return wxID_CANCEL;
 
 		wxPropertyClientData* cd = static_cast<wxPropertyClientData*>(propBox->GetClientObject(selectedIndex));
-		prop.header.typeID = cd->GetPropInfo().type;
-		prop.header.nameID = cd->GetNameID();
+		
+		StyleProperty::Initialize((libmsstyle::IDENTIFIER)cd->GetPropInfo().type,
+								  (libmsstyle::IDENTIFIER)cd->GetNameID(), prop);
 	}
 
 	return ret;

@@ -320,12 +320,12 @@ namespace libmsstyle
 		// TODO: get real data from the XX.msstyles.mui file
 		std::string FindFontName(int fontID)
 		{
-			char txtbuffer[48];
+			char txtbuffer[64];
 
 			auto ret = libmsstyle::FONT_MAP.find(fontID);
 			if (ret != libmsstyle::FONT_MAP.end())
 				sprintf(txtbuffer, "%s (%d)", ret->second, fontID);
-			else sprintf(txtbuffer, "UNKNOWN (%d)", ret->second, fontID);
+			else sprintf(txtbuffer, "UNKNOWN (%d)", fontID);
 			
 			return std::string(txtbuffer);
 		}

@@ -44,6 +44,8 @@ namespace libmsstyle
 		void QueueResourceUpdate(int nameId, StyleResourceType type, const std::string& pathToNew);
 		StyleResource GetResourceFromProperty(const StyleProperty& prop);
 
+		void __AddPropToOriginalList(StyleProperty* prop);
+
 	private:
 		class Impl;
 		Impl* impl;

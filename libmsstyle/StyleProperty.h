@@ -85,7 +85,8 @@ namespace libmsstyle
 		struct
 		{
 			int32_t shortFlag;
-			char reserved[8];
+			int32_t anUnknownValue; // 0x4
+			int32_t reserved;
 			int32_t enumvalue;
 			char reserved2[4];
 		}enumtype;
@@ -153,5 +154,7 @@ namespace libmsstyle
 		void UpdateMargin(int left, int top, int right, int bottom);
 		void UpdatePosition(int x, int y);
 		void UpdateFont(int fontID);
+
+		static void Initialize(libmsstyle::IDENTIFIER type, libmsstyle::IDENTIFIER ident, StyleProperty& prop);
 	};
 }

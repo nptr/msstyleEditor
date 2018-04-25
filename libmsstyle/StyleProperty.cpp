@@ -273,4 +273,59 @@ namespace libmsstyle
 		}
 		}
 	}
+
+
+	void StyleProperty::Initialize(libmsstyle::IDENTIFIER type, libmsstyle::IDENTIFIER ident, StyleProperty& prop)
+	{
+		prop.header.nameID = ident;
+		prop.header.typeID = type;
+
+		switch (type)
+		{
+		case libmsstyle::DIBDATA:
+			break;
+		case libmsstyle::GLYPHDIBDATA:
+			break;
+		case libmsstyle::ENUM:
+			prop.data.enumtype.anUnknownValue = 0x4;
+			break;
+		case libmsstyle::STRING:
+			break;
+		case libmsstyle::INT:
+			break;
+		case libmsstyle::BOOL:
+			prop.data.booltype.anUnknownValue = 0x4;
+			break;
+		case libmsstyle::COLOR:
+			break;
+		case libmsstyle::MARGINS:
+			prop.data.margintype.anUnknownValue = 0x10;
+			break;
+		case libmsstyle::FILENAME:
+			break;
+		case libmsstyle::SIZE:
+			break;
+		case libmsstyle::POSITION:
+			break;
+		case libmsstyle::RECT:
+			prop.data.recttype.anUnknownValue = 0x10;
+			break;
+		case libmsstyle::FONT:
+			break;
+		case libmsstyle::INTLIST:
+			break;
+		case libmsstyle::HBITMAP:
+			break;
+		case libmsstyle::DISKSTREAM:
+			break;
+		case libmsstyle::STREAM:
+			break;
+		case libmsstyle::BITMAPREF:
+			break;
+		case libmsstyle::FLOAT:
+			break;
+		default:
+			break;
+		}
+	}
 }

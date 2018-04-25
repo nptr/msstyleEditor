@@ -444,6 +444,10 @@ void MainWindow::OnPropertyGridItemCreate(wxCommandEvent& event)
 									  ->FindPart(selection.PartId);
 
 		part->FindState(prop->header.stateID)->AddProperty(prop);
+
+		// TODO: remove after saving works correctly
+		currentStyle->__AddPropToOriginalList(prop);
+
 		FillPropertyView(*part);
 	}
 	else delete prop;
@@ -877,7 +881,18 @@ wxTreeItemId MainWindow::FindNext(const SearchProperties& search, wxTreeItemId n
 void MainWindow::OpenStyle(const wxString& file)
 {
 	currentStyle = new VisualStyle();
-	currentStyle->Load(file.ToStdString());
+
+	try
+	{
+		currentStyle->Load(file.ToStdString());
+	}
+	catch (std::exception& ex)
+	{
+		wxMessageBox(ex.what(), "Error loading style!", wxICON_ERROR, this);
+		delete currentStyle;
+		currentStyle = nullptr;
+		return;
+	}
 
 	FillClassView();
 

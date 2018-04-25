@@ -18,16 +18,8 @@ void printfc(WORD color, const char* format, ...)
 }
 
 
-bool SaveReloadCompareTest(libmsstyle::VisualStyle& s1)
+bool CompareStyles(libmsstyle::VisualStyle& s1, libmsstyle::VisualStyle& s2)
 {
-	// SAVE ORIGINAL
-	std::string dstFile = "tmp.msstyle";
-	s1.Save(dstFile, false);
-
-	// RELOAD
-	libmsstyle::VisualStyle s2;
-	s2.Load(dstFile);
-
 	bool result = true;
 
 	// CHECK EVERY SINGLE CLASS, PART, STATE AND PROPERTY
@@ -101,6 +93,35 @@ bool SaveReloadCompareTest(libmsstyle::VisualStyle& s1)
 }
 
 
+bool SaveReloadCompareTest(libmsstyle::VisualStyle& s1)
+{
+	// SAVE IN A NEW ORDER
+	std::string dstFile = "tmp.msstyle";
+	s1.Save(dstFile, false);
+
+	// RELOAD
+	libmsstyle::VisualStyle s2;
+	s2.Load(dstFile);
+
+	return CompareStyles(s1, s2);
+}
+
+
+bool SaveOrderedReloadCompareTest(libmsstyle::VisualStyle& s1)
+{
+	// SAVE IN ORIGINAL ORDER
+	std::string dstFile = "tmp.msstyle";
+	s1.Save(dstFile, true);
+
+	// RELOAD
+	libmsstyle::VisualStyle s2;
+	s2.Load(dstFile);
+
+	return CompareStyles(s1, s2);
+}
+
+
+
 int _tmain(int argc, _TCHAR* argv[])
 {
 	const char* INPUT_FILES[] =
@@ -137,8 +158,24 @@ int _tmain(int argc, _TCHAR* argv[])
 			currentStyle.Load(file);
 
 			if (SaveReloadCompareTest(currentStyle))
-				printfc(OK, "%s - SaveReloadCompareTest - OK\r\n", file);
-			else printfc(ERROR, "%s - SaveReloadCompareTest - FAILED\r\n", file);
+				printfc(OK, "%s - Save and Reload - OK\r\n", file);
+			else printfc(ERROR, "%s - Save and Reload - FAILED\r\n", file);
+		}
+		catch (std::exception& ex)
+		{
+			printfc(ERROR, "ERROR - %s\r\n", ex.what());
+		}
+
+		//
+		// Save in Original Order and Reload
+		//
+		try
+		{
+			currentStyle.Load(file);
+
+			if (SaveReloadCompareTest(currentStyle))
+				printfc(OK, "%s - Save in Original Order and Reload - OK\r\n", file);
+			else printfc(ERROR, "%s - Save in Original Order and Reload - FAILED\r\n", file);
 		}
 		catch (std::exception& ex)
 		{

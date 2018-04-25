@@ -348,15 +348,16 @@ namespace libmsstyle
 					current = next;
 					continue;
 				case rw::PropertyReader::BadProperty:
-					Log("Bad property [N: %d, T: %d] @ 0x%08x\r\n", tmpProp->header.nameID, tmpProp->header.typeID, current-start);
+					char txtBuffer[64];
+					sprintf(txtBuffer,"Bad property [N: %d, T: %d] @ 0x%08x\r\n", tmpProp->header.nameID, tmpProp->header.typeID, current - start);
 					delete tmpProp;
-					throw std::runtime_error("bad prop");
+					throw std::runtime_error(txtBuffer);
 					return;
 				case rw::PropertyReader::End:
 					delete tmpProp;
 					return;
 				default:
-					throw std::runtime_error("unknown result");
+					throw std::runtime_error("ReadNextProperty(). Unknown result. Should never happen.");
 					return;
 				}
 
@@ -551,5 +552,10 @@ namespace libmsstyle
 		if (res != impl->m_classes.end())
 			return &(res->second);
 		else return nullptr;
+	}
+
+	void VisualStyle::__AddPropToOriginalList(StyleProperty* prop)
+	{
+		impl->m_origOrder.push_back(prop);
 	}
 }
