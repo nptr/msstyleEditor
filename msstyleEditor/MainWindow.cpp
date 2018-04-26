@@ -445,9 +445,6 @@ void MainWindow::OnPropertyGridItemCreate(wxCommandEvent& event)
 
 		part->FindState(prop->header.stateID)->AddProperty(prop);
 
-		// TODO: remove after saving works correctly
-		currentStyle->__AddPropToOriginalList(prop);
-
 		FillPropertyView(*part);
 	}
 	else delete prop;

@@ -1,14 +1,12 @@
 #include "StyleClass.h"
 
-#include <unordered_map>
-
 
 namespace libmsstyle
 {
 	class StyleClass::Impl
 	{
 	public:
-		std::unordered_map<int32_t, StylePart> m_parts;
+		std::map<int32_t, StylePart> m_parts;
 	};
 
 

@@ -85,8 +85,8 @@ namespace libmsstyle
 		struct
 		{
 			int32_t shortFlag;
-			int32_t anUnknownValue; // 0x4
 			int32_t reserved;
+			int32_t anUnknownValue; // 0x4
 			int32_t enumvalue;
 			char reserved2[4];
 		}enumtype;

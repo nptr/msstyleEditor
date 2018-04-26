@@ -15,13 +15,14 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <map>
 
 namespace libmsstyle
 {
 	class VisualStyle
 	{
 	public:
-		typedef std::unordered_map<int32_t, StyleClass>::iterator ClassIterator;
+		typedef std::map<int32_t, StyleClass>::iterator ClassIterator;
 
 		VisualStyle();
 		~VisualStyle();
@@ -43,8 +44,6 @@ namespace libmsstyle
 		std::string GetQueuedResourceUpdate(int nameId, StyleResourceType type);
 		void QueueResourceUpdate(int nameId, StyleResourceType type, const std::string& pathToNew);
 		StyleResource GetResourceFromProperty(const StyleProperty& prop);
-
-		void __AddPropToOriginalList(StyleProperty* prop);
 
 	private:
 		class Impl;

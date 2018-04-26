@@ -2,6 +2,7 @@
 
 #include "StyleState.h"
 
+#include <map>
 #include <string>
 #include <memory>
 
@@ -12,7 +13,7 @@ namespace libmsstyle
 	class StylePart
 	{
 	public:
-		typedef std::unordered_map<int, StyleState>::iterator StateIterator;
+		typedef std::map<int, StyleState>::iterator StateIterator;
 
 		StylePart();
 		~StylePart();

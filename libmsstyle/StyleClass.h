@@ -2,6 +2,7 @@
 
 #include "StylePart.h"
 
+#include <map>
 #include <string>
 #include <memory>
 
@@ -13,7 +14,7 @@ namespace libmsstyle
 	class StyleClass
 	{
 	public:
-		typedef std::unordered_map<int, StylePart>::iterator PartIterator;
+		typedef std::map<int, StylePart>::iterator PartIterator;
 
 		StyleClass();
 		~StyleClass();

@@ -159,7 +159,7 @@ namespace libmsstyle
 			}
 		}
 
-		void SavePropertiesHierachically(UpdateHandle updateHandle)
+		void SavePropertiesSorted(UpdateHandle updateHandle)
 		{
 			// assume that twice the size common properties require is enough
 			int estimatedSize = m_propsFound * 48 * 2;
@@ -167,6 +167,13 @@ namespace libmsstyle
 			char* dataptr = data;
 
 			libmsstyle::rw::PropertyWriter writer;
+
+			//
+			// Properties have to be stored sorted by: classId, partID stateId, ?(nameId)?
+			// Otherwise the OS will not accept them!
+			//
+			// I can achieve this by storing everything in (ordered) maps.
+			//
 
 			// for all classes
 			for (auto it = m_classes.begin(); it != m_classes.end(); ++it)
@@ -228,7 +235,7 @@ namespace libmsstyle
 			SaveResources(updHandle);
 
 			if (!keepOrder)
-				SavePropertiesHierachically(updHandle);
+				SavePropertiesSorted(updHandle);
 			else
 				SavePropertiesOriginalOrder(updHandle);
 
@@ -337,6 +344,7 @@ namespace libmsstyle
 				switch (readResult)
 				{
 				case rw::PropertyReader::Ok:
+					//Log("[N: %d, T: %d, C: %d, P: %d, S: %d]\r\n", tmpProp->header.nameID, tmpProp->header.typeID, tmpProp->header.classID, tmpProp->header.partID, tmpProp->header.stateID);
 					prev = reinterpret_cast<const StyleProperty*>(current);
 					break;
 				case rw::PropertyReader::SkippedBytes:
@@ -465,7 +473,7 @@ namespace libmsstyle
 		Platform m_stylePlatform;
 
 		std::string m_stylePath;
-		std::unordered_map<int32_t, StyleClass> m_classes;
+		std::map<int32_t, StyleClass> m_classes;
 		std::unordered_map<StyleResource, std::string, ResourceHasher> m_resourceUpdates;
 		std::vector<StyleProperty*> m_origOrder;
 	};
@@ -552,10 +560,5 @@ namespace libmsstyle
 		if (res != impl->m_classes.end())
 			return &(res->second);
 		else return nullptr;
-	}
-
-	void VisualStyle::__AddPropToOriginalList(StyleProperty* prop)
-	{
-		impl->m_origOrder.push_back(prop);
 	}
 }
