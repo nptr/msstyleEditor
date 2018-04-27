@@ -71,8 +71,6 @@ MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, c
 	fileMenu->Append(ID_FOPEN, wxT("&Open"));
 	fileMenu->Append(ID_FSAVE, wxT("&Save"));
 	fileMenu->Enable(ID_FSAVE, false);
-	fileMenu->Append(ID_FSAVE_ORI, wxT("&Save (keep order)"));
-	fileMenu->Enable(ID_FSAVE_ORI, false);
 
 	wxMenu* exportSubMenu = new wxMenu();
 	exportSubMenu->Append(ID_EXPORT_TREE, wxT("Style Info"));
@@ -107,7 +105,6 @@ MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, c
 	// Main Menu Event Handler
 	Connect(ID_FOPEN, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnFileOpenMenuClicked));
 	Connect(ID_FSAVE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnFileSaveMenuClicked));
-	Connect(ID_FSAVE_ORI, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnFileSaveMenuClicked));
 	Connect(ID_EXPORT_TREE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnExportLogicalStructure));
 	Connect(ID_THEME_APPLY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnThemeApply));
 
@@ -182,10 +179,7 @@ void MainWindow::OnFileSaveMenuClicked(wxCommandEvent& event)
 
 	try
 	{
-		if (event.GetId() == ID_FSAVE)
-			currentStyle->Save(saveFileDialog.GetPath().ToStdString(), false);
-		if (event.GetId() == ID_FSAVE_ORI)
-			currentStyle->Save(saveFileDialog.GetPath().ToStdString(), true);
+		currentStyle->Save(saveFileDialog.GetPath().ToStdString());
 	}
 	catch (std::runtime_error err)
 	{
@@ -896,7 +890,6 @@ void MainWindow::OpenStyle(const wxString& file)
 	imageMenu->Enable(ID_IEXPORT, true);
 	imageMenu->Enable(ID_IREPLACE, true);
 	fileMenu->Enable(ID_FSAVE, true);
-	fileMenu->Enable(ID_FSAVE_ORI, true);
 	themeMenu->Enable(ID_THEME_APPLY, true);
 	viewMenu->Enable(ID_RESOURCEDLG, true);
 

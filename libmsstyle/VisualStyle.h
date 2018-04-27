@@ -35,7 +35,7 @@ namespace libmsstyle
 		StyleClass* FindClass(int id) const;
 
 		void Load(const std::string& path);
-		void Save(const std::string& path, bool keepOrder = false);
+		void Save(const std::string& path);
 
 		int GetPropertyCount() const;
 		Platform GetCompatiblePlatform() const;

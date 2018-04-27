@@ -11,6 +11,7 @@
 
 #include <string.h>
 #include <fstream>
+#include <algorithm>
 #include <Windows.h>
 
 using namespace libmsstyle;
@@ -29,6 +30,14 @@ namespace libmsstyle
 		}
 	};
 
+	struct PropertySortAscending
+	{
+		inline bool operator() (const StyleProperty* p1, const StyleProperty* p2)
+		{
+			return (p1->header.nameID < p2->header.nameID);
+		}
+	};
+
 	class VisualStyle::Impl
 	{
 	public:
@@ -40,10 +49,23 @@ namespace libmsstyle
 
 		~Impl()
 		{
-			// TODO: this does not delete new props!! fix it
-			for (auto& prop : m_origOrder)
+			// for all classes
+			for (auto it = m_classes.begin(); it != m_classes.end(); ++it)
 			{
-				delete prop;
+				// for all parts
+				for (auto partIt = it->second.begin(); partIt != it->second.end(); ++partIt)
+				{
+					// for all states
+					for (auto stateIt = partIt->second.begin(); stateIt != partIt->second.end(); ++stateIt)
+					{
+						// for all properties
+						for (auto propIt = stateIt->second.begin(); propIt != stateIt->second.end(); ++propIt)
+						{
+							// free memory
+							delete *propIt;
+						}
+					}
+				}
 			}
 
 			CloseModule(m_moduleHandle);
@@ -133,32 +155,6 @@ namespace libmsstyle
 			}
 		}
 
-		void SavePropertiesOriginalOrder(UpdateHandle updateHandle)
-		{
-			// assume that twice the size common properties require is enough
-			int estimatedSize = m_propsFound * 48 * 2;
-			char* data = new char[estimatedSize];
-			char* dataptr = data;
-
-			libmsstyle::rw::PropertyWriter writer;
-			for (auto& prop : m_origOrder)
-			{
-				dataptr = writer.WriteProperty(dataptr, *prop);
-
-				if (dataptr - data > estimatedSize)
-					throw std::runtime_error("I haven't allocated enough memory to save the file..sorry for that!");
-			}
-
-			LanguageId lid = GetFirstLanguageId(m_moduleHandle, "NORMAL", "VARIANT");
-			unsigned int length = static_cast<unsigned int>(dataptr - data);
-
-			if (!UpdateStyleResource(updateHandle, "VARIANT", "NORMAL", lid, data, length))
-			{
-				throw std::runtime_error("Could not update properties!");
-				return;
-			}
-		}
-
 		void SavePropertiesSorted(UpdateHandle updateHandle)
 		{
 			// assume that twice the size common properties require is enough
@@ -169,10 +165,11 @@ namespace libmsstyle
 			libmsstyle::rw::PropertyWriter writer;
 
 			//
-			// Properties have to be stored sorted by: classId, partID stateId, ?(nameId)?
-			// Otherwise the OS will not accept them!
+			// Properties have to be stored sorted by: classId, partId, stateId, nameId
+			// Otherwise the OS will not accept them! Actually, nameId isn't required
+			// but microsoft's styles are sorted by it as well, so mine will be too.
 			//
-			// I can achieve this by storing everything in (ordered) maps.
+			// Since the classes, parts and states are stored in (ordered) maps, im fine
 			//
 
 			// for all classes
@@ -184,6 +181,9 @@ namespace libmsstyle
 					// for all states
 					for (auto stateIt = partIt->second.begin(); stateIt != partIt->second.end(); ++stateIt)
 					{
+						// sort properties by nameId
+						std::sort(stateIt->second.begin(), stateIt->second.end(), PropertySortAscending());
+
 						// for all properties
 						for (auto propIt = stateIt->second.begin(); propIt != stateIt->second.end(); ++propIt)
 						{
@@ -196,8 +196,8 @@ namespace libmsstyle
 				}
 
 				// we would save the classnames in the CMAP resource
-				// but as long as we dont modify the classID of the
-				// properties, this shouldn't be necessary
+				// here, but as long as we dont modify the classID of
+				// the properties, this shouldn't be necessary
 			}
 
 			LanguageId lid = GetFirstLanguageId(m_moduleHandle, "NORMAL", "VARIANT");
@@ -211,7 +211,7 @@ namespace libmsstyle
 		}
 
 
-		void Save(const std::string& path, bool keepOrder)
+		void Save(const std::string& path)
 		{
 			// if source != destination
 			if (path != m_stylePath)
@@ -233,16 +233,12 @@ namespace libmsstyle
 			}
 
 			SaveResources(updHandle);
-
-			if (!keepOrder)
-				SavePropertiesSorted(updHandle);
-			else
-				SavePropertiesOriginalOrder(updHandle);
+			SavePropertiesSorted(updHandle);
 
 			int updateError = libmsstyle::EndUpdate(updHandle);
 			if (updateError)
 			{
-				char message[48];
+				char message[64];
 				sprintf(message, "Could not write the changes to the file! ErrorCode: %d", updateError);
 				throw std::runtime_error(message);
 				return;
@@ -344,7 +340,7 @@ namespace libmsstyle
 				switch (readResult)
 				{
 				case rw::PropertyReader::Ok:
-					//Log("[N: %d, T: %d, C: %d, P: %d, S: %d]\r\n", tmpProp->header.nameID, tmpProp->header.typeID, tmpProp->header.classID, tmpProp->header.partID, tmpProp->header.stateID);
+					Log("[N: %d, T: %d, C: %d, P: %d, S: %d]\r\n", tmpProp->header.nameID, tmpProp->header.typeID, tmpProp->header.classID, tmpProp->header.partID, tmpProp->header.stateID);
 					prev = reinterpret_cast<const StyleProperty*>(current);
 					break;
 				case rw::PropertyReader::SkippedBytes:
@@ -400,7 +396,7 @@ namespace libmsstyle
 					}
 					else
 					{
-						char txt[160];
+						char txt[32];
 						sprintf(txt, "Part %d", tmpProp->header.partID);
 						newPart.partName = std::string(txt);
 					}
@@ -430,7 +426,7 @@ namespace libmsstyle
 						}
 						else
 						{
-							char txt[160];
+							char txt[32];
 							sprintf(txt, "State %d", tmpProp->header.stateID);
 							newState.stateName = std::string(txt);
 						}
@@ -539,9 +535,9 @@ namespace libmsstyle
 		impl->Load(path);
 	}
 
-	void VisualStyle::Save(const std::string& path, bool keepOrder)
+	void VisualStyle::Save(const std::string& path)
 	{
-		impl->Save(path, keepOrder);
+		impl->Save(path);
 	}
 
 	VisualStyle::ClassIterator VisualStyle::begin()
