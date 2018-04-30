@@ -397,7 +397,7 @@ void MainWindow::OnPropertyGridChanging(wxPropertyGridEvent& event)
 	else if (styleProp->header.typeID == IDENTIFIER::POSITION)
 	{
 		int x, y;
-		if (sscanf(event.GetValidationInfo().GetValue().GetString().mb_str(), "%d, %d", &x, &y) != 4)
+		if (sscanf(event.GetValidationInfo().GetValue().GetString().mb_str(), "%d, %d", &x, &y) != 2)
 		{
 			event.Veto();
 			wxMessageBox("Invalid format! expected: a, b", "format error", wxICON_ERROR);
@@ -405,8 +405,8 @@ void MainWindow::OnPropertyGridChanging(wxPropertyGridEvent& event)
 		}
 		else
 		{
-			styleProp->data.positiontype.x;
-			styleProp->data.positiontype.y;
+			styleProp->data.positiontype.x = x;
+			styleProp->data.positiontype.y = y;
 		}
 	}
 	else if (styleProp->header.typeID == IDENTIFIER::FONT)
@@ -475,7 +475,6 @@ void MainWindow::OnPropertyGridItemDelete(wxCommandEvent& event)
 									  ->FindPart(selection.PartId);
 
 		// todo: cannot just remove any prop. image props are still used in the classview..
-		// also: there is still the vector with the props in their original order.
 		part->FindState(prop->header.stateID)->RemoveProperty(prop);
 		FillPropertyView(*part);
 	}

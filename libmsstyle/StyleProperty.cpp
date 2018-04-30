@@ -292,11 +292,13 @@ namespace libmsstyle
 		case libmsstyle::STRING:
 			break;
 		case libmsstyle::INT:
+			prop.data.inttype.anUnknownValue = 0x4;
 			break;
 		case libmsstyle::BOOL:
 			prop.data.booltype.anUnknownValue = 0x4;
 			break;
 		case libmsstyle::COLOR:
+			prop.data.colortype.anUnknownValue = 0x4;
 			break;
 		case libmsstyle::MARGINS:
 			prop.data.margintype.anUnknownValue = 0x10;
@@ -306,6 +308,7 @@ namespace libmsstyle
 		case libmsstyle::SIZE:
 			break;
 		case libmsstyle::POSITION:
+			prop.data.positiontype.anUnknownValue = 0x8;
 			break;
 		case libmsstyle::RECT:
 			prop.data.recttype.anUnknownValue = 0x10;

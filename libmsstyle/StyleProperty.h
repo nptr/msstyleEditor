@@ -34,7 +34,8 @@ namespace libmsstyle
 		struct
 		{
 			int32_t shortFlag;
-			char reserved[8];
+			int32_t reserved;
+			int32_t anUnknownValue; // 0x4
 			int32_t value;
 			char reserved2[4];
 		}inttype;
@@ -56,7 +57,8 @@ namespace libmsstyle
 		struct
 		{
 			int32_t shortFlag;
-			char reserved[8];
+			int32_t alwaysZero;
+			int32_t anUnknownValue; // 0x4
 			unsigned char r;
 			unsigned char g;
 			unsigned char b;
@@ -93,7 +95,8 @@ namespace libmsstyle
 		struct
 		{
 			int32_t shortFlag;
-			char reserved[8];
+			int32_t reserved;
+			int32_t anUnknownValue; // 0x8
 			int32_t x;
 			int32_t y;
 		}positiontype;

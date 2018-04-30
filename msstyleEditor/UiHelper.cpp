@@ -23,6 +23,7 @@ wxPGProperty* GetWXPropertyFromMsStyleProperty(StyleProperty& prop)
 	switch (prop.header.typeID)
 	{
 	case IDENTIFIER::FILENAME:
+	case IDENTIFIER::DISKSTREAM:
 	{
 		wxIntProperty* p = new wxIntProperty(propName, *wxPGProperty::sm_wxPG_LABEL, prop.data.imagetype.imageID);
 		p->SetClientData(const_cast<void*>(static_cast<const void*>(&prop)));

@@ -15,7 +15,7 @@ namespace libmsstyle
 				Ok,
 				End,
 				SkippedBytes,
-				UnknownProp,
+				UnknownType,
 				BadProperty
 			};
 

@@ -28,13 +28,6 @@ namespace libmsstyle
 				return Result::SkippedBytes;
 			}
 
-			int dstAddr = reinterpret_cast<int>(cursor);
-			bool propAligned = dstAddr % 8 == 0 ? true : false;
-			if (!propAligned)
-			{
-				// todo:
-			}
-
 			// Copy the property header
 			memcpy(&(prop->header), cursor, sizeof(PropertyHeader));
 			cursor += sizeof(PropertyHeader);
@@ -102,7 +95,7 @@ namespace libmsstyle
 				// I encountered an INTLIST prop, that had the
 				// short indicator NOT set, but still ended right
 				// after. That shouldn't be allowed from my understanding.
-				// I'll try to handle that soemhow...
+				// I'll try to handle that somehow...
 				if (IsProbablyValidHeader(cursor + 12))
 				{
 					memcpy(&(prop->data), cursor, 12);
@@ -151,15 +144,19 @@ namespace libmsstyle
 			} break;
 			default:
 			{
-				// Unknown property. What we can do is blindly copy the assumend
-				// minimum of data every propert has, and let the next call skip.
-				// Todo: scan for the next prop, and copy everything in between?
+				// Unknown type. What we can do is blindly copy the assumend
+				// minimum of data every propert has and notify the caller.
+				// This does not enable us to work with the style.
 				memcpy(&(prop->data), cursor, 12);
 				cursor += 12;
 				prop->bytesAfterHeader += 12;
 
+				// Alternatively, we could scan for the next property and
+				// just store the data in between. In theory this should
+				// allow us to handle unknown datatypes as well (limited).
+
 				*out_next = cursor;
-				return Result::UnknownProp;
+				return Result::UnknownType;
 			} break;
 			}
 

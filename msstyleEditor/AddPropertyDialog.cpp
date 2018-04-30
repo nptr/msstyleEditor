@@ -6,17 +6,21 @@ using namespace libmsstyle;
 const char* typeNameArray[] =
 {
 	"Enum",
+	"Int",
 	"Bool",
 	"Color",
-	"Margin"
+	"Margin",
+	"Position"
 };
 
 const int typeIdArray[] =
 {
 	200,
+	202,
 	203,
 	204,
-	205
+	205,
+	208
 };
 
 class wxPropertyClientData : public wxClientData
@@ -66,6 +70,8 @@ AddPropertyDialog::AddPropertyDialog(wxWindow* parent, wxWindowID id, const wxSt
 	typeBoxChoices.Add(typeNameArray[1]);
 	typeBoxChoices.Add(typeNameArray[2]);
 	typeBoxChoices.Add(typeNameArray[3]);
+	typeBoxChoices.Add(typeNameArray[4]);
+	typeBoxChoices.Add(typeNameArray[5]);
 	typeBox = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, typeBoxChoices, 0);
 	typeBox->SetSelection(0);
 	typeBox->SetMaxSize(wxSize(120, -1));

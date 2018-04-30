@@ -331,6 +331,8 @@ namespace libmsstyle
 			const char* current = start;
 			const char* next = start;
 			const StyleProperty* prev = 0;
+			char txtBuffer[100];
+
 
 			while (current < end)
 			{
@@ -347,12 +349,12 @@ namespace libmsstyle
 					Log("Skipped %d bytes after prop [N: %d, T: %d]\r\n", next - current, prev->header.nameID, prev->header.typeID);
 					current = next;
 					continue;
-				case rw::PropertyReader::UnknownProp:
-					Log("Unknown property [N: %d, T: %d] @ 0x%08x\r\n", tmpProp->header.nameID, tmpProp->header.typeID, current - start);
-					current = next;
-					continue;
+				case rw::PropertyReader::UnknownType:
+					sprintf(txtBuffer, "Unknown property [N: %d, T: %d] @ 0x%08x\r\n", tmpProp->header.nameID, tmpProp->header.typeID, current - start);
+					delete tmpProp;
+					throw std::runtime_error(txtBuffer);
+					return;
 				case rw::PropertyReader::BadProperty:
-					char txtBuffer[64];
 					sprintf(txtBuffer,"Bad property [N: %d, T: %d] @ 0x%08x\r\n", tmpProp->header.nameID, tmpProp->header.typeID, current - start);
 					delete tmpProp;
 					throw std::runtime_error(txtBuffer);
@@ -366,9 +368,6 @@ namespace libmsstyle
 				}
 
 				current = next;
-
-
-				m_origOrder.push_back(tmpProp);
 
 				// See if we have created a "Style Class" object already for
 				// this classID that we can use. If not, create one.
@@ -471,7 +470,6 @@ namespace libmsstyle
 		std::string m_stylePath;
 		std::map<int32_t, StyleClass> m_classes;
 		std::unordered_map<StyleResource, std::string, ResourceHasher> m_resourceUpdates;
-		std::vector<StyleProperty*> m_origOrder;
 	};
 
 
