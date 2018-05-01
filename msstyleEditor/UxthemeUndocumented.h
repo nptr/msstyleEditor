@@ -3,7 +3,7 @@
 #include <Windows.h>
 #include <Uxtheme.h>
 
-namespace msstyle
+namespace uxtheme
 {
 	// https://doxygen.reactos.org/de/d08/dll_2win32_2uxtheme_2system_8c_source.html#l01101
 

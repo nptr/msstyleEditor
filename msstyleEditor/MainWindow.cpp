@@ -1,6 +1,7 @@
 #include "MainWindow.h"
 #include "AboutDialog.h"
 #include "HelpDialog.h"
+#include "AddPropertyDialog.h"
 
 #include "CustomFileDropTarget.h"
 #include "CustomTreeItemData.h"
@@ -16,13 +17,19 @@
 
 #include <shlobj.h> // SHGetKnownFolderPath()
 
+#include "libmsstyle\VisualStyle.h"
+#include "libmsstyle\StylePart.h"
+
 #include "Exporter.h"
 #include "UxthemeUndocumented.h"
 
-using namespace msstyle;
+#include "wxPropertyCategoryToolbar.h"
+
+using namespace libmsstyle;
 
 
-MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style) : wxFrame(parent, id, title, pos, size, style)
+MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
+	: wxFrame(parent, id, title, pos, size, style)
 {	
 	this->SetSizeHints(wxSize(900, 600), wxDefaultSize);
 	this->SetBackgroundColour(wxSystemSettings::GetColour(wxSystemColour::wxSYS_COLOUR_LISTBOX));
@@ -95,13 +102,7 @@ MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, c
 
 	statusBar = this->CreateStatusBar(1);
 
-	imageViewMenu = new wxMenu();
-	imageViewMenu->AppendRadioItem(ID_BG_WHITE, wxT("White"));
-	imageViewMenu->AppendRadioItem(ID_BG_GREY, wxT("Light Grey"))->Check();
-	imageViewMenu->AppendRadioItem(ID_BG_BLACK, wxT("Black"));
-	imageViewMenu->AppendRadioItem(ID_BG_CHESS, wxT("Chessboard"));
-
-	// Menu Event Handler
+	// Main Menu Event Handler
 	Connect(ID_FOPEN, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnFileOpenMenuClicked));
 	Connect(ID_FSAVE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnFileSaveMenuClicked));
 	Connect(ID_EXPORT_TREE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnExportLogicalStructure));
@@ -116,23 +117,31 @@ MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, c
 	Connect(ID_THEMEFOLDER, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnOpenThemeFolder));
 	Connect(ID_FIND, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnOpenSearchDlg));
 
-	// Image View Context Menu
-	imageView->Connect(wxEVT_CONTEXT_MENU, wxContextMenuEventHandler(MainWindow::OnImageViewContextMenuTriggered), NULL, this);
-	Connect(ID_BG_WHITE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnImageViewBgWhite));
-	Connect(ID_BG_GREY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnImageViewBgGrey));
-	Connect(ID_BG_BLACK, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnImageViewBgBlack));
-	Connect(ID_BG_CHESS, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnImageViewBgChess));
+	//
+	// Image View  & Context Menu
+	//
+	imageViewMenu = new wxMenu();
+	imageViewMenu->AppendRadioItem(ID_BG_WHITE, wxT("White"));
+	imageViewMenu->AppendRadioItem(ID_BG_GREY, wxT("Light Grey"))->Check();
+	imageViewMenu->AppendRadioItem(ID_BG_BLACK, wxT("Black"));
+	imageViewMenu->AppendRadioItem(ID_BG_CHESS, wxT("Chessboard"));
 
+	imageView->Connect(wxEVT_CONTEXT_MENU, wxContextMenuEventHandler(MainWindow::OnImageViewContextMenuTriggered), NULL, this);
+	Connect(ID_BG_WHITE, ID_BG_CHESS, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnImageViewBgSelect));
+
+	//
 	// Treeview & Property Grid
+	//
 	Connect(wxEVT_COMMAND_TREE_SEL_CHANGED, wxTreeEventHandler(MainWindow::OnClassViewTreeSelChanged), NULL, this);
+
 	propView->Connect(wxEVT_PG_CHANGING, wxPropertyGridEventHandler(MainWindow::OnPropertyGridChanging), NULL, this);	
+	propView->Connect(wxPropertyCategoryToolbar::ID_ADD_PROP, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainWindow::OnPropertyGridItemCreate), NULL, this);
+	propView->Connect(wxPropertyCategoryToolbar::ID_REMOVE_PROP, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainWindow::OnPropertyGridItemDelete), NULL, this);
 	propView->SetCaptionBackgroundColour(wxColour(0xE0E0E0));
 	propView->SetCaptionTextColour(wxColour(0x202020)); // BGR
 	propView->SetBackgroundColour(*wxWHITE);
 	propView->SetMarginColour(*wxWHITE);
-
 	// Make sure selected image struct is 0
-	selectedImage = { 0 };
 	currentStyle = nullptr;
 
 	// Looks like the resource has to be on top alphabetically or it wont be used as caption image..
@@ -168,12 +177,9 @@ void MainWindow::OnFileSaveMenuClicked(wxCommandEvent& event)
 	if (saveFileDialog.ShowModal() == wxID_CANCEL)
 		return;
 
-	wchar_t newPath[256]; // max path lenght for pretty much every FS
-	lstrcpyW(newPath, (wchar_t*)saveFileDialog.GetPath().wc_str());
-
 	try
 	{
-		currentStyle->Save(newPath);
+		currentStyle->Save(saveFileDialog.GetPath().ToStdString());
 	}
 	catch (std::runtime_error err)
 	{
@@ -208,10 +214,6 @@ void MainWindow::OnThemeApply(wxCommandEvent& event)
 	if (currentStyle == nullptr)
 		return;
 
-	const wchar_t* file = currentStyle->GetFileName();
-	if (file == nullptr)
-		return;
-
 	bool needConfirmation = false;
 	OSVERSIONINFO version;
 	ZeroMemory(&version, sizeof(OSVERSIONINFO));
@@ -220,26 +222,26 @@ void MainWindow::OnThemeApply(wxCommandEvent& event)
 #pragma warning( disable : 4996 )
 	GetVersionEx(&version);
 
-	msstyle::Platform styleplatform = currentStyle->GetCompatiblePlatform();
+	libmsstyle::Platform styleplatform = currentStyle->GetCompatiblePlatform();
 
 	if (version.dwMajorVersion == 6 &&
 		version.dwMinorVersion == 1 &&
-		styleplatform != msstyle::Platform::WIN7)
+		styleplatform != libmsstyle::Platform::WIN7)
 	{
 		needConfirmation = true;
 	}
 
 	if (version.dwMajorVersion == 6 &&
 		version.dwMinorVersion >= 2 &&
-		styleplatform != msstyle::Platform::WIN8 &&
-		styleplatform != msstyle::Platform::WIN81)
+		styleplatform != libmsstyle::Platform::WIN8 &&
+		styleplatform != libmsstyle::Platform::WIN81)
 	{
 		needConfirmation = true;
 	}
 
 	if (version.dwMajorVersion == 10 &&
 		version.dwMinorVersion >= 0  &&
-		styleplatform != msstyle::Platform::WIN10)
+		styleplatform != libmsstyle::Platform::WIN10)
 	{
 		needConfirmation = true;
 	}
@@ -250,7 +252,9 @@ void MainWindow::OnThemeApply(wxCommandEvent& event)
 			return;
 	}
 
-	if (msstyle::SetSystemTheme(file, L"NormalColor", L"NormalSize", 0) != S_OK)
+	std::wstring widePath = UTF8ToWide(currentStyle->GetPath());
+
+	if (uxtheme::SetSystemTheme(widePath.c_str(), L"NormalColor", L"NormalSize", 0) != S_OK)
 		wxMessageBox(wxT("Failed to apply the theme as the OS rejected it!"), wxT("msstyleEditor"), wxICON_ERROR);
 }
 
@@ -264,9 +268,16 @@ void MainWindow::OnClassViewTreeSelChanged(wxTreeEvent& event)
 	statusBar->SetStatusText(wxEmptyString);
 
 	// Class Node
-	PropClassTreeItemData* classData = dynamic_cast<PropClassTreeItemData*>(treeItemData);
+	ClassTreeItemData* classData = dynamic_cast<ClassTreeItemData*>(treeItemData);
 	if (classData != nullptr)
 	{
+		// Track selection
+		selection.ClassId = classData->GetClass()->classID;
+		selection.PartId = -1;
+		selection.StateId = -1;
+
+		// Update UI
+		propView->Clear();
 		return;
 	}
 
@@ -274,7 +285,18 @@ void MainWindow::OnClassViewTreeSelChanged(wxTreeEvent& event)
 	PartTreeItemData* partData = dynamic_cast<PartTreeItemData*>(treeItemData);
 	if (partData != nullptr)
 	{
-		MsStylePart* part = partData->GetMsStylePart();
+		StylePart* part = partData->GetPart();
+
+		// Track selection
+		classData = dynamic_cast<ClassTreeItemData*>(
+			classView->GetItemData(
+			classView->GetItemParent(treeItemID)));
+
+		selection.ClassId = classData->GetClass()->classID;
+		selection.PartId = part->partID;
+		selection.StateId = -1;
+
+		// Update UI
 		statusBar->SetStatusText(wxString::Format("Part ID: %d", part->partID));
 		FillPropertyView(*part);
 		return;
@@ -284,19 +306,41 @@ void MainWindow::OnClassViewTreeSelChanged(wxTreeEvent& event)
 	PropTreeItemData* propData = dynamic_cast<PropTreeItemData*>(treeItemData);
 	if (propData != nullptr)
 	{
-		selectedImageProp = propData->GetMSStyleProp();
+		selectedImageProp = propData->GetProperty();
+		
+		// Track selection
+		partData = dynamic_cast<PartTreeItemData*>(
+			classView->GetItemData(
+			classView->GetItemParent(treeItemID)));
+		
+		classData = dynamic_cast<ClassTreeItemData*>(
+			classView->GetItemData(
+			classView->GetItemParent(
+			classView->GetItemParent(treeItemID))));
 
-		const wchar_t* file = currentStyle->IsReplacementImageQueued(propData->GetMSStyleProp());
-		if (file != nullptr)
+		selection.ClassId = classData->GetClass()->classID;
+		selection.PartId = partData->GetPart()->partID;
+		selection.StateId = -1;
+		
+		// Update UI
+		StyleResourceType type;
+		if (selectedImageProp->GetTypeID() == IDENTIFIER::FILENAME)
+			type = StyleResourceType::IMAGE;
+		else if (selectedImageProp->GetTypeID() == IDENTIFIER::DISKSTREAM)
+			type = StyleResourceType::ATLAS;
+		else type = StyleResourceType::NONE;
+
+		std::string file = currentStyle->GetQueuedResourceUpdate(selectedImageProp->data.imagetype.imageID, type);
+		if (!file.empty())
 		{
 			wxString tmpFile(file);
 			ShowImageFromFile(tmpFile);
-			statusBar->SetStatusText(wxString::Format("Image ID: %d*", propData->GetMSStyleProp()->variants.imagetype.imageID));
+			statusBar->SetStatusText(wxString::Format("Image ID: %d*", selectedImageProp->data.imagetype.imageID));
 		}
 		else
 		{
-			ShowImageFromResource(propData->GetMSStyleProp());
-			statusBar->SetStatusText(wxString::Format("Image ID: %d", propData->GetMSStyleProp()->variants.imagetype.imageID));
+			ShowImageFromResource(selectedImageProp);
+			statusBar->SetStatusText(wxString::Format("Image ID: %d", selectedImageProp->data.imagetype.imageID));
 		}
 
 		return;
@@ -308,28 +352,31 @@ void MainWindow::OnClassViewTreeSelChanged(wxTreeEvent& event)
 void MainWindow::OnPropertyGridChanging(wxPropertyGridEvent& event)
 {
 	wxPGProperty* tmpProp = event.GetProperty();
-	MsStyleProperty* styleProp = (MsStyleProperty*)tmpProp->GetClientData();
+	StyleProperty* styleProp = (StyleProperty*)tmpProp->GetClientData();
+
+	if (!styleProp)
+		return;
 
 	// Update Data. TODO: Check data for validity!
-	if (styleProp->typeID == IDENTIFIER::FILENAME)
-		styleProp->variants.imagetype.imageID = event.GetValidationInfo().GetValue().GetInteger();
-	else if (styleProp->typeID == IDENTIFIER::INT)
-		styleProp->variants.inttype.value = event.GetValidationInfo().GetValue().GetInteger();
-	else if (styleProp->typeID == IDENTIFIER::SIZE)
-		styleProp->variants.sizetype.size = event.GetValidationInfo().GetValue().GetInteger();
-	else if (styleProp->typeID == IDENTIFIER::ENUM)
-		styleProp->variants.enumtype.enumvalue = event.GetValidationInfo().GetValue().GetInteger();
-	else if (styleProp->typeID == IDENTIFIER::BOOL)
-		styleProp->variants.booltype.boolvalue = event.GetValidationInfo().GetValue().GetBool();
-	else if (styleProp->typeID == IDENTIFIER::COLOR)
+	if (styleProp->header.typeID == IDENTIFIER::FILENAME)
+		styleProp->data.imagetype.imageID = event.GetValidationInfo().GetValue().GetInteger();
+	else if (styleProp->header.typeID == IDENTIFIER::INT)
+		styleProp->data.inttype.value = event.GetValidationInfo().GetValue().GetInteger();
+	else if (styleProp->header.typeID == IDENTIFIER::SIZE)
+		styleProp->data.sizetype.size = event.GetValidationInfo().GetValue().GetInteger();
+	else if (styleProp->header.typeID == IDENTIFIER::ENUM)
+		styleProp->data.enumtype.enumvalue = event.GetValidationInfo().GetValue().GetInteger();
+	else if (styleProp->header.typeID == IDENTIFIER::BOOL)
+		styleProp->data.booltype.boolvalue = event.GetValidationInfo().GetValue().GetBool();
+	else if (styleProp->header.typeID == IDENTIFIER::COLOR)
 	{
 		wxAny value = event.GetValidationInfo().GetValue();
 		wxColor color = value.As<wxColour>();
-		styleProp->variants.colortype.r = color.Red();
-		styleProp->variants.colortype.g = color.Green();
-		styleProp->variants.colortype.b = color.Blue();
+		styleProp->data.colortype.r = color.Red();
+		styleProp->data.colortype.g = color.Green();
+		styleProp->data.colortype.b = color.Blue();
 	}
-	else if (styleProp->typeID == IDENTIFIER::RECT || styleProp->typeID == IDENTIFIER::MARGINS)
+	else if (styleProp->header.typeID == IDENTIFIER::RECT || styleProp->header.typeID == IDENTIFIER::MARGINS)
 	{
 		int l, t, r, b;
 		if (sscanf(event.GetValidationInfo().GetValue().GetString().mb_str(), "%d, %d, %d, %d", &l, &t, &r, &b) != 4)
@@ -341,16 +388,16 @@ void MainWindow::OnPropertyGridChanging(wxPropertyGridEvent& event)
 		else
 		{
 			//margins and rect have the same memory layout
-			styleProp->variants.recttype.left = l;
-			styleProp->variants.recttype.top = t;
-			styleProp->variants.recttype.right = r;
-			styleProp->variants.recttype.bottom = b;
+			styleProp->data.recttype.left = l;
+			styleProp->data.recttype.top = t;
+			styleProp->data.recttype.right = r;
+			styleProp->data.recttype.bottom = b;
 		}
 	}
-	else if (styleProp->typeID == IDENTIFIER::POSITION)
+	else if (styleProp->header.typeID == IDENTIFIER::POSITION)
 	{
 		int x, y;
-		if (sscanf(event.GetValidationInfo().GetValue().GetString().mb_str(), "%d, %d", &x, &y) != 4)
+		if (sscanf(event.GetValidationInfo().GetValue().GetString().mb_str(), "%d, %d", &x, &y) != 2)
 		{
 			event.Veto();
 			wxMessageBox("Invalid format! expected: a, b", "format error", wxICON_ERROR);
@@ -358,19 +405,84 @@ void MainWindow::OnPropertyGridChanging(wxPropertyGridEvent& event)
 		}
 		else
 		{
-			styleProp->variants.positiontype.x;
-			styleProp->variants.positiontype.y;
+			styleProp->data.positiontype.x = x;
+			styleProp->data.positiontype.y = y;
 		}
 	}
-	else if (styleProp->typeID == IDENTIFIER::FONT)
+	else if (styleProp->header.typeID == IDENTIFIER::FONT)
 	{
-		styleProp->variants.fonttype.fontID = event.GetValidationInfo().GetValue().GetInteger();
+		styleProp->data.fonttype.fontID = event.GetValidationInfo().GetValue().GetInteger();
+	}
+}
+
+void MainWindow::OnPropertyGridItemCreate(wxCommandEvent& event)
+{
+	if (selection.ClassId < 0 ||
+		selection.PartId < 0 )
+	{
+		wxMessageBox("Internal error. lost track of state.");
+		return;
+	}
+
+	wxPropertyCategoryToolbar* category = dynamic_cast<wxPropertyCategoryToolbar*>(event.GetEventObject());
+	
+	libmsstyle::StyleProperty* prop = new StyleProperty();
+	prop->header.classID = selection.ClassId;
+	prop->header.partID = selection.PartId;
+	prop->header.stateID = ((StyleState*)category->GetClientData())->stateID;
+
+	AddPropertyDialog propDlg(this);
+	if (propDlg.ShowModal(*prop) == wxID_OK)
+	{
+		StylePart* part = currentStyle->FindClass(selection.ClassId)
+									  ->FindPart(selection.PartId);
+
+		part->FindState(prop->header.stateID)->AddProperty(prop);
+
+		FillPropertyView(*part);
+	}
+	else delete prop;
+}
+
+void MainWindow::OnPropertyGridItemDelete(wxCommandEvent& event)
+{
+	wxPGProperty* wxprop = propView->GetSelection();
+	if (wxprop == nullptr || wxprop->IsCategory())
+	{
+		wxMessageBox("No item selected!");
+		return;
+	}
+
+	if (selection.ClassId < 0 ||
+		selection.PartId < 0)
+	{
+		wxMessageBox("Internal error. Lost track of selection.", "Remove Property", wxICON_ERROR);
+		return;
+	}
+
+	StyleProperty* prop = static_cast<StyleProperty*>(wxprop->GetClientData());
+	if (prop->GetTypeID() == IDENTIFIER::FILENAME ||
+		prop->GetTypeID() == IDENTIFIER::DISKSTREAM)
+	{
+		wxMessageBox("Cannot remove image properties yet!", "Remove Property", wxICON_INFORMATION);
+		return;
+	}
+	
+	wxString msgText = wxString::Format("Remove property \"%s\" with value: \"%s\"?", prop->LookupName(), prop->GetValueAsString());
+	if (wxMessageBox(msgText, "Remove Property", wxYES_NO) == wxYES)
+	{
+		StylePart* part = currentStyle->FindClass(selection.ClassId)
+									  ->FindPart(selection.PartId);
+
+		// todo: cannot just remove any prop. image props are still used in the classview..
+		part->FindState(prop->header.stateID)->RemoveProperty(prop);
+		FillPropertyView(*part);
 	}
 }
 
 void MainWindow::OnImageExportClicked(wxCommandEvent& event)
 {
-	if (selectedImage.size == 0 || selectedImage.data == 0 || selectedImageProp == nullptr)
+	if (selectedImage.GetSize() == 0 || selectedImage.GetData() == 0 || selectedImageProp == nullptr)
 	{
 		wxMessageBox("Select an image first!", "Export Image", wxICON_ERROR);
 		return;
@@ -387,7 +499,7 @@ void MainWindow::OnImageExportClicked(wxCommandEvent& event)
 		return;
 	}
 
-	if (!outputStream.WriteAll(selectedImage.data, selectedImage.size))
+	if (!outputStream.WriteAll(selectedImage.GetData(), selectedImage.GetSize()))
 	{
 		wxLogError("Error while writing to the file!");
 		return;
@@ -408,7 +520,15 @@ void MainWindow::OnImageReplaceClicked(wxCommandEvent& event)
 	if (openFileDialog.ShowModal() == wxID_CANCEL)
 		return;
 
-	currentStyle->UpdateImageResource(selectedImageProp, openFileDialog.GetPath().wc_str());
+	// TODO: ugly
+	StyleResourceType tp;
+	if (selectedImageProp->GetTypeID() == IDENTIFIER::FILENAME)
+		tp = StyleResourceType::IMAGE;
+	else if (selectedImageProp->GetTypeID() == IDENTIFIER::DISKSTREAM)
+		tp = StyleResourceType::ATLAS;
+	else tp = StyleResourceType::NONE;
+
+	currentStyle->QueueResourceUpdate(selectedImageProp->data.imagetype.imageID, tp, openFileDialog.GetPath().ToStdString());
 }
 
 void MainWindow::OnImageViewContextMenuTriggered(wxContextMenuEvent& event)
@@ -416,25 +536,27 @@ void MainWindow::OnImageViewContextMenuTriggered(wxContextMenuEvent& event)
 	imageView->PopupMenu(imageViewMenu, imageView->ScreenToClient(event.GetPosition()));
 }
 
-void MainWindow::OnImageViewBgWhite(wxCommandEvent& event)
+void MainWindow::OnImageViewBgSelect(wxCommandEvent& event)
 {
-	imageView->SetBackgroundStyle(ImageViewCtrl::BackgroundStyle::White);
+	switch (event.GetId())
+	{
+	case ID_BG_WHITE:
+		imageView->SetBackgroundStyle(ImageViewCtrl::BackgroundStyle::White);
+		break;
+	case ID_BG_GREY:
+		imageView->SetBackgroundStyle(ImageViewCtrl::BackgroundStyle::LightGrey);
+		break;
+	case ID_BG_BLACK:
+		imageView->SetBackgroundStyle(ImageViewCtrl::BackgroundStyle::Black);
+		break;
+	case ID_BG_CHESS:
+		imageView->SetBackgroundStyle(ImageViewCtrl::BackgroundStyle::Chessboard);
+		break;
+	default:
+		break;
+	}
 }
 
-void MainWindow::OnImageViewBgGrey(wxCommandEvent& event)
-{
-	imageView->SetBackgroundStyle(ImageViewCtrl::BackgroundStyle::LightGrey);
-}
-
-void MainWindow::OnImageViewBgBlack(wxCommandEvent& event)
-{
-	imageView->SetBackgroundStyle(ImageViewCtrl::BackgroundStyle::Black);
-}
-
-void MainWindow::OnImageViewBgChess(wxCommandEvent& event)
-{
-	imageView->SetBackgroundStyle(ImageViewCtrl::BackgroundStyle::Chessboard);
-}
 
 void MainWindow::OnHelpClicked(wxCommandEvent& event)
 {
@@ -562,25 +684,25 @@ bool ContainsProperty(const SearchProperties& search, wxTreeItemData* treeItemDa
 	if (partData == nullptr)
 		return false;
 
-	MsStylePart* part = partData->GetMsStylePart();
+	StylePart* part = partData->GetPart();
 	
-	for (auto stateIt = part->states.begin(); stateIt != part->states.end(); ++stateIt)
+	for (auto& state : *part)
 	{
-		for (auto& propIt : stateIt->second->properties)
+		for (auto& prop : state.second)
 		{
 			// if its a property of the desired type, do a comparison
-			if (propIt->typeID != search.type)
+			if (prop->header.typeID != search.type)
 				continue;
 
 			// comparison
-			switch (propIt->typeID)
+			switch (prop->header.typeID)
 			{
 				case IDENTIFIER::POSITION:
 				{
 					char propPos[32];
 					sprintf(propPos, "%d,%d",
-						propIt->variants.positiontype.x,
-						propIt->variants.positiontype.y);
+						prop->data.positiontype.x,
+						prop->data.positiontype.y);
 
 					std::string tmp = search.value;
 					tmp.erase(std::remove_if(tmp.begin(), tmp.end(), std::isspace), tmp.end());
@@ -592,9 +714,9 @@ bool ContainsProperty(const SearchProperties& search, wxTreeItemData* treeItemDa
 				{
 					char propColor[32];
 					sprintf(propColor, "%d,%d,%d",
-						propIt->variants.colortype.r,
-						propIt->variants.colortype.g,
-						propIt->variants.colortype.b);
+						prop->data.colortype.r,
+						prop->data.colortype.g,
+						prop->data.colortype.b);
 
 					std::string tmp = search.value;
 					tmp.erase(std::remove_if(tmp.begin(), tmp.end(), std::isspace), tmp.end());
@@ -606,10 +728,10 @@ bool ContainsProperty(const SearchProperties& search, wxTreeItemData* treeItemDa
 				{
 					char propMargin[32];
 					sprintf(propMargin, "%d,%d,%d,%d",
-						propIt->variants.margintype.left,
-						propIt->variants.margintype.top,
-						propIt->variants.margintype.right,
-						propIt->variants.margintype.bottom);
+						prop->data.margintype.left,
+						prop->data.margintype.top,
+						prop->data.margintype.right,
+						prop->data.margintype.bottom);
 
 					std::string tmp = search.value;
 					tmp.erase(std::remove_if(tmp.begin(), tmp.end(), std::isspace), tmp.end());
@@ -621,10 +743,10 @@ bool ContainsProperty(const SearchProperties& search, wxTreeItemData* treeItemDa
 				{
 					char propRect[32];
 					sprintf(propRect, "%d,%d,%d,%d",
-						propIt->variants.recttype.left,
-						propIt->variants.recttype.top,
-						propIt->variants.recttype.right,
-						propIt->variants.recttype.bottom);
+						prop->data.recttype.left,
+						prop->data.recttype.top,
+						prop->data.recttype.right,
+						prop->data.recttype.bottom);
 
 					std::string tmp = search.value;
 					tmp.erase(std::remove_if(tmp.begin(), tmp.end(), std::isspace), tmp.end());
@@ -637,7 +759,7 @@ bool ContainsProperty(const SearchProperties& search, wxTreeItemData* treeItemDa
 					try
 					{
 						int size = std::stoi(search.value);
-						if (size == propIt->variants.sizetype.size)
+						if (size == prop->data.sizetype.size)
 							return true;
 					}
 					catch (...) {}
@@ -655,7 +777,7 @@ bool ContainsName(const std::string& str, wxTreeItemData* treeItemData)
 		return false;
 
 	// Class Node
-	PropClassTreeItemData* classData = dynamic_cast<PropClassTreeItemData*>(treeItemData);
+	ClassTreeItemData* classData = dynamic_cast<ClassTreeItemData*>(treeItemData);
 	if (classData != nullptr)
 	{
 		return ContainsStringInvariant(classData->GetClass()->className, str);
@@ -665,14 +787,14 @@ bool ContainsName(const std::string& str, wxTreeItemData* treeItemData)
 	PartTreeItemData* partData = dynamic_cast<PartTreeItemData*>(treeItemData);
 	if (partData != nullptr)
 	{
-		return ContainsStringInvariant(partData->GetMsStylePart()->partName, str);
+		return ContainsStringInvariant(partData->GetPart()->partName, str);
 	}
 
 	// Image Node
 	PropTreeItemData* propData = dynamic_cast<PropTreeItemData*>(treeItemData);
 	if (propData != nullptr)
 	{
-		const char* name = VisualStyle::FindPropName(propData->GetMSStyleProp()->nameID);
+		const char* name = propData->GetProperty()->LookupName();
 		if (name == nullptr)
 			return false;
 		else return ContainsStringInvariant(std::string(name), str);
@@ -749,9 +871,20 @@ wxTreeItemId MainWindow::FindNext(const SearchProperties& search, wxTreeItemId n
 void MainWindow::OpenStyle(const wxString& file)
 {
 	currentStyle = new VisualStyle();
-	currentStyle->Load(file);
 
-	FillClassView(currentStyle->GetClasses());
+	try
+	{
+		currentStyle->Load(file.ToStdString());
+	}
+	catch (std::exception& ex)
+	{
+		wxMessageBox(ex.what(), "Error loading style!", wxICON_ERROR, this);
+		delete currentStyle;
+		currentStyle = nullptr;
+		return;
+	}
+
+	FillClassView();
 
 	imageMenu->Enable(ID_IEXPORT, true);
 	imageMenu->Enable(ID_IREPLACE, true);
@@ -760,7 +893,7 @@ void MainWindow::OpenStyle(const wxString& file)
 	viewMenu->Enable(ID_RESOURCEDLG, true);
 
 
-	this->SetTitle(wxString("msstyleEditor - ") + wxString(currentStyle->GetFileName()));
+	this->SetTitle(wxString("msstyleEditor - ") + wxString(currentStyle->GetPath()));
 }
 
 void MainWindow::CloseStyle()
@@ -780,69 +913,70 @@ void MainWindow::CloseStyle()
 }
 
 
-void MainWindow::FillClassView(const std::unordered_map<int, MsStyleClass*>* classes)
+void MainWindow::FillClassView()
 {
 	classView->Freeze();
 	classView->DeleteAllItems();
 	wxTreeItemId rootNode = classView->AddRoot(wxT("[StyleName]"));
-	
+
 	// Add classes
-	for (auto& cls : *classes)
+	for (auto& cls : *currentStyle)
 	{
-		wxTreeItemId classNode = classView->AppendItem(rootNode, cls.second->className, -1, -1, static_cast<wxTreeItemData*>(new PropClassTreeItemData(cls.second)));
+		wxTreeItemId classNode = classView->AppendItem(rootNode, cls.second.className, -1, -1, static_cast<wxTreeItemData*>(new ClassTreeItemData(&cls.second)));
 
 		// Add parts
-		for (auto& part : cls.second->parts)
+		for (auto& part : cls.second)
 		{
-			wxTreeItemId partNode = classView->AppendItem(classNode, part.second->partName, -1, -1, static_cast<wxTreeItemData*>(new PartTreeItemData(part.second)));
+			wxTreeItemId partNode = classView->AppendItem(classNode, part.second.partName, -1, -1, static_cast<wxTreeItemData*>(new PartTreeItemData(&part.second)));
 
 			// Add images
-			for (auto& state : part.second->states)
+			for (auto& state : part.second)
 			{
-				for (auto& prop : state.second->properties)
+				// Add properties
+				for (auto& prop : state.second)
 				{
-					if (prop->typeID == IDENTIFIER::FILENAME || prop->typeID == IDENTIFIER::DISKSTREAM)
+					// Add images
+					if (prop->header.typeID == IDENTIFIER::FILENAME || prop->header.typeID == IDENTIFIER::DISKSTREAM)
 					{
-						const char* propName = VisualStyle::FindPropName(prop->nameID); // propnames have to be looked up, but thats fast
-						classView->AppendItem(partNode, propName, -1, -1, dynamic_cast<wxTreeItemData*>(new PropTreeItemData(prop)));
+						const char* propName = prop->LookupName(); // propnames have to be looked up, but thats fast
+						classView->AppendItem(partNode, propName, -1, -1, static_cast<wxTreeItemData*>(new PropTreeItemData(prop)));
 					}
 				}
 			}
 		}
+
 	}
+
 	classView->SortChildren(rootNode);
 	classView->Thaw();
 }
 
-void MainWindow::FillPropertyView(MsStylePart& part)
+void MainWindow::FillPropertyView(StylePart& part)
 {
 	propView->Clear();
-
-	for (auto& state : part.states)
+	for (auto& state : part)
 	{
-		wxPropertyCategory* category = new wxPropertyCategory(state.second->stateName);
-		for (auto& prop : state.second->properties)
+		wxPropertyCategoryToolbar* category = new wxPropertyCategoryToolbar(propView->GetPanel(), state.second.stateName);
+		category->SetClientData(&state);
+		for (auto& prop : state.second)
 		{
 			category->AppendChild(GetWXPropertyFromMsStyleProperty(*prop));
 		}
-
 		propView->Append(category);
 	}
 }
 
 
-void MainWindow::ShowImageFromResource(const MsStyleProperty* prop)
+void MainWindow::ShowImageFromResource(const StyleProperty* prop)
 {
-	if (prop->typeID == IDENTIFIER::FILENAME)
-		selectedImage = currentStyle->GetResource(MAKEINTRESOURCEA(prop->variants.imagetype.imageID), "IMAGE");
-	else if (prop->typeID == IDENTIFIER::DISKSTREAM)
-		selectedImage = currentStyle->GetResource(MAKEINTRESOURCEA(prop->variants.imagetype.imageID), "STREAM");
-	else return;
-
-	wxMemoryInputStream stream(selectedImage.data, selectedImage.size);
-
-	wxImage img(stream, wxBITMAP_TYPE_PNG);
-	imageView->SetImage(img);
+	StyleResource res = currentStyle->GetResourceFromProperty(*prop);
+	if (res.GetData() != nullptr && res.GetSize() != 0)
+	{
+		selectedImage = res;
+		wxMemoryInputStream stream(selectedImage.GetData(), selectedImage.GetSize());
+		wxImage img(stream, wxBITMAP_TYPE_PNG);
+		imageView->SetImage(img);
+	}
 }
 
 void MainWindow::ShowImageFromFile(wxString& imgPath)

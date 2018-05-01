@@ -1,10 +1,14 @@
 #pragma once
 
-#include "VisualStyle.h"
+#include "libmsstyle\StyleProperty.h"
 
-#include <wx\wx.h>
-#include <wx\propgrid\property.h>
-#include <wx\propgrid\advprops.h>
+class wxMenu;
+class wxPGProperty;
+class wxPGChoices;
 
-wxPGProperty* GetWXPropertyFromMsStyleProperty(msstyle::MsStyleProperty& prop);
-wxPGChoices* GetEnumsFromMsStyleProperty(msstyle::MsStyleProperty& prop);
+wxPGProperty* GetWXPropertyFromMsStyleProperty(libmsstyle::StyleProperty& prop);
+wxPGChoices* GetEnumsFromMsStyleProperty(libmsstyle::StyleProperty& prop);
+wxPGChoices* GetFontsFromMsStyleProperty(libmsstyle::StyleProperty& prop);
+
+std::string WideToUTF8(const std::wstring& str);
+std::wstring UTF8ToWide(const std::string& str);

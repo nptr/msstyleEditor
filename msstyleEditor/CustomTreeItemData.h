@@ -1,43 +1,42 @@
 #pragma once
 #include "wx\treebase.h"
-#include "VisualStyle.h"
+#include "libmsstyle\VisualStyle.h"
 
 
 // Instances of these classes are attached to treeview nodes.
 // They link to a class/part/property the the style data
-class PropClassTreeItemData : public wxTreeItemData
+class ClassTreeItemData : public wxTreeItemData
 {
 protected:
-	msstyle::MsStyleClass* propClass;
+	libmsstyle::StyleClass* propClass;
 
 public:
-	PropClassTreeItemData(msstyle::MsStyleClass* classPtr);
-	virtual ~PropClassTreeItemData();
+	ClassTreeItemData(libmsstyle::StyleClass* classPtr);
+	virtual ~ClassTreeItemData();
 
-	msstyle::MsStyleClass* GetClass();
+	libmsstyle::StyleClass* GetClass();
 };
 
 class PropTreeItemData : public wxTreeItemData
 {
 protected:
-	msstyle::MsStyleProperty* property;
+	libmsstyle::StyleProperty* property;
 
 public:
-	PropTreeItemData(msstyle::MsStyleProperty* classPtr);
+	PropTreeItemData(libmsstyle::StyleProperty* classPtr);
 	virtual ~PropTreeItemData();
 
-	msstyle::MsStyleProperty* GetMSStyleProp();
+	libmsstyle::StyleProperty* GetProperty();
 };
 
 class PartTreeItemData : public wxTreeItemData
 {
 protected:
-	msstyle::MsStylePart* part;
+	libmsstyle::StylePart* part;
 
 public:
-	PartTreeItemData(msstyle::MsStylePart* partptr);
+	PartTreeItemData(libmsstyle::StylePart* partptr);
 	virtual ~PartTreeItemData();
 
-	msstyle::MsStylePart* GetMsStylePart();
+	libmsstyle::StylePart* GetPart();
 };
-
