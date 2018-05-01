@@ -124,6 +124,8 @@ void AddPropertyDialog::OnTypeSelectionChanged(wxCommandEvent& event)
 	}
 
 	propBox->Select(0);
+	wxCommandEvent dummy;
+	OnPropertySelectionChanged(dummy);
 }
 
 void AddPropertyDialog::OnPropertySelectionChanged(wxCommandEvent& event)
