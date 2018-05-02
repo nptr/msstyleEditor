@@ -33,6 +33,15 @@ namespace libmsstyle
 		impl->m_type = StyleResourceType::IMAGE;
 	}
 
+	StyleResource::StyleResource(const StyleResource& other)
+		: impl(new Impl())
+	{
+		impl->m_data = other.impl->m_data;
+		impl->m_size = other.impl->m_size;
+		impl->m_name = other.impl->m_name;
+		impl->m_type = other.impl->m_type;
+	}
+
 	StyleResource::StyleResource(const void* data, int size, int nameId, StyleResourceType type)
 		: impl(new Impl())
 	{
@@ -44,11 +53,11 @@ namespace libmsstyle
 
 	StyleResource::~StyleResource()
 	{
-		if (impl)
-		{
-			delete impl;
-			impl = nullptr;
-		}
+		//if (impl)
+		//{
+		//	delete impl;
+		//	impl = nullptr;
+		//}
 	}
 
 	StyleResource& StyleResource::operator=(const StyleResource& other)
@@ -67,7 +76,7 @@ namespace libmsstyle
 
 	bool StyleResource::operator==(const StyleResource& rhs) const
 	{
-		return impl == rhs.impl;
+		return *impl == *rhs.impl;
 	}
 
 	int StyleResource::GetNameID() const

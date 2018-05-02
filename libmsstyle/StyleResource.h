@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 namespace libmsstyle
 {
 	enum StyleResourceType
@@ -13,6 +15,7 @@ namespace libmsstyle
 	{
 	public:
 		StyleResource();
+		StyleResource(const StyleResource& other);
 		StyleResource(const void* data, int size, int nameId, StyleResourceType type);
 		~StyleResource();
 
@@ -26,6 +29,6 @@ namespace libmsstyle
 
 	private:
 		class Impl;
-		Impl* impl;
+		std::shared_ptr<Impl> impl;
 	};
 }

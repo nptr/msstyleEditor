@@ -30,6 +30,14 @@ namespace libmsstyle
 		}
 	};
 
+	struct ResourceComparer
+	{
+		bool operator()(const StyleResource& r1, const StyleResource& r2) const
+		{
+			return r1 == r2;
+		}
+	};
+
 	struct PropertySortAscending
 	{
 		inline bool operator() (const StyleProperty* p1, const StyleProperty* p2)
@@ -142,8 +150,8 @@ namespace libmsstyle
 
 				bool success = libmsstyle::UpdateStyleResource(updateHandle, resName,
 					resource.first.GetNameID(),
-					resource.first.GetData(),
-					resource.first.GetSize());
+					imgBuffer,
+					size); 
 				if (!success)
 				{
 					throw std::runtime_error("Could not update IMAGE/STREAM resource!");
@@ -469,7 +477,7 @@ namespace libmsstyle
 
 		std::string m_stylePath;
 		std::map<int32_t, StyleClass> m_classes;
-		std::unordered_map<StyleResource, std::string, ResourceHasher> m_resourceUpdates;
+		std::unordered_map<StyleResource, std::string, ResourceHasher, ResourceComparer> m_resourceUpdates;
 	};
 
 

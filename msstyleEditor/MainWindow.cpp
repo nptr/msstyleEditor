@@ -30,6 +30,8 @@ using namespace libmsstyle;
 
 MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
 	: wxFrame(parent, id, title, pos, size, style)
+	, currentStyle(nullptr)
+	, selectedImageProp(nullptr)
 {	
 	this->SetSizeHints(wxSize(900, 600), wxDefaultSize);
 	this->SetBackgroundColour(wxSystemSettings::GetColour(wxSystemColour::wxSYS_COLOUR_LISTBOX));
@@ -141,8 +143,6 @@ MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, c
 	propView->SetCaptionTextColour(wxColour(0x202020)); // BGR
 	propView->SetBackgroundColour(*wxWHITE);
 	propView->SetMarginColour(*wxWHITE);
-	// Make sure selected image struct is 0
-	currentStyle = nullptr;
 
 	// Looks like the resource has to be on top alphabetically or it wont be used as caption image..
 	wxFrame::SetIcon(wxICON(APPICON));
@@ -180,14 +180,13 @@ void MainWindow::OnFileSaveMenuClicked(wxCommandEvent& event)
 	try
 	{
 		currentStyle->Save(saveFileDialog.GetPath().ToStdString());
+		statusBar->SetStatusText("Style saved successfully!");
+
 	}
 	catch (std::runtime_error err)
 	{
 		wxMessageBox(err.what(), "Error saving file!", wxICON_ERROR);
 	}
-
-
-	statusBar->SetStatusText("Style saved successfully!");
 }
 
 void MainWindow::OnExportLogicalStructure(wxCommandEvent& event)
@@ -520,13 +519,16 @@ void MainWindow::OnImageReplaceClicked(wxCommandEvent& event)
 	if (openFileDialog.ShowModal() == wxID_CANCEL)
 		return;
 
-	// TODO: ugly
 	StyleResourceType tp;
-	if (selectedImageProp->GetTypeID() == IDENTIFIER::FILENAME)
-		tp = StyleResourceType::IMAGE;
-	else if (selectedImageProp->GetTypeID() == IDENTIFIER::DISKSTREAM)
-		tp = StyleResourceType::ATLAS;
-	else tp = StyleResourceType::NONE;
+	switch (selectedImageProp->GetTypeID())
+	{
+	case IDENTIFIER::FILENAME:
+		tp = StyleResourceType::IMAGE; break;
+	case IDENTIFIER::DISKSTREAM:
+		tp = StyleResourceType::ATLAS; break;
+	default:
+		tp = StyleResourceType::NONE; break;
+	}
 
 	currentStyle->QueueResourceUpdate(selectedImageProp->data.imagetype.imageID, tp, openFileDialog.GetPath().ToStdString());
 }
