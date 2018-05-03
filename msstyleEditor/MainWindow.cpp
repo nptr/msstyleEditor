@@ -998,4 +998,6 @@ MainWindow::~MainWindow()
 		delete currentStyle;
 		currentStyle = nullptr;
 	}
+
+	delete imageViewMenu; // not wxWidgets managed!
 }

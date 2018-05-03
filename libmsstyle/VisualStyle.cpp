@@ -358,7 +358,7 @@ namespace libmsstyle
 					current = next;
 					continue;
 				case rw::PropertyReader::UnknownType:
-					sprintf(txtBuffer, "Unknown property [N: %d, T: %d] @ 0x%08x\r\n", tmpProp->header.nameID, tmpProp->header.typeID, current - start);
+					sprintf(txtBuffer, "Unknown type [N: %d, T: %d] @ 0x%08x\r\n", tmpProp->header.nameID, tmpProp->header.typeID, current - start);
 					delete tmpProp;
 					throw std::runtime_error(txtBuffer);
 					return;

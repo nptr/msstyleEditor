@@ -17,7 +17,7 @@ using namespace libmsstyle;
 
 wxPGProperty* GetWXPropertyFromMsStyleProperty(StyleProperty& prop)
 {
-	char* str = new char[32];
+	char str[64];
 	const char* propName = prop.LookupName();
 
 	switch (prop.header.typeID)
