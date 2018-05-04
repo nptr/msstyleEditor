@@ -8,6 +8,12 @@
 
 namespace libmsstyle
 {
+	const PartMap PARTS_ADDRESSBAND[] =
+	{
+		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 1, "BACKGROUND", VS_STATE(STATES_EDITTEXT_BG) }, // reuse states
+	};
+
 	const PartMap PARTS_BUTTON[] =
 	{
 		{ 0, "Common Properties", VS_STATE_NONE },
@@ -97,6 +103,12 @@ namespace libmsstyle
 		{ 8, "EXPANDBUTTON", VS_STATE(STATES_LISTVIEW_EXPCOLLAPSE) },
 		{ 9, "COLLAPSEBUTTON", VS_STATE(STATES_LISTVIEW_EXPCOLLAPSE) },
 		{ 10, "COLUMNDETAIL", VS_STATE_NONE },
+	};
+
+	const PartMap PARTS_LINK[] =
+	{
+		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 1, "HyperLink", VS_STATE(STATES_TOOLTIP_BALLOON_AND_STANDARD) }, // reuse states
 	};
 
 	const PartMap PARTS_MENU[] =
@@ -518,6 +530,14 @@ namespace libmsstyle
 		{ 8, "GRIPPERHORZ", VS_STATE_NONE },
 		{ 9, "GRIPPERVERT", VS_STATE_NONE },
 		{ 10, "SIZEBOX", VS_STATE(STATES_SCROLLBAR_SIZEBOX) },
+	};
+
+	const PartMap PARTS_STATUS[] =
+	{
+		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 1, "PANE", VS_STATE_NONE },
+		{ 2, "GRIPPERPANE", VS_STATE_NONE },
+		{ 3, "GRIPPER", VS_STATE_NONE },
 	};
 
 	const PartMap PARTS_FLYOUT[] =

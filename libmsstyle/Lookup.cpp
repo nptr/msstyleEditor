@@ -115,6 +115,11 @@ namespace libmsstyle
 				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_EDIT);
 				m.parts = PARTS_EDIT;
 			}
+			else if (strstr(className, "AddressBand"))
+			{
+				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_ADDRESSBAND);
+				m.parts = PARTS_ADDRESSBAND;
+			}
 			else if (strstr(className, "Rebar"))
 			{
 				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_REBAR);
@@ -144,6 +149,11 @@ namespace libmsstyle
 			{
 				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_LISTVIEW);
 				m.parts = PARTS_LISTVIEW;
+			}
+			else if (strstr(className, "Link"))
+			{
+				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_LINK);
+				m.parts = PARTS_LINK;
 			}
 			else if (strstr(className, "Menu"))
 			{
@@ -215,7 +225,7 @@ namespace libmsstyle
 				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_TAB);
 				m.parts = PARTS_TAB;
 			}
-			else if (strstr(className, "ToolTip") || strstr(className, "Tooltip")) // overcome inconsitencies in the naming
+			else if (strstr(className, "ToolTip") || strstr(className, "Tooltip")) // overcome inconsistencies in the naming
 			{
 				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_TOOLTIP);
 				m.parts = PARTS_TOOLTIP;
@@ -235,10 +245,15 @@ namespace libmsstyle
 				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_SPIN);
 				m.parts = PARTS_SPIN;
 			}
-			else if (strstr(className, "ScrollBar") || strstr(className, "Scrollbar")) // overcome inconsitencies in the naming
+			else if (strstr(className, "ScrollBar") || strstr(className, "Scrollbar")) // overcome inconsistencies in the naming
 			{
 				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_SCROLLBAR);
 				m.parts = PARTS_SCROLLBAR;
+			}
+			else if (strstr(className, "Status"))
+			{
+				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_STATUS);
+				m.parts = PARTS_STATUS;
 			}
 			else if (strstr(className, "TaskBand2"))
 			{

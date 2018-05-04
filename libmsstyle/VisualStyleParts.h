@@ -13,6 +13,8 @@ namespace libmsstyle
 		const int32_t numStates;
 	} PartMap;
 
+	extern const PartMap PARTS_ADDRESSBAND[2];
+
 	extern const PartMap PARTS_BUTTON[8];
 
 	extern const PartMap PARTS_COMBOBOX[9];
@@ -24,6 +26,8 @@ namespace libmsstyle
 	extern const PartMap PARTS_LISTBOX[6];
 
 	extern const PartMap PARTS_LISTVIEW[11];
+
+	extern const PartMap PARTS_LINK[2];
 
 	extern const PartMap PARTS_MENU[21];
 
@@ -65,6 +69,8 @@ namespace libmsstyle
 	extern const PartMap PARTS_SPIN[5];
 
 	extern const PartMap PARTS_SCROLLBAR[11];
+
+	extern const PartMap PARTS_STATUS[4];
 
 	extern const PartMap PARTS_FLYOUT[9];
 

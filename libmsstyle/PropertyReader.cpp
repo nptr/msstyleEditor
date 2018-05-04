@@ -21,7 +21,7 @@ namespace libmsstyle
 			while (!IsProbablyValidHeader(cursor))
 				cursor += 1;
 
-			int diff = cursor - source;
+			ptrdiff_t diff = cursor - source;
 			if (diff > 0)
 			{
 				*out_next = cursor;
