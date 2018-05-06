@@ -21,7 +21,7 @@ AboutDialog::AboutDialog(wxWindow* parent, wxWindowID id, const wxString& title,
 
 	bSizer4->Add(bSizer7, 0, wxEXPAND, 5);
 
-	m_staticText2 = new wxStaticText(this, wxID_ANY, wxT("Version 1.3.0.0"), wxDefaultPosition, wxDefaultSize, 0);
+	m_staticText2 = new wxStaticText(this, wxID_ANY, wxT("Version 1.3.0.0-beta"), wxDefaultPosition, wxDefaultSize, 0);
 	m_staticText2->Wrap(-1);
 	bSizer4->Add(m_staticText2, 0, wxBOTTOM | wxLEFT, 5);
 
