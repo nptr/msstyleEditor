@@ -529,11 +529,11 @@ namespace libmsstyle
 		// INT
 		{ 5006, { "ANIMATIONDURATION", 202, "" } },
 		// Unknown props found in Win10 styles
-		{ 5111, { "UNKNOWN_5111", 0, "" } },
-		{ 5112, { "UNKNOWN_5112", 0, "" } },
-		{ 5128, { "UNKNOWN_5128", 0, "" } },
-		{ 5129, { "UNKNOWN_5129", 0, "" } },
-		{ 5130, { "UNKNOWN_5130", 0, "" } },
+		{ 5111, { "UNKNOWN_5111", 241, "" } },
+		{ 5112, { "UNKNOWN_5112", 241, "" } },
+		{ 5128, { "UNKNOWN_5128", 202, "" } },
+		{ 5129, { "UNKNOWN_5129", 202, "" } },
+		{ 5130, { "UNKNOWN_5130", 202, "" } },
 		// INTLIST
 		{ 6000, { "TRANSITIONDURATIONS", 211, "" } },
 		// BOOL

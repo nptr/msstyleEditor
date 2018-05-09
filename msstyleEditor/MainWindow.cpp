@@ -7,23 +7,24 @@
 #include "CustomTreeItemData.h"
 #include "SearchDialog.h"
 #include "UiHelper.h"
+#include "Exporter.h"
+#include "UxthemeUndocumented.h"
+
+#include "wxPropertyCategoryToolbar.h"
+
+#include "libmsstyle\VisualStyle.h"
+#include "libmsstyle\StylePart.h"
+
 #include <wx\mstream.h>
 #include <wx\wfstream.h>
 #include <wx\wupdlock.h>
+
 #include <fstream>
 #include <algorithm>
 #include <string>
 #include <cctype>	// std::isspace
 
 #include <shlobj.h> // SHGetKnownFolderPath()
-
-#include "libmsstyle\VisualStyle.h"
-#include "libmsstyle\StylePart.h"
-
-#include "Exporter.h"
-#include "UxthemeUndocumented.h"
-
-#include "wxPropertyCategoryToolbar.h"
 
 using namespace libmsstyle;
 

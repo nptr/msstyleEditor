@@ -1,7 +1,6 @@
 #pragma once
 
 #include "VisualStyleStates.h"
-#include <stdint.h>
 
 namespace libmsstyle
 {
@@ -552,7 +551,6 @@ namespace libmsstyle
 		{ 8, "HALFTOPLEFTALIGN" },
 	};
 
-
 	const StateMap STATES_SPIN_GENERAL[] =
 	{
 		{ 0, "Common" },
@@ -684,8 +682,7 @@ namespace libmsstyle
 		{ 2, "OPENED" },
 	};
 
-
-	const StateMap HOVERBACKGROUNDSTATES[] =
+	const StateMap STATES_USERTILE_HOVERBACKGROUND[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },

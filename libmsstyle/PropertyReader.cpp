@@ -87,15 +87,10 @@ namespace libmsstyle
 			// Arbitrary
 			case IDENTIFIER::INTLIST:
 			{
-				// There was an intlist, without short indicator,
-				// immediately followed by a property instead of
-				// "numints" + list data. It ended exactly on a
-				// 8byte boundary.
-
 				// I encountered an INTLIST prop, that had the
 				// short indicator NOT set, but still ended right
-				// after. That shouldn't be allowed from my understanding.
-				// I'll try to handle that somehow...
+				// after it. That shouldn't be allowed from my understanding.
+				// I'll reject it until i know more, not wanting this to get too hacky.
 				if (IsProbablyValidHeader(cursor + 12))
 				{
 					memcpy(&(prop->data), cursor, 12);
@@ -154,6 +149,7 @@ namespace libmsstyle
 				// Alternatively, we could scan for the next property and
 				// just store the data in between. In theory this should
 				// allow us to handle unknown datatypes as well (limited).
+				// <IMPL>
 
 				*out_next = cursor;
 				return Result::UnknownType;

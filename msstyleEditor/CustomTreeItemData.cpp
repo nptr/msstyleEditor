@@ -1,5 +1,5 @@
 #include "CustomTreeItemData.h"
-
+#include "libmsstyle\VisualStyle.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 ClassTreeItemData::ClassTreeItemData(libmsstyle::StyleClass* classPtr)

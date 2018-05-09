@@ -149,8 +149,7 @@ namespace libmsstyle
 
 	extern const StateMap STATES_TREEVIEW_GLYPH[3];
 
-
-	extern const StateMap HOVERBACKGROUNDSTATES[4];
+	extern const StateMap STATES_USERTILE_HOVERBACKGROUND[4];
 
 	extern const StateMap STATES_GRIPPER[3];
 

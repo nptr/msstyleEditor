@@ -2,6 +2,8 @@
 
 #include "libmsstyle\StyleProperty.h"
 
+#include <string>
+
 class wxMenu;
 class wxPGProperty;
 class wxPGChoices;

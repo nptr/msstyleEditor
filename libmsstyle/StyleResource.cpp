@@ -25,7 +25,7 @@ namespace libmsstyle
 	};
 
 	StyleResource::StyleResource()
-		: impl(new Impl())
+		: impl(std::make_shared<Impl>())
 	{
 		impl->m_data = nullptr;
 		impl->m_size = 0;
@@ -34,7 +34,7 @@ namespace libmsstyle
 	}
 
 	StyleResource::StyleResource(const StyleResource& other)
-		: impl(new Impl())
+		: impl(std::make_shared<Impl>())
 	{
 		impl->m_data = other.impl->m_data;
 		impl->m_size = other.impl->m_size;
@@ -43,7 +43,7 @@ namespace libmsstyle
 	}
 
 	StyleResource::StyleResource(const void* data, int size, int nameId, StyleResourceType type)
-		: impl(new Impl())
+		: impl(std::make_shared<Impl>())
 	{
 		impl->m_data = data;
 		impl->m_size = size;
@@ -53,11 +53,6 @@ namespace libmsstyle
 
 	StyleResource::~StyleResource()
 	{
-		//if (impl)
-		//{
-		//	delete impl;
-		//	impl = nullptr;
-		//}
 	}
 
 	StyleResource& StyleResource::operator=(const StyleResource& other)

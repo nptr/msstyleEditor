@@ -1,5 +1,7 @@
 #pragma once
 
+#include "libmsstyle/StyleProperty.h"
+
 #include <wx/artprov.h>
 #include <wx/xrc/xmlres.h>
 #include <wx/string.h>
@@ -13,8 +15,6 @@
 #include <wx/statline.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
-#include "libmsstyle/StyleProperty.h"
-
 
 class AddPropertyDialog : public wxDialog
 {

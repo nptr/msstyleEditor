@@ -1,10 +1,16 @@
 #pragma once
-#include "wx\treebase.h"
-#include "libmsstyle\VisualStyle.h"
 
+#include "wx\treebase.h"
+
+namespace libmsstyle
+{
+	class StyleClass;
+	class StylePart;
+	class StyleProperty;
+}
 
 // Instances of these classes are attached to treeview nodes.
-// They link to a class/part/property the the style data
+// They reference class/part/property items in the style data.
 class ClassTreeItemData : public wxTreeItemData
 {
 protected:

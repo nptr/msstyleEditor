@@ -1,21 +1,16 @@
 #include "Exporter.h"
+#include "libmsstyle\VisualStyle.h"
 
 #include <fstream>
 #include <iostream>
 #include <string>
 #include <codecvt>
 
-#include "libmsstyle\VisualStyle.h"
 
 std::string WStringToUTF8(const std::wstring& str)
 {
 	std::wstring_convert<std::codecvt_utf8<wchar_t>> myconv;
 	return myconv.to_bytes(str);
-}
-
-void Exporter::ExportPropertyCSV(const libmsstyle::VisualStyle& style)
-{
-
 }
 
 void Exporter::ExportLogicalStructure(const std::string& path, libmsstyle::VisualStyle& style)
@@ -50,13 +45,11 @@ void Exporter::ExportLogicalStructure(const std::string& path, libmsstyle::Visua
 		} break;
 		default:
 		{
-			txt.append("\nPlatform: This should never happen.\n\n");
+			txt.append("\nPlatform: Unknown!\n\n");
 		} break;
 	}
 
 	txt.append("BEGIN STRUCTURE"); txt.append("\n");
-
-	//const std::unordered_map<int32_t, libmsstyle::StyleClass*>* classes = style.GetClasses();
 
 	for (auto& cls : style)
 	{

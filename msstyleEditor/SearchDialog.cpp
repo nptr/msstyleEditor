@@ -27,19 +27,17 @@ SearchDialog::SearchDialog(wxWindow* parent, wxWindowID id, const wxString& titl
 	bSizer11 = new wxBoxSizer(wxHORIZONTAL);
 
 	searchBar = new wxSearchCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
-#ifndef __WXMAC__
 	searchBar->ShowSearchButton(true);
-#endif
 	searchBar->ShowCancelButton(false);
 
 	bSizer11->Add(searchBar, 1, wxALL | wxALIGN_CENTER_VERTICAL, 5);
 	bSizer9->Add(bSizer11, 1, wxEXPAND, 5);
 
-
 	searchType->Connect(wxEVT_CHOICE, wxCommandEventHandler(SearchDialog::OnSearchModeChanged), NULL, this);
 	typeBox->Connect(wxEVT_CHOICE, wxCommandEventHandler(SearchDialog::OnSearchTypeChanged), NULL, this);
 	searchBar->Connect(wxEVT_SEARCHCTRL_SEARCH_BTN, wxCommandEventHandler(SearchDialog::OnNextButtonClicked), NULL, this);
 	searchBar->Connect(wxEVT_TEXT_ENTER, wxCommandEventHandler(SearchDialog::OnNextButtonClicked), NULL, this);
+	
 	typeBox->Enable(false);
 	typeBox->Append("COLOR",	(void*)libmsstyle::IDENTIFIER::COLOR);
 	typeBox->Append("MARGINS",	(void*)libmsstyle::IDENTIFIER::MARGINS);
@@ -105,6 +103,10 @@ void SearchDialog::OnSearchTypeChanged(wxCommandEvent& evt)
 		case libmsstyle::IDENTIFIER::POSITION:
 		{
 			searchBar->SetDescriptiveText("x, y");
+		} break;
+		default:
+		{
+			assert(false);
 		} break;
 	}
 }

@@ -1,6 +1,7 @@
 #include "ResourceUtil.h"
-#include <string>
 #include "StringConvert.h"
+
+#include <string>
 
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>

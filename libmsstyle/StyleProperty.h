@@ -1,8 +1,7 @@
 #pragma once
 
-#include <stdint.h>
-
 #include "VisualStyleDefinitions.h"
+#include <stdint.h>
 
 namespace libmsstyle
 {

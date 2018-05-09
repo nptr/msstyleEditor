@@ -1,8 +1,9 @@
 #include "StyleProperty.h"
 #include "VisualStyleDefinitions.h"
-#include <string.h>
 #include "StringConvert.h"
 #include "Lookup.h"
+
+#include <string.h>
 
 using namespace libmsstyle;
 
@@ -10,8 +11,7 @@ namespace libmsstyle
 {
 	bool StyleProperty::IsPropertyValid() const
 	{
-		// Not a known type
-		if (header.typeID < 200 || header.typeID >= IDENTIFIER::COLORSCHEMES)
+		if (header.typeID < IDENTIFIER::ENUM || header.typeID >= IDENTIFIER::COLORSCHEMES)
 			return false;
 
 		// Some color and font props use an type id as name id.
@@ -30,11 +30,20 @@ namespace libmsstyle
 			return true;
 
 		// Not sure where the line for valid name ids is.
-		if (header.nameID < IDENTIFIER::COLORSCHEMES)
+		// Upper bound is ATLASRECT, but im leaving a bit of space
+		// for unknown props.
+		if (header.nameID < IDENTIFIER::COLORSCHEMES ||
+			header.nameID > 10000)
 			return false;
 
-		// Not a known class
-		if (header.classID > 8002)
+		// First attempt was 255, but yielded false-positives.
+		// Smaller than 200 eliminates type & prop name ids.
+		if (header.partID < 0 ||
+			header.partID > 199)
+			return false;
+
+		if (header.stateID < 0 ||
+			header.stateID > 199)
 			return false;
 
 		return true;
@@ -82,9 +91,8 @@ namespace libmsstyle
 		case IDENTIFIER::STRING:
 			// string length in bytes including the null terminator
 			return 20 + 8 + 4 + data.texttype.sizeInBytes;
-			// return 20 + 8 + 4 + (wcslen(&prop.data.texttype.firstchar) + 1) * sizeof(wchar_t);
-		case 225: // Unknown or wrong prop, since Win7 ?
-		case 241: // Unknown or wrong prop, since Win10 ?
+		case 225:					  // Unknown type, since Win7, i think its a mistake. didn't see it again.
+		case IDENTIFIER::UNKNOWN_241: // Unknown type, since Win10
 			return 40;
 		default:
 			return 40;
@@ -280,6 +288,8 @@ namespace libmsstyle
 		prop.header.nameID = ident;
 		prop.header.typeID = type;
 
+		// Initialize fields with values which purpose i don't know yet.
+		// They are required, otherwise windows rejects the style.
 		switch (type)
 		{
 		case libmsstyle::DIBDATA:
