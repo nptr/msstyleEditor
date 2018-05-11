@@ -40,6 +40,7 @@ namespace libmsstyle
 			case IDENTIFIER::FILENAME:
 			case IDENTIFIER::DISKSTREAM:
 			case IDENTIFIER::FONT:
+			case IDENTIFIER::UNKNOWN_243:
 			{
 				memcpy(&(prop->data), cursor, 12);
 				cursor += 12;
@@ -107,7 +108,7 @@ namespace libmsstyle
 					prop->bytesAfterHeader += 16;
 				}
 
-				int32_t numValues = prop->data.intlist.numints;
+				int32_t numValues = prop->data.intlist.numInts;
 
 				prop->intlist.reserve(numValues);
 				for (int32_t i = 0; i < numValues; ++i)
@@ -117,7 +118,25 @@ namespace libmsstyle
 					cursor += sizeof(int32_t);
 				}
 
-				prop->bytesAfterHeader += prop->data.intlist.numints * sizeof(int32_t);
+				prop->bytesAfterHeader += prop->data.intlist.numInts * sizeof(int32_t);
+			} break;
+			case IDENTIFIER::COLORLIST:
+			{
+				memcpy(&(prop->data), cursor, 12);
+				cursor += 12;
+				prop->bytesAfterHeader += 12;
+
+				int32_t numValues = prop->data.colorlist.sizeInBytes / 4;
+
+				prop->intlist.reserve(numValues);
+				for (int32_t i = 0; i < numValues; ++i)
+				{
+					const int32_t* valuePtr = reinterpret_cast<const int32_t*>(cursor);
+					prop->intlist.push_back(*valuePtr);
+					cursor += sizeof(int32_t);
+				}
+
+				prop->bytesAfterHeader += prop->data.intlist.numInts * sizeof(int32_t);
 			} break;
 			case IDENTIFIER::STRING:
 			{

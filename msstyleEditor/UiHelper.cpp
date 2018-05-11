@@ -112,20 +112,20 @@ wxPGProperty* GetWXPropertyFromMsStyleProperty(StyleProperty& prop)
 	}
 	case IDENTIFIER::STRING:
 	{
-		wxStringProperty* p = new wxStringProperty(propName, *wxPGProperty::sm_wxPG_LABEL, &prop.data.texttype.firstchar);
+		wxStringProperty* p = new wxStringProperty(propName, *wxPGProperty::sm_wxPG_LABEL, &prop.data.texttype.firstChar);
 		p->SetClientData(&prop);
 		return p;
 	}
 	case IDENTIFIER::INTLIST:
 	{
-		if (prop.data.intlist.numints >= 3)
+		if (prop.data.intlist.numInts >= 3)
 		{
-			sprintf(str, "%d, %d, %d, .. (%d)", prop.data.intlist.numints
-				, *(&prop.data.intlist.firstint + 0)
-				, *(&prop.data.intlist.firstint + 1)
-				, *(&prop.data.intlist.firstint + 2));
+			sprintf(str, "%d, %d, %d, .. (%d)", prop.data.intlist.numInts
+				, *(&prop.data.intlist.firstInt + 0)
+				, *(&prop.data.intlist.firstInt + 1)
+				, *(&prop.data.intlist.firstInt + 2));
 		}
-		else sprintf(str, "Len: %d, Values omitted", prop.data.intlist.numints);
+		else sprintf(str, "Len: %d, Values omitted", prop.data.intlist.numInts);
 		wxStringProperty* p = new wxStringProperty(propName, *wxPGProperty::sm_wxPG_LABEL, str);
 		p->SetClientData(&prop);
 		return p;

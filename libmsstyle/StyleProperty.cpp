@@ -87,7 +87,7 @@ namespace libmsstyle
 			return 40;
 		case IDENTIFIER::INTLIST:
 			// header, reserved, numints, intlist, nullterminator
-			return 20 + 12 + 4 + data.intlist.numints * sizeof(int32_t);
+			return 20 + 12 + 4 + data.intlist.numInts * sizeof(int32_t);
 		case IDENTIFIER::STRING:
 			// string length in bytes including the null terminator
 			return 20 + 8 + 4 + data.texttype.sizeInBytes;
@@ -119,9 +119,9 @@ namespace libmsstyle
 
 	const char* StyleProperty::LookupName() const
 	{
-		auto ret = libmsstyle::PROPERTY_MAP.find(header.nameID);
-		if (ret != libmsstyle::PROPERTY_MAP.end())
-			return ret->second;
+		auto ret = libmsstyle::PROPERTY_INFO_MAP.find(header.nameID);
+		if (ret != libmsstyle::PROPERTY_INFO_MAP.end())
+			return ret->second.name;
 		else return "UNKNOWN";
 	}
 
@@ -265,14 +265,14 @@ namespace libmsstyle
 		} break;
 		case IDENTIFIER::INTLIST:
 		{
-			if (data.intlist.numints >= 3)
+			if (data.intlist.numInts >= 3)
 			{
-				sprintf(textbuffer, "Len: %d, Values: %d, %d, %d, ...", data.intlist.numints
-					, *(&data.intlist.firstint + 0)
-					, *(&data.intlist.firstint + 1)
-					, *(&data.intlist.firstint + 2));
+				sprintf(textbuffer, "Len: %d, Values: %d, %d, %d, ...", data.intlist.numInts
+					, *(&data.intlist.firstInt + 0)
+					, *(&data.intlist.firstInt + 1)
+					, *(&data.intlist.firstInt + 2));
 			}
-			else sprintf(textbuffer, "Len: %d, Values omitted", data.intlist.numints);
+			else sprintf(textbuffer, "Len: %d, Values omitted", data.intlist.numInts);
 			return std::string(textbuffer);
 		} break;
 		default:
@@ -297,33 +297,35 @@ namespace libmsstyle
 		case libmsstyle::GLYPHDIBDATA:
 			break;
 		case libmsstyle::ENUM:
-			prop.data.enumtype.anUnknownValue = 0x4;
+			prop.data.enumtype.sizeInBytes = 0x4;
 			break;
 		case libmsstyle::STRING:
 			break;
 		case libmsstyle::INT:
-			prop.data.inttype.anUnknownValue = 0x4;
+			prop.data.inttype.sizeInBytes = 0x4;
 			break;
 		case libmsstyle::BOOL:
-			prop.data.booltype.anUnknownValue = 0x4;
+			prop.data.booltype.sizeInBytes = 0x4;
 			break;
 		case libmsstyle::COLOR:
-			prop.data.colortype.anUnknownValue = 0x4;
+			prop.data.colortype.sizeInBytes = 0x4;
 			break;
 		case libmsstyle::MARGINS:
-			prop.data.margintype.anUnknownValue = 0x10;
+			prop.data.margintype.sizeInBytes = 0x10;
 			break;
 		case libmsstyle::FILENAME:
+			prop.data.imagetype.sizeInBytes = 0x10;
 			break;
 		case libmsstyle::SIZE:
 			break;
 		case libmsstyle::POSITION:
-			prop.data.positiontype.anUnknownValue = 0x8;
+			prop.data.positiontype.sizeInBytes = 0x8;
 			break;
 		case libmsstyle::RECT:
-			prop.data.recttype.anUnknownValue = 0x10;
+			prop.data.recttype.sizeInBytes = 0x10;
 			break;
 		case libmsstyle::FONT:
+			prop.data.fonttype.sizeInBytes = 0x5C;
 			break;
 		case libmsstyle::INTLIST:
 			break;

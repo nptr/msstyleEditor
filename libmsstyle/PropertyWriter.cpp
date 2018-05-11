@@ -82,6 +82,31 @@ namespace libmsstyle
 					*dest++ = 0;
 				}
 			} break;
+			case IDENTIFIER::COLORLIST:
+			{
+				// shortFlag, unknown 4 bytes & numBytes field
+				memcpy(dest, &prop.data, 12);
+				dest += 12;
+
+				for (auto& num : prop.intlist)
+				{
+					// copy data, inc dest
+					*dest++ = (num >> 0) & 0xFF;
+					*dest++ = (num >> 8) & 0xFF;
+					*dest++ = (num >> 16) & 0xFF;
+					*dest++ = (num >> 24) & 0xFF;
+				}
+
+				// not sure if padding is required here as well
+				size_t ptr = reinterpret_cast<size_t>(dest);
+				if (ptr % 8 != 0)
+				{
+					*dest++ = 0;
+					*dest++ = 0;
+					*dest++ = 0;
+					*dest++ = 0;
+				}
+			} break;
 			case IDENTIFIER::STRING:
 			{
 				// shortFlag, unknown 4 bytes & length field

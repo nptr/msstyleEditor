@@ -28,8 +28,6 @@ namespace libmsstyle
 	/////////////////////////////////////////////////////////////////////////////
 
 	// This map hold all known properties and datatypes
-	extern const std::unordered_map<int, const char*> PROPERTY_MAP;
-
 	extern const std::unordered_map<int, PropertyInfo> PROPERTY_INFO_MAP;
 
 	extern const std::unordered_map<int, const char*> DATATYPE_MAP;
@@ -58,7 +56,10 @@ namespace libmsstyle
 		BITMAPREF = 215,
 		FLOAT = 216,
 		FLOATLIST = 217,
-		UNKNOWN_241 = 241, // Win10
+		COLORLIST = 240,	// Win10 aerolite	
+		UNKNOWN_241 = 241,	// Win10
+		UNKNOWN_242 = 242,	// Win10 - never encountered
+		UNKNOWN_243 = 243,	// Win10 aerolite - some id??
 		COLORSCHEMES = 401,
 		SIZES = 402,
 		CHARSET = 403,
@@ -287,6 +288,7 @@ namespace libmsstyle
 		CUSTOMSPLITRECT = 5004,
 		ANIMATIONBUTTONRECT = 5005,
 		ANIMATIONDURATION = 5006,
+		SOMECOLORLIST = 5100, // Win10 aerolite
 		UNKNOWN_5111 = 5111, // Win10 begin
 		UNKNOWN_5112 = 5112,
 		UNKNOWN_5128 = 5128,

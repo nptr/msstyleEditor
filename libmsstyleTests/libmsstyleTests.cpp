@@ -110,14 +110,16 @@ bool SaveReloadCompareTest(libmsstyle::VisualStyle& s1)
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-	const char* INPUT_FILES[] =
+	const char* INPUT_DIR[] =
 	{
-		"W7.msstyles",
-		"W8.msstyles",
-		"W81.msstyles",
-		"W10.msstyles",
+		"W7",
+		"W8",
+		"W81",
+		"W10",
 		NULL
 	};
+
+	
 
 	libmsstyle::Platform EXPECTED_PLATFORMS[] =
 	{
@@ -127,37 +129,59 @@ int _tmain(int argc, _TCHAR* argv[])
 		libmsstyle::Platform::WIN10,
 	};
 
-	const char* file = NULL;
-	for (int i = 0; INPUT_FILES[i] != NULL; ++i)
+	WIN32_FIND_DATAA ffd;
+	const char* dir = NULL;
+	char filter[128];
+	char fileName[128];
+
+	for (int i = 0; INPUT_DIR[i] != NULL; ++i)
 	{
-		file = INPUT_FILES[i];
+		dir = INPUT_DIR[i];
+		printfc(NORMAL, "\r\nDirectory: %s\r\n", dir);
 
-		printfc(NORMAL, "Testing with: %s\r\n", file);
-
-		libmsstyle::VisualStyle currentStyle;
-
-		//
-		// Save and Reload
-		//
-		try
+		sprintf(filter, "%s\\*.msstyles", dir);
+		HANDLE hFirst = FindFirstFileA(filter, &ffd);
+		if (hFirst == INVALID_HANDLE_VALUE)
 		{
-			currentStyle.Load(file);
-
-			if (SaveReloadCompareTest(currentStyle))
-				printfc(OK, "%s - Save and Reload - OK\r\n", file);
-			else printfc(ERROR, "%s - Save and Reload - FAILED\r\n", file);
-		}
-		catch (std::exception& ex)
-		{
-			printfc(ERROR, "ERROR - %s\r\n", ex.what());
+			printfc(NORMAL, "Directory not found %s\r\n", dir);
+			continue;
 		}
 
-		//
-		// Platform Determination
-		//
-		if (currentStyle.GetCompatiblePlatform() == EXPECTED_PLATFORMS[i])
-			printfc(OK, "%s - DeterminePlatformTest - OK\r\n", file);
-		else printfc(ERROR, "%s - DeterminePlatformTest - FAILED\r\n", file);
+		do
+		{
+			if (!(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) // just files
+			{
+				sprintf(fileName, "%s\\%s", dir, ffd.cFileName);
+
+				printfc(NORMAL, "Testing with: %s\r\n", fileName);
+
+				libmsstyle::VisualStyle currentStyle;
+
+				//
+				// Save and Reload
+				//
+				try
+				{
+					currentStyle.Load(fileName);
+
+					if (SaveReloadCompareTest(currentStyle))
+						printfc(OK, "%s - Save and Reload - OK\r\n", fileName);
+					else printfc(ERROR, "%s - Save and Reload - FAILED\r\n", fileName);
+				}
+				catch (std::exception& ex)
+				{
+					printfc(ERROR, "ERROR - %s\r\n", ex.what());
+				}
+
+				//
+				// Platform Determination
+				//
+				if (currentStyle.GetCompatiblePlatform() == EXPECTED_PLATFORMS[i])
+					printfc(OK, "%s - DeterminePlatformTest - OK\r\n", fileName);
+				else printfc(ERROR, "%s - DeterminePlatformTest - FAILED\r\n", fileName);
+			}
+		}
+		while (FindNextFileA(hFirst, &ffd) != 0);
 	}
 
 	getchar();

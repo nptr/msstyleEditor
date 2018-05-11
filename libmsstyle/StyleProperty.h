@@ -12,62 +12,66 @@ namespace libmsstyle
 		int32_t typeID;		// Offset: 4, Size: 4,	ID for the type of the property, described in MSDN
 		int32_t classID;	// Offset: 8, Size: 4,	Index to the class from CMAP the propery belongs to
 		int32_t partID;		// Offset: 12, Size: 4	ID for the part of the class the property belongs to, see vsstyle.h
-		int32_t stateID;	// Offset: 16, Size: 4	ID for the state map, see see vsstyle.h
+		int32_t stateID;	// Offset: 16, Size: 4	ID for the state map, see vsstyle.h
 	};
 	#pragma pack(pop)
 
 
-	union PropertyData			// Offset: 20, Size: 20
+	#pragma pack(push, 1)
+	union PropertyData		// Offset: 20, Size: 20
 	{
 		struct
 		{
-			int32_t imageID;	// for MAKEINTRESOURCE()
-			char reserved[16];
+			int32_t imageID;		// the images resource id, for MAKEINTRESOURCE()
+			int32_t reserved;
+			int32_t sizeInBytes;	// 0x10 - wrong, no data follows!
 		}imagetype;
 		struct
 		{
-			int32_t fontID;		// for MAKEINTRESOURCE(), load from  en-US/XXXX.msstyles.mui. Language may vary...
-			int32_t important1;
-			int32_t important2;
+			int32_t fontID;			// the font-strings resource id, for MAKEINTRESOURCE(), load from <en-US>/XXXX.msstyles.mui
+			int32_t reserved;
+			int32_t sizeInBytes;	// 0x5C - wrong, no data follows!
 		}fonttype;
 		struct
 		{
 			int32_t shortFlag;
 			int32_t reserved;
-			int32_t anUnknownValue; // 0x4
+			int32_t sizeInBytes;	// 0x4 - never includes padding
 			int32_t value;
-			char reserved2[4];
+			char padding[4];		// 8 byte alignment
 		}inttype;
 		struct
 		{
 			int32_t shortFlag;
-			char reserved[8];
+			int32_t reserved;
+			int32_t sizeInBytes;	// 0x4 - never includes padding
 			int32_t size;
-			char reserved2[4];
+			char padding[4];		// 8 byte alignment
 		}sizetype;
 		struct
 		{
-			int32_t shortFlag; // 0x7C
-			int32_t alwaysZero;
-			int32_t anUnknownValue; // 0x04
+			int32_t shortFlag;		// if != 0, no data after "sizeInBytes". Was observed to be 0x7C
+			int32_t reserved;
+			int32_t sizeInBytes;	// 0x04 - never includes padding
 			int32_t boolvalue;
-			char reserved2[4];
+			char padding[4];		// 8 byte alignment
 		}booltype;
 		struct
 		{
-			int32_t shortFlag;
-			int32_t alwaysZero;
-			int32_t anUnknownValue; // 0x4
+			int32_t shortFlag;		// if != 0, no data after "sizeInBytes".
+			int32_t reserved;
+			int32_t sizeInBytes;	// 0x4 - never includes padding
 			unsigned char r;
 			unsigned char g;
 			unsigned char b;
-			char reserved2[5];
+			unsigned char a;		// not used
+			char padding[4];		// 8 byte alignment
 		}colortype;
 		struct
 		{
-			int32_t shortFlag; // 0x73, 0x76, 0x77, 0x7B
-			int32_t alwaysZero;
-			int32_t anUnknownValue; // 0x10
+			int32_t shortFlag;		// if != 0, no data after "sizeInBytes". Values observed: 0x7C, 0x73, 0x76, 0x77, 0x7B
+			int32_t reserved;
+			int32_t sizeInBytes;	// 0x10 - never includes padding
 			int32_t left;
 			int32_t top;
 			int32_t right;
@@ -75,9 +79,9 @@ namespace libmsstyle
 		}recttype;
 		struct
 		{
-			int32_t shortFlag; // same as rect i guess
-			int32_t alwaysZero;
-			int32_t anUnknownValue; // same as rect i guess
+			int32_t shortFlag;		// if != 0, no data after "sizeInBytes".
+			int32_t reserved;
+			int32_t sizeInBytes;	// 0x10 - never includes padding
 			int32_t left;
 			int32_t top;
 			int32_t right;
@@ -85,34 +89,46 @@ namespace libmsstyle
 		}margintype;
 		struct
 		{
-			int32_t shortFlag;
+			int32_t shortFlag;		// if != 0, no data after "sizeInBytes".
 			int32_t reserved;
-			int32_t anUnknownValue; // 0x4
+			int32_t sizeInBytes;	// 0x4 - never includes padding
 			int32_t enumvalue;
-			char reserved2[4];
+			char padding[4];		// 8 byte alignment
 		}enumtype;
 		struct
 		{
-			int32_t shortFlag;
+			int32_t shortFlag;		// if != 0, no data after "sizeInBytes".
 			int32_t reserved;
-			int32_t anUnknownValue; // 0x8
+			int32_t sizeInBytes;	// 0x8 - never includes padding
 			int32_t x;
 			int32_t y;
 		}positiontype;
 		struct // INTLIST struct (uxtheme.h)
 		{
-			int32_t shortFlag;
-			char reserved[8];
-			int32_t numints;
-			int32_t firstint;
+			int32_t shortFlag;		// if != 0, no data after "sizeInBytes".
+			int32_t reserved;
+			int32_t sizeInBytes;
+			int32_t numInts;
+			int32_t firstInt;
 		}intlist;
+		struct // Type 240, analog to INTLIST?
+		{
+			int32_t shortFlag;		// if != 0, no data after "sizeInBytes".
+			int32_t reserved;
+			int32_t sizeInBytes;	// Unlikes others, this seems to include the 4 padding bytes if: size % 8 != 0
+			int32_t numColors;		// number of RGBA quadruplets. does not include the possible padding field
+			int32_t firstColorRGBA;	// first RGB(A?) color
+		}colorlist;
 		struct
 		{
-			char reserved[8];
-			int32_t sizeInBytes;
-			wchar_t firstchar;
+			int32_t shortFlag;		// if != 0, no data after "sizeInBytes".
+			int32_t reserved;
+			int32_t sizeInBytes;	// seems to include the padding if: size % 8 != 0
+			wchar_t firstChar;		// first UTF16 character of the string. Not sure if null terminated...
 		}texttype;
 	};
+	#pragma pack(pop)
+
 
 	class StyleProperty
 	{

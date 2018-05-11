@@ -318,9 +318,9 @@ namespace libmsstyle
 
 		const char* FindPropertyName(int nameID)
 		{
-			auto ret = libmsstyle::PROPERTY_MAP.find(nameID);
-			if (ret != libmsstyle::PROPERTY_MAP.end())
-				return ret->second;
+			auto ret = libmsstyle::PROPERTY_INFO_MAP.find(nameID);
+			if (ret != libmsstyle::PROPERTY_INFO_MAP.end())
+				return ret->second.name;
 			else return "UNKNOWN";
 		}
 
