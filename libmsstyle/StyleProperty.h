@@ -117,7 +117,7 @@ namespace libmsstyle
 			int32_t reserved;
 			int32_t sizeInBytes;	// Unlikes others, this seems to include the 4 padding bytes if: size % 8 != 0
 			int32_t numColors;		// number of RGBA quadruplets. does not include the possible padding field
-			int32_t firstColorRGBA;	// first RGB(A?) color
+			int32_t firstColorBGR;	// first BGR color, probably a COLORREF -> 0x00bbggrr
 		}colorlist;
 		struct
 		{
@@ -135,6 +135,7 @@ namespace libmsstyle
 	public:
 		StyleProperty()
 			: bytesAfterHeader(0)
+			, unknown(nullptr)
 		{
 			memset(&header, 0, sizeof(PropertyHeader));
 			memset(&data, 0, sizeof(PropertyData));
@@ -147,6 +148,7 @@ namespace libmsstyle
 
 		std::vector<int32_t> intlist;
 		std::wstring text;
+		void* unknown;
 
 		int bytesAfterHeader;
 
@@ -162,6 +164,8 @@ namespace libmsstyle
 		const char* LookupTypeName() const;
 		std::string GetValueAsString() const;
 
+		void Initialize(libmsstyle::IDENTIFIER type, libmsstyle::IDENTIFIER ident);
+
 		void UpdateImageLink(int imageID);
 		void UpdateInteger(int intVal);
 		void UpdateSize(int size);
@@ -172,7 +176,5 @@ namespace libmsstyle
 		void UpdateMargin(int left, int top, int right, int bottom);
 		void UpdatePosition(int x, int y);
 		void UpdateFont(int fontID);
-
-		static void Initialize(libmsstyle::IDENTIFIER type, libmsstyle::IDENTIFIER ident, StyleProperty& prop);
 	};
 }

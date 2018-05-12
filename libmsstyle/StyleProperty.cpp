@@ -4,6 +4,7 @@
 #include "Lookup.h"
 
 #include <string.h>
+#include <assert.h>
 
 using namespace libmsstyle;
 
@@ -147,31 +148,39 @@ namespace libmsstyle
 
 	void StyleProperty::UpdateImageLink(int imageID)
 	{
+		assert(	header.typeID == IDENTIFIER::FILENAME ||
+				header.typeID == IDENTIFIER::DISKSTREAM );
 		data.imagetype.imageID = imageID;
+
 	}
 
 	void StyleProperty::UpdateInteger(int intVal)
 	{
+		assert(header.typeID == IDENTIFIER::INT);
 		data.inttype.value = intVal;
 	}
 
 	void StyleProperty::UpdateSize(int size)
 	{
+		assert(header.typeID == IDENTIFIER::SIZE);
 		data.sizetype.size = size;
 	}
 
 	void StyleProperty::UpdateEnum(int enumVal)
 	{
+		assert(header.typeID == IDENTIFIER::ENUM);
 		data.enumtype.enumvalue = enumVal;
 	}
 
 	void StyleProperty::UpdateBoolean(bool boolVal)
 	{
+		assert(header.typeID == IDENTIFIER::BOOL);
 		data.booltype.boolvalue = boolVal;
 	}
 
 	void StyleProperty::UpdateColor(uint8_t r, uint8_t g, uint8_t b)
 	{
+		assert(header.typeID == IDENTIFIER::COLOR);
 		data.colortype.r = r;
 		data.colortype.g = g;
 		data.colortype.b = b;
@@ -179,6 +188,7 @@ namespace libmsstyle
 
 	void StyleProperty::UpdateRectangle(int left, int top, int right, int bottom)
 	{
+		assert(header.typeID == IDENTIFIER::RECT);
 		data.recttype.left = left;
 		data.recttype.top = top;
 		data.recttype.right = right;
@@ -187,6 +197,7 @@ namespace libmsstyle
 
 	void StyleProperty::UpdateMargin(int left, int top, int right, int bottom)
 	{
+		assert(header.typeID == IDENTIFIER::MARGINS);
 		data.margintype.left = left;
 		data.margintype.top = top;
 		data.margintype.right = right;
@@ -195,12 +206,14 @@ namespace libmsstyle
 
 	void StyleProperty::UpdatePosition(int x, int y)
 	{
+		assert(header.typeID == IDENTIFIER::POSITION);
 		data.positiontype.x = x;
 		data.positiontype.y = y;
 	}
 
 	void StyleProperty::UpdateFont(int fontID)
 	{
+		assert(header.typeID == IDENTIFIER::FONT);
 		data.fonttype.fontID = fontID;
 	}
 
@@ -283,10 +296,10 @@ namespace libmsstyle
 	}
 
 
-	void StyleProperty::Initialize(libmsstyle::IDENTIFIER type, libmsstyle::IDENTIFIER ident, StyleProperty& prop)
+	void StyleProperty::Initialize(libmsstyle::IDENTIFIER type, libmsstyle::IDENTIFIER ident)
 	{
-		prop.header.nameID = ident;
-		prop.header.typeID = type;
+		this->header.nameID = ident;
+		this->header.typeID = type;
 
 		// Initialize fields with values which purpose i don't know yet.
 		// They are required, otherwise windows rejects the style.
@@ -297,37 +310,40 @@ namespace libmsstyle
 		case libmsstyle::GLYPHDIBDATA:
 			break;
 		case libmsstyle::ENUM:
-			prop.data.enumtype.sizeInBytes = 0x4;
+			this->data.enumtype.sizeInBytes = 0x4;
 			break;
 		case libmsstyle::STRING:
+			// dynamic !!
 			break;
 		case libmsstyle::INT:
-			prop.data.inttype.sizeInBytes = 0x4;
+			this->data.inttype.sizeInBytes = 0x4;
 			break;
 		case libmsstyle::BOOL:
-			prop.data.booltype.sizeInBytes = 0x4;
+			this->data.booltype.sizeInBytes = 0x4;
 			break;
 		case libmsstyle::COLOR:
-			prop.data.colortype.sizeInBytes = 0x4;
+			this->data.colortype.sizeInBytes = 0x4;
 			break;
 		case libmsstyle::MARGINS:
-			prop.data.margintype.sizeInBytes = 0x10;
+			this->data.margintype.sizeInBytes = 0x10;
 			break;
 		case libmsstyle::FILENAME:
-			prop.data.imagetype.sizeInBytes = 0x10;
+			this->data.imagetype.sizeInBytes = 0x10;
 			break;
 		case libmsstyle::SIZE:
+			this->data.sizetype.sizeInBytes = 0x4;
 			break;
 		case libmsstyle::POSITION:
-			prop.data.positiontype.sizeInBytes = 0x8;
+			this->data.positiontype.sizeInBytes = 0x8;
 			break;
 		case libmsstyle::RECT:
-			prop.data.recttype.sizeInBytes = 0x10;
+			this->data.recttype.sizeInBytes = 0x10;
 			break;
 		case libmsstyle::FONT:
-			prop.data.fonttype.sizeInBytes = 0x5C;
+			this->data.fonttype.sizeInBytes = 0x5C;
 			break;
 		case libmsstyle::INTLIST:
+			// dynamic !!
 			break;
 		case libmsstyle::HBITMAP:
 			break;

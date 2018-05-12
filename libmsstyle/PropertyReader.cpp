@@ -159,7 +159,7 @@ namespace libmsstyle
 			default:
 			{
 				// Unknown type. What we can do is blindly copy the assumend
-				// minimum of data every propert has and notify the caller.
+				// minimum of data every property has and notify the caller.
 				// This does not enable us to work with the style.
 				memcpy(&(prop->data), cursor, 12);
 				cursor += 12;

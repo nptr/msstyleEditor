@@ -154,8 +154,8 @@ int AddPropertyDialog::ShowModal(StyleProperty& prop)
 
 		wxPropertyClientData* cd = static_cast<wxPropertyClientData*>(propBox->GetClientObject(selectedIndex));
 		
-		StyleProperty::Initialize((libmsstyle::IDENTIFIER)cd->GetPropInfo().type,
-								  (libmsstyle::IDENTIFIER)cd->GetNameID(), prop);
+		prop.Initialize((libmsstyle::IDENTIFIER)cd->GetPropInfo().type,
+						(libmsstyle::IDENTIFIER)cd->GetNameID());
 	}
 
 	return ret;

@@ -8,12 +8,13 @@ namespace libmsstyle
 	{
 		char* PropertyWriter::WriteProperty(char* dest, StyleProperty& prop)
 		{
+			char* source = dest;
 			memcpy(dest, &prop.header, sizeof(PropertyHeader));
 			dest += sizeof(PropertyHeader);
 
 			switch (prop.header.typeID)
 			{
-			// 32 bytes
+			// 32 bytes - padding included
 			case IDENTIFIER::FILENAME:
 			case IDENTIFIER::DISKSTREAM:
 			case IDENTIFIER::FONT:
@@ -21,7 +22,7 @@ namespace libmsstyle
 				memcpy(dest, &prop.data, 12);
 				dest += 12;
 			} break;
-			// 40 bytes
+			// 40 bytes - padding included
 			case IDENTIFIER::INT:
 			case IDENTIFIER::SIZE:
 			case IDENTIFIER::BOOL:
@@ -40,7 +41,7 @@ namespace libmsstyle
 					dest += 20;
 				}
 			} break;
-			// 48 bytes
+			// 48 bytes - padding included
 			case IDENTIFIER::RECT:
 			case IDENTIFIER::MARGINS:
 			{
@@ -71,10 +72,9 @@ namespace libmsstyle
 					*dest++ = (num >> 24) & 0xFF;
 				}
 
-				// padding the list to a multiple of eight
-				// seems to be required.
-				size_t ptr = reinterpret_cast<size_t>(dest);
-				if (ptr % 8 != 0)
+				// pad to a multiple of eight
+				ptrdiff_t propSize = dest-source;
+				if (propSize % 8 != 0)
 				{
 					*dest++ = 0;
 					*dest++ = 0;
@@ -97,9 +97,9 @@ namespace libmsstyle
 					*dest++ = (num >> 24) & 0xFF;
 				}
 
-				// not sure if padding is required here as well
-				size_t ptr = reinterpret_cast<size_t>(dest);
-				if (ptr % 8 != 0)
+				// pad to a multiple of eight
+				ptrdiff_t propSize = dest - source;
+				if (propSize % 8 != 0)
 				{
 					*dest++ = 0;
 					*dest++ = 0;
@@ -120,9 +120,12 @@ namespace libmsstyle
 					*dest++ = (ch >> 8) & 0xFF;
 				}
 
-				// null terminator
-				*dest++ = 0;
-				*dest++ = 0;
+				// pad to a multiple of eight
+				while ((dest-source) % 8 != 0)
+				{
+					*dest++ = 0;
+					*dest++ = 0;
+				}
 			} break;
 			default:
 			{

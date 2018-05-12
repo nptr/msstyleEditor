@@ -357,26 +357,26 @@ void MainWindow::OnPropertyGridChanging(wxPropertyGridEvent& event)
 	if (!styleProp)
 		return;
 
-	// Update Data. TODO: Check data for validity!
-	if (styleProp->header.typeID == IDENTIFIER::FILENAME)
-		styleProp->data.imagetype.imageID = event.GetValidationInfo().GetValue().GetInteger();
-	else if (styleProp->header.typeID == IDENTIFIER::INT)
-		styleProp->data.inttype.value = event.GetValidationInfo().GetValue().GetInteger();
-	else if (styleProp->header.typeID == IDENTIFIER::SIZE)
-		styleProp->data.sizetype.size = event.GetValidationInfo().GetValue().GetInteger();
-	else if (styleProp->header.typeID == IDENTIFIER::ENUM)
-		styleProp->data.enumtype.enumvalue = event.GetValidationInfo().GetValue().GetInteger();
-	else if (styleProp->header.typeID == IDENTIFIER::BOOL)
-		styleProp->data.booltype.boolvalue = event.GetValidationInfo().GetValue().GetBool();
-	else if (styleProp->header.typeID == IDENTIFIER::COLOR)
+	switch (styleProp->header.typeID)
+	{
+	case IDENTIFIER::FILENAME:
+		styleProp->UpdateImageLink(event.GetValidationInfo().GetValue().GetInteger()); break;
+	case IDENTIFIER::INT:
+		styleProp->UpdateInteger(event.GetValidationInfo().GetValue().GetInteger()); break;
+	case IDENTIFIER::SIZE:
+		styleProp->UpdateSize(event.GetValidationInfo().GetValue().GetInteger()); break;
+	case IDENTIFIER::ENUM:
+		styleProp->UpdateEnum(event.GetValidationInfo().GetValue().GetInteger()); break;
+	case IDENTIFIER::BOOL:
+		styleProp->UpdateBoolean(event.GetValidationInfo().GetValue().GetBool()); break;
+	case IDENTIFIER::COLOR:
 	{
 		wxAny value = event.GetValidationInfo().GetValue();
 		wxColor color = value.As<wxColour>();
-		styleProp->data.colortype.r = color.Red();
-		styleProp->data.colortype.g = color.Green();
-		styleProp->data.colortype.b = color.Blue();
-	}
-	else if (styleProp->header.typeID == IDENTIFIER::RECT || styleProp->header.typeID == IDENTIFIER::MARGINS)
+		styleProp->UpdateColor(color.Red(), color.Green(), color.Blue());
+	} break;
+	case IDENTIFIER::RECT:
+	case IDENTIFIER::MARGINS:
 	{
 		int l, t, r, b;
 		if (sscanf(event.GetValidationInfo().GetValue().GetString().mb_str(), "%d, %d, %d, %d", &l, &t, &r, &b) != 4)
@@ -387,14 +387,13 @@ void MainWindow::OnPropertyGridChanging(wxPropertyGridEvent& event)
 		}
 		else
 		{
-			//margins and rect have the same memory layout
-			styleProp->data.recttype.left = l;
-			styleProp->data.recttype.top = t;
-			styleProp->data.recttype.right = r;
-			styleProp->data.recttype.bottom = b;
+			if (styleProp->header.typeID == IDENTIFIER::RECT)
+				styleProp->UpdateRectangle(l, t, r, b);
+			if (styleProp->header.typeID == IDENTIFIER::MARGINS)
+				styleProp->UpdateMargin(l, t, r, b);
 		}
-	}
-	else if (styleProp->header.typeID == IDENTIFIER::POSITION)
+	} break;
+	case IDENTIFIER::POSITION:
 	{
 		int x, y;
 		if (sscanf(event.GetValidationInfo().GetValue().GetString().mb_str(), "%d, %d", &x, &y) != 2)
@@ -405,14 +404,21 @@ void MainWindow::OnPropertyGridChanging(wxPropertyGridEvent& event)
 		}
 		else
 		{
-			styleProp->data.positiontype.x = x;
-			styleProp->data.positiontype.y = y;
+			styleProp->UpdatePosition(x, y);
 		}
-	}
-	else if (styleProp->header.typeID == IDENTIFIER::FONT)
+	} break;
+	case IDENTIFIER::FONT:
+		styleProp->UpdateFont(event.GetValidationInfo().GetValue().GetInteger()); break;
+	default:
 	{
-		styleProp->data.fonttype.fontID = event.GetValidationInfo().GetValue().GetInteger();
+		char msg[100];
+		sprintf(msg, "Changing properties of type '%s' is not supported yet!", lookup::FindTypeName(styleProp->GetTypeID()));
+		wxMessageBox(msg, "Unsupported", wxICON_INFORMATION);
+
+		event.Veto();
+	} break;
 	}
+
 }
 
 void MainWindow::OnPropertyGridItemCreate(wxCommandEvent& event)
