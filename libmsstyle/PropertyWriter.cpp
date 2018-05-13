@@ -6,6 +6,15 @@ namespace libmsstyle
 {
 	namespace rw
 	{
+		char* PropertyWriter::PadToMultipleOf(char* source, char* cursor, int align)
+		{
+			while ((cursor - source) % align != 0)
+			{
+				*cursor++ = 0;
+			}
+			return cursor;
+		}
+
 		char* PropertyWriter::WriteProperty(char* dest, StyleProperty& prop)
 		{
 			char* source = dest;
@@ -14,54 +23,12 @@ namespace libmsstyle
 
 			switch (prop.header.typeID)
 			{
-			// 32 bytes - padding included
-			case IDENTIFIER::FILENAME:
-			case IDENTIFIER::DISKSTREAM:
-			case IDENTIFIER::FONT:
-			{
-				memcpy(dest, &prop.data, 12);
-				dest += 12;
-			} break;
-			// 40 bytes - padding included
-			case IDENTIFIER::INT:
-			case IDENTIFIER::SIZE:
-			case IDENTIFIER::BOOL:
-			case IDENTIFIER::COLOR:
-			case IDENTIFIER::ENUM:
-			case IDENTIFIER::POSITION:
-			{
-				if (prop.data.booltype.shortFlag != 0)
-				{
-					memcpy(dest, &prop.data, 12);
-					dest += 12;
-				}
-				else
-				{
-					memcpy(dest, &prop.data, 20);
-					dest += 20;
-				}
-			} break;
-			// 48 bytes - padding included
-			case IDENTIFIER::RECT:
-			case IDENTIFIER::MARGINS:
-			{
-				if (prop.data.recttype.shortFlag != 0)
-				{
-					memcpy(dest, &prop.data, 12);
-					dest += 12;
-				}
-				else
-				{
-					memcpy(dest, &prop.data, 28);
-					dest += 28;
-				}
-			} break;
 			// arbitrary
 			case IDENTIFIER::INTLIST:
 			{
-				// shortFlag, unknown 8 bytes & length field
-				memcpy(dest, &prop.data, 16);
-				dest += 16;
+				// numInts field
+				memcpy(dest, &prop.data, 4);
+				dest += 4;
 
 				for (auto& num : prop.intlist)
 				{
@@ -72,22 +39,10 @@ namespace libmsstyle
 					*dest++ = (num >> 24) & 0xFF;
 				}
 
-				// pad to a multiple of eight
-				ptrdiff_t propSize = dest-source;
-				if (propSize % 8 != 0)
-				{
-					*dest++ = 0;
-					*dest++ = 0;
-					*dest++ = 0;
-					*dest++ = 0;
-				}
+				dest = PadToMultipleOf(source, dest, 8);
 			} break;
 			case IDENTIFIER::COLORLIST:
 			{
-				// shortFlag, unknown 4 bytes & numBytes field
-				memcpy(dest, &prop.data, 12);
-				dest += 12;
-
 				for (auto& num : prop.intlist)
 				{
 					// copy data, inc dest
@@ -97,22 +52,10 @@ namespace libmsstyle
 					*dest++ = (num >> 24) & 0xFF;
 				}
 
-				// pad to a multiple of eight
-				ptrdiff_t propSize = dest - source;
-				if (propSize % 8 != 0)
-				{
-					*dest++ = 0;
-					*dest++ = 0;
-					*dest++ = 0;
-					*dest++ = 0;
-				}
+				dest = PadToMultipleOf(source, dest, 8);
 			} break;
 			case IDENTIFIER::STRING:
 			{
-				// shortFlag, unknown 4 bytes & length field
-				memcpy(dest, &prop.data, 12);
-				dest += 12;
-
 				for (auto& ch : prop.text)
 				{
 					// copy data, inc dest
@@ -120,19 +63,44 @@ namespace libmsstyle
 					*dest++ = (ch >> 8) & 0xFF;
 				}
 
-				// pad to a multiple of eight
-				while ((dest-source) % 8 != 0)
+				dest = PadToMultipleOf(source, dest, 8);
+			} break;
+			// 32 bytes - padding included
+			case IDENTIFIER::FILENAME:
+			case IDENTIFIER::DISKSTREAM:
+			case IDENTIFIER::FONT:
+			case IDENTIFIER::UNKNOWN_243:
+			// 40 bytes - padding included
+			case IDENTIFIER::INT:
+			case IDENTIFIER::SIZE:
+			case IDENTIFIER::BOOL:
+			case IDENTIFIER::COLOR:
+			case IDENTIFIER::ENUM:
+			case IDENTIFIER::POSITION:
+			case IDENTIFIER::UNKNOWN_241:
+			// 48 bytes - padding included
+			case IDENTIFIER::RECT:
+			case IDENTIFIER::MARGINS:
+			{
+				// copy data from known prop
+				if (prop.header.shortFlag == 0)
 				{
-					*dest++ = 0;
-					*dest++ = 0;
+					memcpy(dest, &prop.data, prop.header.sizeInBytes);
+					dest += prop.header.sizeInBytes;
 				}
+
+				dest = PadToMultipleOf(source, dest, 8);
 			} break;
 			default:
 			{
-				// blindly copy the data back that we found earlier
-				int cnt = prop.GetPropertySizeAsFound() - sizeof(PropertyHeader);
-				memcpy(dest, &prop.data, cnt);
-				dest += cnt;
+				// copy data from opaque memory
+				if (prop.header.shortFlag == 0)
+				{
+					memcpy(dest, prop.unknown, prop.header.sizeInBytes);
+					dest += prop.header.sizeInBytes;
+				}
+
+				dest = PadToMultipleOf(source, dest, 8);
 			} break;
 			}
 

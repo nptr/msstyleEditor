@@ -34,7 +34,7 @@ namespace libmsstyle
 		// Upper bound is ATLASRECT, but im leaving a bit of space
 		// for unknown props.
 		if (header.nameID < IDENTIFIER::COLORSCHEMES ||
-			header.nameID > 10000)
+			header.nameID > 25000)
 			return false;
 
 		// First attempt was 255, but yielded false-positives.
@@ -53,11 +53,6 @@ namespace libmsstyle
 	bool StyleProperty::IsNameMatchingType() const
 	{
 		// lookup typemap if prop exists in there
-		return true;
-	}
-
-	bool StyleProperty::IsContentMatchingType() const
-	{
 		return true;
 	}
 
@@ -91,7 +86,7 @@ namespace libmsstyle
 			return 20 + 12 + 4 + data.intlist.numInts * sizeof(int32_t);
 		case IDENTIFIER::STRING:
 			// string length in bytes including the null terminator
-			return 20 + 8 + 4 + data.texttype.sizeInBytes;
+			return 20 + 8 + 4 + header.sizeInBytes;
 		case 225:					  // Unknown type, since Win7, i think its a mistake. didn't see it again.
 		case IDENTIFIER::UNKNOWN_241: // Unknown type, since Win10
 			return 40;
@@ -100,11 +95,18 @@ namespace libmsstyle
 		}
 	}
 
-	int StyleProperty::GetPropertySizeAsFound() const
+	StyleProperty::StyleProperty()
+		: bytesAfterHeader(0)
+		, unknown(nullptr)
 	{
-		return sizeof(PropertyHeader) + bytesAfterHeader;
+		memset(&header, 0, sizeof(PropertyHeader));
+		memset(&data, 0, sizeof(PropertyData));
 	}
 
+	StyleProperty::~StyleProperty()
+	{
+		delete unknown;
+	}
 
 	IDENTIFIER StyleProperty::GetTypeID() const
 	{
@@ -150,7 +152,7 @@ namespace libmsstyle
 	{
 		assert(	header.typeID == IDENTIFIER::FILENAME ||
 				header.typeID == IDENTIFIER::DISKSTREAM );
-		data.imagetype.imageID = imageID;
+		header.shortFlag = imageID;
 
 	}
 
@@ -214,7 +216,12 @@ namespace libmsstyle
 	void StyleProperty::UpdateFont(int fontID)
 	{
 		assert(header.typeID == IDENTIFIER::FONT);
-		data.fonttype.fontID = fontID;
+		header.shortFlag = fontID;
+	}
+
+	int StyleProperty::GetResourceID() const
+	{
+		return header.shortFlag;
 	}
 
 	std::string StyleProperty::GetValueAsString() const
@@ -256,7 +263,7 @@ namespace libmsstyle
 		case IDENTIFIER::FILENAME:
 		case IDENTIFIER::DISKSTREAM:
 		{
-			return std::to_string(data.imagetype.imageID);
+			return std::to_string(header.shortFlag);
 		} break;
 		case IDENTIFIER::SIZE:
 		{
@@ -274,7 +281,7 @@ namespace libmsstyle
 		} break;
 		case IDENTIFIER::FONT:
 		{
-			return lookup::FindFontName(data.fonttype.fontID);
+			return lookup::FindFontName(header.shortFlag);
 		} break;
 		case IDENTIFIER::INTLIST:
 		{
@@ -310,37 +317,37 @@ namespace libmsstyle
 		case libmsstyle::GLYPHDIBDATA:
 			break;
 		case libmsstyle::ENUM:
-			this->data.enumtype.sizeInBytes = 0x4;
+			this->header.sizeInBytes = 0x4;
 			break;
 		case libmsstyle::STRING:
 			// dynamic !!
 			break;
 		case libmsstyle::INT:
-			this->data.inttype.sizeInBytes = 0x4;
+			this->header.sizeInBytes = 0x4;
 			break;
 		case libmsstyle::BOOL:
-			this->data.booltype.sizeInBytes = 0x4;
+			this->header.sizeInBytes = 0x4;
 			break;
 		case libmsstyle::COLOR:
-			this->data.colortype.sizeInBytes = 0x4;
+			this->header.sizeInBytes = 0x4;
 			break;
 		case libmsstyle::MARGINS:
-			this->data.margintype.sizeInBytes = 0x10;
+			this->header.sizeInBytes = 0x10;
 			break;
 		case libmsstyle::FILENAME:
-			this->data.imagetype.sizeInBytes = 0x10;
+			this->header.sizeInBytes = 0x10;
 			break;
 		case libmsstyle::SIZE:
-			this->data.sizetype.sizeInBytes = 0x4;
+			this->header.sizeInBytes = 0x4;
 			break;
 		case libmsstyle::POSITION:
-			this->data.positiontype.sizeInBytes = 0x8;
+			this->header.sizeInBytes = 0x8;
 			break;
 		case libmsstyle::RECT:
-			this->data.recttype.sizeInBytes = 0x10;
+			this->header.sizeInBytes = 0x10;
 			break;
 		case libmsstyle::FONT:
-			this->data.fonttype.sizeInBytes = 0x5C;
+			this->header.sizeInBytes = 0x5C;
 			break;
 		case libmsstyle::INTLIST:
 			// dynamic !!

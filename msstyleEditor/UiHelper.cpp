@@ -25,7 +25,7 @@ wxPGProperty* GetWXPropertyFromMsStyleProperty(StyleProperty& prop)
 	case IDENTIFIER::FILENAME:
 	case IDENTIFIER::DISKSTREAM:
 	{
-		wxIntProperty* p = new wxIntProperty(propName, *wxPGProperty::sm_wxPG_LABEL, prop.data.imagetype.imageID);
+		wxIntProperty* p = new wxIntProperty(propName, *wxPGProperty::sm_wxPG_LABEL, prop.GetResourceID());
 		p->SetClientData(const_cast<void*>(static_cast<const void*>(&prop)));
 		return p;
 	}
@@ -99,12 +99,12 @@ wxPGProperty* GetWXPropertyFromMsStyleProperty(StyleProperty& prop)
 
 		if (cp != nullptr)
 		{
-			p = new wxEnumProperty(propName, *wxPGProperty::sm_wxPG_LABEL, *cp, prop.data.fonttype.fontID);
+			p = new wxEnumProperty(propName, *wxPGProperty::sm_wxPG_LABEL, *cp, prop.GetResourceID());
 			delete cp;
 		}
 		else
 		{
-			p = new wxIntProperty(propName, *wxPGProperty::sm_wxPG_LABEL, prop.data.fonttype.fontID);
+			p = new wxIntProperty(propName, *wxPGProperty::sm_wxPG_LABEL, prop.GetResourceID());
 		}
 
 		p->SetClientData(&prop);

@@ -35,8 +35,8 @@ namespace libmsstyle
 			// - BadProperty:  Property at "src" was invalid.
 			//				   "src" < "out_next"
 			//				   "out_prop" is not valid
-			Result ReadNextProperty(const char* src, const char* end, const char** out_next, StyleProperty* out_prop);
-			
+			const char* ReadNextProperty(const char* src, Result& result, StyleProperty* prop);
+
 			// Does a few range and sanity checks to see if the data could 
 			// be valid. It does not do a typeID or nameID lookup, so yet 
 			// unknown properties have a chance to work as well.

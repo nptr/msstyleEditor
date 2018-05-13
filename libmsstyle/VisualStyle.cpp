@@ -81,7 +81,7 @@ namespace libmsstyle
 
 		void Log(const char* format, ...)
 		{
-			char textbuffer[64];
+			char textbuffer[100];
 
 			va_list args;
 			va_start(args, format);
@@ -269,12 +269,12 @@ namespace libmsstyle
 
 			if (prop.GetTypeID() == IDENTIFIER::FILENAME)
 			{
-				r = libmsstyle::GetResource(m_moduleHandle, prop.data.imagetype.imageID, "IMAGE");
+				r = libmsstyle::GetResource(m_moduleHandle, prop.header.shortFlag, "IMAGE");
 				return StyleResource(r.data, r.size, prop.header.nameID, StyleResourceType::IMAGE);
 			}
 			else if (prop.GetTypeID() == IDENTIFIER::DISKSTREAM)
 			{
-				r = libmsstyle::GetResource(m_moduleHandle, prop.data.imagetype.imageID, "STREAM");
+				r = libmsstyle::GetResource(m_moduleHandle, prop.header.shortFlag, "STREAM");
 				return StyleResource(r.data, r.size, prop.header.nameID, StyleResourceType::ATLAS);
 			}
 
@@ -334,34 +334,39 @@ namespace libmsstyle
 		{
 			libmsstyle::rw::PropertyReader reader(m_classes.size());
 
-			const char* start = static_cast<const char*>(propResource.data);
+			const char* start = reinterpret_cast<const char*>(propResource.data);
 			const char* end = start + propResource.size;
 			const char* current = start;
 			const char* next = start;
 			const StyleProperty* prev = 0;
 			char txtBuffer[100];
 
+			libmsstyle::rw::PropertyReader::Result result;
 
-			while (current < end)
+			// This end condition would be nice if SizeOfResource() would return
+			// the correct resource size. Unfortunately, it returns less
+			// than there is data returned by LockResource(). That makes me 
+			// miss the last few props; Saving it creates a bunch of new problems..
+			while (current < end - 4)
 			{
 				StyleProperty* tmpProp = new StyleProperty();
-				auto readResult = reader.ReadNextProperty(current, end, &next, tmpProp);
+				next = reader.ReadNextProperty(current, result, tmpProp);
 
-				switch (readResult)
+				switch (result)
 				{
 				case rw::PropertyReader::Ok:
 					Log("[N: %d, T: %d, C: %d, P: %d, S: %d]\r\n", tmpProp->header.nameID, tmpProp->header.typeID, tmpProp->header.classID, tmpProp->header.partID, tmpProp->header.stateID);
 					prev = reinterpret_cast<const StyleProperty*>(current);
 					break;
+				case rw::PropertyReader::UnknownType:
+					Log("Unknown: [N: %d, T: %d, C: %d, P: %d, S: %d] @ 0x%08x\r\n", tmpProp->header.nameID, tmpProp->header.typeID, tmpProp->header.classID, tmpProp->header.partID, tmpProp->header.stateID, current - start);
+					prev = reinterpret_cast<const StyleProperty*>(current);
+					break;
 				case rw::PropertyReader::SkippedBytes:
 					Log("Skipped %d bytes after prop [N: %d, T: %d]\r\n", next - current, prev->header.nameID, prev->header.typeID);
 					current = next;
-					continue;
-				case rw::PropertyReader::UnknownType:
-					sprintf(txtBuffer, "Unknown type [N: %d, T: %d] @ 0x%08x\r\n", tmpProp->header.nameID, tmpProp->header.typeID, current - start);
 					delete tmpProp;
-					throw std::runtime_error(txtBuffer);
-					return;
+					continue;
 				case rw::PropertyReader::BadProperty:
 					sprintf(txtBuffer,"Bad property [N: %d, T: %d] @ 0x%08x\r\n", tmpProp->header.nameID, tmpProp->header.typeID, current - start);
 					delete tmpProp;

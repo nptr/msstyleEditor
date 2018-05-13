@@ -15,76 +15,28 @@ namespace libmsstyle
 		{
 		}
 
-		PropertyReader::Result PropertyReader::ReadNextProperty(const char* source, const char* end, const char** out_next, StyleProperty* prop)
+		
+		const char* PropertyReader::ReadNextProperty(const char* source, Result& result, StyleProperty* prop)
 		{
 			const char* cursor = source;
 			while (!IsProbablyValidHeader(cursor))
 				cursor += 1;
 
+			// Notify if not the usual padding
 			ptrdiff_t diff = cursor - source;
-			if (diff > 0)
+			if (diff > 4)
 			{
-				*out_next = cursor;
-				return Result::SkippedBytes;
+				result = Result::SkippedBytes;
+				return cursor;
 			}
 
 			// Copy the property header
 			memcpy(&(prop->header), cursor, sizeof(PropertyHeader));
 			cursor += sizeof(PropertyHeader);
 
-
 			// Copy the data
 			switch (prop->header.typeID)
 			{
-			// 32 bytes
-			case IDENTIFIER::FILENAME:
-			case IDENTIFIER::DISKSTREAM:
-			case IDENTIFIER::FONT:
-			case IDENTIFIER::UNKNOWN_243:
-			{
-				memcpy(&(prop->data), cursor, 12);
-				cursor += 12;
-				prop->bytesAfterHeader += 12;
-			} break;
-			// 40 bytes
-			case IDENTIFIER::INT:
-			case IDENTIFIER::SIZE:
-			case IDENTIFIER::BOOL:
-			case IDENTIFIER::COLOR:
-			case IDENTIFIER::ENUM:
-			case IDENTIFIER::POSITION:
-			case IDENTIFIER::UNKNOWN_241:
-			{
-				memcpy(&(prop->data), cursor, 12);
-				cursor += 12;
-				prop->bytesAfterHeader += 12;
-
-				// Copy the rest if not a short prop
-				if (prop->data.booltype.shortFlag == 0)
-				{
-					char* dataPlusPSHDR = reinterpret_cast<char*>(&prop->data) + 12;
-					memcpy(dataPlusPSHDR, cursor, 8);
-					cursor += 8;
-					prop->bytesAfterHeader += 8;
-				}
-			} break;
-			// 48 bytes
-			case IDENTIFIER::RECT:
-			case IDENTIFIER::MARGINS:
-			{
-				memcpy(&(prop->data), cursor, 12);
-				cursor += 12;
-				prop->bytesAfterHeader += 12;
-
-				// Copy the rest if not a short prop
-				if (prop->data.recttype.shortFlag == 0)
-				{
-					char* dataPlusPSHDR = reinterpret_cast<char*>(&prop->data) + 12;
-					memcpy(dataPlusPSHDR, cursor, 16);
-					cursor += 16;
-					prop->bytesAfterHeader += 16;
-				}
-			} break;
 			// Arbitrary
 			case IDENTIFIER::INTLIST:
 			{
@@ -92,26 +44,22 @@ namespace libmsstyle
 				// short indicator NOT set, but still ended right
 				// after it. That shouldn't be allowed from my understanding.
 				// I'll reject it until i know more, not wanting this to get too hacky.
-				if (IsProbablyValidHeader(cursor + 12))
+				if (IsProbablyValidHeader(cursor))
 				{
-					memcpy(&(prop->data), cursor, 12);
-					cursor += 12;
-					prop->bytesAfterHeader += 12;
-					
-					*out_next = cursor;
-					return Result::BadProperty;
+					result = Result::BadProperty;
+					return cursor;
 				}
 				else
 				{
-					memcpy(&(prop->data), cursor, 16);
-					cursor += 16;
-					prop->bytesAfterHeader += 16;
+					// Copy the "numInts" field
+					memcpy(&(prop->data), cursor, 4);
+					cursor += 4;
+					prop->bytesAfterHeader += 4;
 				}
 
-				int32_t numValues = prop->data.intlist.numInts;
-
-				prop->intlist.reserve(numValues);
-				for (int32_t i = 0; i < numValues; ++i)
+				// Copy the list
+				prop->intlist.reserve(prop->data.intlist.numInts);
+				for (int32_t i = 0; i < prop->data.intlist.numInts; ++i)
 				{
 					const int32_t* valuePtr = reinterpret_cast<const int32_t*>(cursor);
 					prop->intlist.push_back(*valuePtr);
@@ -122,29 +70,22 @@ namespace libmsstyle
 			} break;
 			case IDENTIFIER::COLORLIST:
 			{
-				memcpy(&(prop->data), cursor, 12);
-				cursor += 12;
-				prop->bytesAfterHeader += 12;
+				int32_t numColors = prop->header.sizeInBytes / 4;
 
-				int32_t numValues = prop->data.colorlist.sizeInBytes / 4;
-
-				prop->intlist.reserve(numValues);
-				for (int32_t i = 0; i < numValues; ++i)
+				// Copy the list
+				prop->intlist.reserve(numColors);
+				for (int32_t i = 0; i < numColors; ++i)
 				{
 					const int32_t* valuePtr = reinterpret_cast<const int32_t*>(cursor);
 					prop->intlist.push_back(*valuePtr);
 					cursor += sizeof(int32_t);
 				}
 
-				prop->bytesAfterHeader += prop->data.intlist.numInts * sizeof(int32_t);
+				prop->bytesAfterHeader += prop->header.sizeInBytes;
 			} break;
 			case IDENTIFIER::STRING:
 			{
-				memcpy(&(prop->data), cursor, 12);
-				cursor += 12;
-				prop->bytesAfterHeader += 12;
-
-				int32_t szLen = prop->data.texttype.sizeInBytes / 2;
+				int32_t szLen = prop->header.sizeInBytes / 2;
 
 				prop->text.reserve(szLen);
 				for (int32_t i = 0; i < szLen - 1; ++i) // dont need the NULL term.
@@ -154,29 +95,62 @@ namespace libmsstyle
 					cursor += sizeof(wchar_t);
 				}
 
-				prop->bytesAfterHeader += prop->data.texttype.sizeInBytes;
+				prop->bytesAfterHeader += prop->header.sizeInBytes;
+			} break;
+			// 32 bytes
+			case IDENTIFIER::FILENAME:
+			case IDENTIFIER::DISKSTREAM:
+			case IDENTIFIER::FONT:
+			case IDENTIFIER::UNKNOWN_243:
+			// 40 bytes
+			case IDENTIFIER::INT:
+			case IDENTIFIER::SIZE:
+			case IDENTIFIER::BOOL:
+			case IDENTIFIER::COLOR:
+			case IDENTIFIER::ENUM:
+			case IDENTIFIER::POSITION:
+			case IDENTIFIER::UNKNOWN_241:
+			// 48 bytes
+			case IDENTIFIER::RECT:
+			case IDENTIFIER::MARGINS:
+			{
+				// Copy the data of known props to the PropertyData field.
+				if (prop->header.shortFlag == 0)
+				{
+					int sizeOfPayload = prop->header.sizeInBytes;
+					if (sizeOfPayload > 0 && sizeOfPayload <= sizeof(PropertyData))
+					{
+						memcpy(&(prop->data), cursor, sizeOfPayload);
+						cursor += sizeOfPayload;
+						prop->bytesAfterHeader += prop->header.sizeInBytes;
+					}
+				}
+
+				result = Result::Ok;
+				return cursor;
 			} break;
 			default:
 			{
-				// Unknown type. What we can do is blindly copy the assumend
-				// minimum of data every property has and notify the caller.
-				// This does not enable us to work with the style.
-				memcpy(&(prop->data), cursor, 12);
-				cursor += 12;
-				prop->bytesAfterHeader += 12;
+				// Copy the data of known props to an opaque memory block.
+				if (prop->header.shortFlag == 0)
+				{
+					int sizeOfPayload = prop->header.sizeInBytes;
+					if (sizeOfPayload > 0)
+					{
+						prop->unknown = new char[sizeOfPayload];
+						memcpy(prop->unknown, cursor, sizeOfPayload);
+						cursor += sizeOfPayload;
+						prop->bytesAfterHeader += prop->header.sizeInBytes;
+					}
+				}
 
-				// Alternatively, we could scan for the next property and
-				// just store the data in between. In theory this should
-				// allow us to handle unknown datatypes as well (limited).
-				// <IMPL>
-
-				*out_next = cursor;
-				return Result::UnknownType;
+				result = Result::UnknownType;
+				return cursor;
 			} break;
 			}
 
-			*out_next = cursor;
-			return Result::Ok;
+			result = Result::Ok;
+			return cursor;
 		}
 
 
@@ -206,7 +180,7 @@ namespace libmsstyle
 			// Upper bound is ATLASRECT, but im leaving a bit of space
 			// for unknown props.
 			if (header->nameID < IDENTIFIER::COLORSCHEMES ||
-				header->nameID > 10000)
+				header->nameID > 25000)
 				return false;
 
 			// First attempt was 255, but yielded false-positives.

@@ -330,17 +330,17 @@ void MainWindow::OnClassViewTreeSelChanged(wxTreeEvent& event)
 			type = StyleResourceType::ATLAS;
 		else type = StyleResourceType::NONE;
 
-		std::string file = currentStyle->GetQueuedResourceUpdate(selectedImageProp->data.imagetype.imageID, type);
+		std::string file = currentStyle->GetQueuedResourceUpdate(selectedImageProp->GetResourceID(), type);
 		if (!file.empty())
 		{
 			wxString tmpFile(file);
 			ShowImageFromFile(tmpFile);
-			statusBar->SetStatusText(wxString::Format("Image ID: %d*", selectedImageProp->data.imagetype.imageID));
+			statusBar->SetStatusText(wxString::Format("Image ID: %d*", selectedImageProp->GetResourceID()));
 		}
 		else
 		{
 			ShowImageFromResource(selectedImageProp);
-			statusBar->SetStatusText(wxString::Format("Image ID: %d", selectedImageProp->data.imagetype.imageID));
+			statusBar->SetStatusText(wxString::Format("Image ID: %d", selectedImageProp->GetResourceID()));
 		}
 
 		return;
@@ -537,7 +537,7 @@ void MainWindow::OnImageReplaceClicked(wxCommandEvent& event)
 		tp = StyleResourceType::NONE; break;
 	}
 
-	currentStyle->QueueResourceUpdate(selectedImageProp->data.imagetype.imageID, tp, openFileDialog.GetPath().ToStdString());
+	currentStyle->QueueResourceUpdate(selectedImageProp->GetResourceID(), tp, openFileDialog.GetPath().ToStdString());
 }
 
 void MainWindow::OnImageViewContextMenuTriggered(wxContextMenuEvent& event)

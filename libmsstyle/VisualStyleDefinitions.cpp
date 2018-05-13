@@ -307,7 +307,9 @@ namespace libmsstyle
 		// STRING
 		{ 8001, { "ATLASINPUTIMAGE", 201, "" } },
 		// RECT
-		{ 8002, { "ATLASRECT", 209, "" } }
+		{ 8002, { "ATLASRECT", 209, "" } },
+		// "HIDDEN"
+		{ 20100, { "HIDDEN_20100", 242, "" } }
 	};
 
 	const std::unordered_map<int, const char*> DATATYPE_MAP =
