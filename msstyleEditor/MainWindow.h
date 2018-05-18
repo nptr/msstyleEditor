@@ -1,16 +1,17 @@
 #pragma once
 
+#include "ImageViewCtrl.h"
+#include "SearchDialog.h"
+#include "ThemeManager.h"
+
+#include "libmsstyle\VisualStyle.h"
+
 #include <unordered_map>
 
 #include <wx\wx.h>
 #include <wx\propgrid\propgrid.h>
 #include <wx\propgrid\advprops.h>
 #include <wx\treectrl.h>
-
-#include "ImageViewCtrl.h"
-#include "libmsstyle\VisualStyle.h"
-#include "SearchDialog.h"
-
 
 class MainWindow : public wxFrame, public ISearchDialogListener
 {
@@ -39,6 +40,7 @@ private:
 	libmsstyle::VisualStyle* currentStyle;
 	libmsstyle::StyleResource selectedImage;
 	const libmsstyle::StyleProperty* selectedImageProp;
+	ThemeManager themeManager;
 
 	struct SelectionModel
 	{

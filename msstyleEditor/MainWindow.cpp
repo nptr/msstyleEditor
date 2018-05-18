@@ -8,7 +8,6 @@
 #include "SearchDialog.h"
 #include "UiHelper.h"
 #include "Exporter.h"
-#include "UxthemeUndocumented.h"
 
 #include "wxPropertyCategoryToolbar.h"
 
@@ -252,10 +251,22 @@ void MainWindow::OnThemeApply(wxCommandEvent& event)
 			return;
 	}
 
-	std::wstring widePath = UTF8ToWide(currentStyle->GetPath());
-
-	if (uxtheme::SetSystemTheme(widePath.c_str(), L"NormalColor", L"NormalSize", 0) != S_OK)
-		wxMessageBox(wxT("Failed to apply the theme as the OS rejected it!"), wxT("msstyleEditor"), wxICON_ERROR);
+	try
+	{
+		themeManager.ApplyTheme(*currentStyle);
+	}
+	catch (std::runtime_error& err)
+	{
+		wxMessageBox(err.what(), "Error applying style!", wxICON_ERROR);
+	}
+	catch (std::exception& ex)
+	{
+		wxMessageBox(ex.what(), "Error applying style!", wxICON_ERROR);
+	}
+	catch (...)
+	{
+		wxMessageBox("Unknown exception!", "Error applying style!", wxICON_ERROR);
+	}
 }
 
 void MainWindow::OnClassViewTreeSelChanged(wxTreeEvent& event)
@@ -909,6 +920,12 @@ void MainWindow::CloseStyle()
 {
 	if (currentStyle != nullptr)
 	{
+		try {
+			themeManager.Rollback();
+		}
+		catch (...)
+		{ }
+
 		// remove everything that could still point to the style data
 		propView->Clear();
 		imageView->RemoveImage();

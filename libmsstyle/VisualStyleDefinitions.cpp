@@ -308,7 +308,8 @@ namespace libmsstyle
 		{ 8001, { "ATLASINPUTIMAGE", 201, "" } },
 		// RECT
 		{ 8002, { "ATLASRECT", 209, "" } },
-		// "HIDDEN"
+		// "HIDDEN" - found in aerolite beyond SizeOfResource()-bytes
+		{ 20000, { "HIDDEN_20000", 241, "" } },
 		{ 20100, { "HIDDEN_20100", 242, "" } }
 	};
 

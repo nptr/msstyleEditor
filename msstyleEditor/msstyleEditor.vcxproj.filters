@@ -31,6 +31,7 @@
     <ClCompile Include="AddPropertyDialog.cpp">
       <Filter>GUI</Filter>
     </ClCompile>
+    <ClCompile Include="ThemeManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AboutDialog.h">
@@ -63,6 +64,7 @@
     <ClInclude Include="AddPropertyDialog.h">
       <Filter>GUI</Filter>
     </ClInclude>
+    <ClInclude Include="ThemeManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="msstyleEditor.rc" />
