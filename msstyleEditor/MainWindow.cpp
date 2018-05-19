@@ -1,4 +1,4 @@
-#include "MainWindow.h"
+﻿#include "MainWindow.h"
 #include "AboutDialog.h"
 #include "HelpDialog.h"
 #include "AddPropertyDialog.h"
@@ -27,6 +27,8 @@
 
 using namespace libmsstyle;
 
+#define TEXT_PLAY "&Test \u25B6"
+#define TEXT_STOP "&Stop Test \u25A0"
 
 MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
 	: wxFrame(parent, id, title, pos, size, style)
@@ -70,15 +72,15 @@ MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, c
 	imageMenu = new wxMenu();
 	viewMenu = new wxMenu();
 
-	fileMenu->Append(ID_FOPEN, wxT("&Open"));
-	fileMenu->Append(ID_FSAVE, wxT("&Save"));
-	fileMenu->Enable(ID_FSAVE, false);
-
 	wxMenu* exportSubMenu = new wxMenu();
 	exportSubMenu->Append(ID_EXPORT_TREE, wxT("Style Info"));
-	themeMenu->AppendSubMenu(exportSubMenu, wxT("Export ..."));
-	themeMenu->Append(ID_THEME_APPLY, wxT("Apply"));
-	themeMenu->Enable(ID_THEME_APPLY, false);
+
+	fileMenu->Append(ID_FOPEN, wxT("&Open"));
+	fileMenu->Append(ID_FSAVE, wxT("&Save"));
+	fileMenu->AppendSubMenu(exportSubMenu, wxT("Export ..."));
+	fileMenu->Enable(ID_FSAVE, false);
+
+	themeMenu->Append(ID_THEME_APPLY, wxT(TEXT_PLAY));
 
 	imageMenu->Append(ID_IEXPORT, wxT("&Export"));
 	imageMenu->Append(ID_IREPLACE, wxT("&Replace"));
@@ -99,7 +101,6 @@ MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, c
 	mainmenu->Append(imageMenu, wxT("&Image"));
 	mainmenu->Append(viewMenu, wxT("&View"));
 	mainmenu->Append(aboutMenu, wxT("I&nfo"));
-
 	this->SetMenuBar(mainmenu);
 
 	statusBar = this->CreateStatusBar(1);
@@ -213,6 +214,19 @@ void MainWindow::OnThemeApply(wxCommandEvent& event)
 	if (currentStyle == nullptr)
 		return;
 
+	if (themeManager.IsThemeInUse())
+	{
+		try
+		{
+			themeManager.Rollback();
+			themeMenu->SetLabel(ID_THEME_APPLY, wxT(TEXT_PLAY));
+			Sleep(300); // prevent doubleclicks
+			return;
+		}
+		catch (...)
+		{ }
+	}
+
 	bool needConfirmation = false;
 	OSVERSIONINFO version;
 	ZeroMemory(&version, sizeof(OSVERSIONINFO));
@@ -254,6 +268,8 @@ void MainWindow::OnThemeApply(wxCommandEvent& event)
 	try
 	{
 		themeManager.ApplyTheme(*currentStyle);
+		themeMenu->SetLabel(ID_THEME_APPLY, wxT(TEXT_STOP));
+		Sleep(300); // prevent doubleclicks
 	}
 	catch (std::runtime_error& err)
 	{
@@ -287,6 +303,8 @@ void MainWindow::OnClassViewTreeSelChanged(wxTreeEvent& event)
 		selection.PartId = -1;
 		selection.StateId = -1;
 
+		statusBar->SetStatusText(wxString::Format("C: %d", selection.ClassId));
+
 		// Update UI
 		propView->Clear();
 		return;
@@ -308,7 +326,7 @@ void MainWindow::OnClassViewTreeSelChanged(wxTreeEvent& event)
 		selection.StateId = -1;
 
 		// Update UI
-		statusBar->SetStatusText(wxString::Format("Part ID: %d", part->partID));
+		statusBar->SetStatusText(wxString::Format("C: %d, P: %d", selection.ClassId, part->partID));
 		FillPropertyView(*part);
 		return;
 	}
@@ -346,12 +364,13 @@ void MainWindow::OnClassViewTreeSelChanged(wxTreeEvent& event)
 		{
 			wxString tmpFile(file);
 			ShowImageFromFile(tmpFile);
-			statusBar->SetStatusText(wxString::Format("Image ID: %d*", selectedImageProp->GetResourceID()));
+
+			statusBar->SetStatusText(wxString::Format("C: %d, P: %d, Img: %d*", selection.ClassId, selection.PartId, selectedImageProp->GetResourceID()));
 		}
 		else
 		{
 			ShowImageFromResource(selectedImageProp);
-			statusBar->SetStatusText(wxString::Format("Image ID: %d", selectedImageProp->GetResourceID()));
+			statusBar->SetStatusText(wxString::Format("C: %d, P: %d, Img: %d", selection.ClassId, selection.PartId, selectedImageProp->GetResourceID()));
 		}
 
 		return;
@@ -592,6 +611,7 @@ void MainWindow::OnAboutClicked(wxCommandEvent& event)
 
 void MainWindow::OnCollapseClicked(wxCommandEvent& event)
 {
+	// Hide temporarily so collapsing goes faster (no unnecessary redraws)
 	classView->HideWithEffect(wxShowEffect::wxSHOW_EFFECT_BLEND);
 	classView->CollapseAll();
 	classView->ShowWithEffect(wxShowEffect::wxSHOW_EFFECT_BLEND);
@@ -602,13 +622,25 @@ void MainWindow::OnCollapseClicked(wxCommandEvent& event)
 	wxTreeItemId selectedItem = classView->GetSelection();
 	if (selectedItem != nullptr)
 		classView->ScrollTo(selectedItem);
-	else classView->ScrollTo(classView->GetFirstChild(classView->GetRootItem(), cookie));
+	else
+	{
+		wxTreeItemId root = classView->GetRootItem();
+		if (root.IsOk())
+		{
+			wxTreeItemId first = classView->GetFirstChild(root, cookie);
+			if (first.IsOk())
+			{
+				classView->ScrollTo(first);
+			}
+		}
+	}
 
 	classView->SetFocus();
 }
 
 void MainWindow::OnExpandClicked(wxCommandEvent& event)
 {
+	// Hide temporarily so expansion goes faster (no unnecessary redraws)
 	classView->HideWithEffect(wxShowEffect::wxSHOW_EFFECT_BLEND);
 	classView->ExpandAll();
 	classView->ShowWithEffect(wxShowEffect::wxSHOW_EFFECT_BLEND);
@@ -619,7 +651,18 @@ void MainWindow::OnExpandClicked(wxCommandEvent& event)
 	wxTreeItemId selectedItem = classView->GetSelection();
 	if (selectedItem != nullptr)
 		classView->ScrollTo(selectedItem);
-	else classView->ScrollTo(classView->GetFirstChild(classView->GetRootItem(), cookie));
+	else
+	{
+		wxTreeItemId root = classView->GetRootItem();
+		if (root.IsOk())
+		{
+			wxTreeItemId first = classView->GetFirstChild(root, cookie);
+			if (first.IsOk())
+			{
+				classView->ScrollTo(first);
+			}
+		}
+	}
 
 	classView->SetFocus();
 }
@@ -922,6 +965,7 @@ void MainWindow::CloseStyle()
 	{
 		try {
 			themeManager.Rollback();
+			themeMenu->SetLabel(ID_THEME_APPLY, wxT(TEXT_PLAY));
 		}
 		catch (...)
 		{ }

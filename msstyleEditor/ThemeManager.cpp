@@ -25,7 +25,7 @@ static std::wstring UTF8ToWide(const std::string& str)
 
 ThemeManager::ThemeManager()
 	: m_valid(true)
-	, m_custom(false)
+	, m_usertheme(false)
 {
 	if (uxtheme::GetCurrentThemeName(m_prevTheme, MAX_THEMECHARS,
 		m_prevColor, MAX_COLORCHARS,
@@ -83,14 +83,14 @@ void ThemeManager::ApplyTheme(libmsstyle::VisualStyle& style)
 	{
 		// Remove previous tmp theme now that it's not
 		// in use by the OS anymore.
-		if (m_custom)
+		if (m_usertheme)
 		{
 			DeleteFileW(m_customTheme);
 		}
 
 		// Update state
 		memcpy(m_customTheme, newPath, MAX_THEMECHARS);
-		m_custom = true;
+		m_usertheme = true;
 	}
 }
 
@@ -99,7 +99,7 @@ void ThemeManager::Rollback()
 	if (!m_valid) // invalid state
 		return;
 
-	if (!m_custom) // same theme as when we started
+	if (!m_usertheme) // same theme as when we started
 		return;
 
 	if (uxtheme::SetSystemTheme(m_prevTheme, m_prevColor, m_prevSize, 33) != S_OK)
@@ -108,7 +108,7 @@ void ThemeManager::Rollback()
 	}
 
 	DeleteFileW(m_customTheme);
-	m_custom = false;
+	m_usertheme = false;
 }
 
 void ThemeManager::GetActiveTheme(std::string& theme, std::string& color, std::string& size)
@@ -123,4 +123,9 @@ void ThemeManager::GetActiveTheme(std::string& theme, std::string& color, std::s
 		color = WideToUTF8(actColor);
 		size = WideToUTF8(actSize);
 	}
+}
+
+bool ThemeManager::IsThemeInUse() const
+{
+	return m_usertheme;
 }

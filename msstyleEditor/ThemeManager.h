@@ -21,10 +21,11 @@ public:
 	void Rollback();
 
 	void GetActiveTheme(std::string& theme, std::string& color, std::string& size);
+	bool IsThemeInUse() const;
 
 private:
 	bool m_valid;
-	bool m_custom;
+	bool m_usertheme;
 	wchar_t m_customTheme[MAX_THEMECHARS];
 	wchar_t m_prevTheme[MAX_THEMECHARS];
 	wchar_t m_prevColor[MAX_COLORCHARS];

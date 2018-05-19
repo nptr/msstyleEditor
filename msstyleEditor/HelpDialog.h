@@ -15,7 +15,7 @@ protected:
 
 public:
 
-	HelpDialog(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(600, 350), long style = wxDEFAULT_DIALOG_STYLE);
+	HelpDialog(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(620, 350), long style = wxDEFAULT_DIALOG_STYLE);
 	~HelpDialog();
 
 };
