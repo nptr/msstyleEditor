@@ -23,6 +23,7 @@ wxPGProperty* GetWXPropertyFromMsStyleProperty(StyleProperty& prop)
 	switch (prop.header.typeID)
 	{
 	case IDENTIFIER::FILENAME:
+	case IDENTIFIER::FILENAME_LITE:
 	case IDENTIFIER::DISKSTREAM:
 	{
 		wxIntProperty* p = new wxIntProperty(propName, *wxPGProperty::sm_wxPG_LABEL, prop.GetResourceID());
@@ -60,6 +61,7 @@ wxPGProperty* GetWXPropertyFromMsStyleProperty(StyleProperty& prop)
 		return p;
 	}
 	case IDENTIFIER::INT:
+	case IDENTIFIER::UNKNOWN_241:
 	{
 		wxIntProperty* p = new wxIntProperty(propName, *wxPGProperty::sm_wxPG_LABEL, prop.data.inttype.value);
 		p->SetClientData(&prop);

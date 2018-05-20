@@ -59,7 +59,7 @@ namespace libmsstyle
 		COLORLIST = 240,	// Win10 aerolite	
 		UNKNOWN_241 = 241,	// Win10
 		UNKNOWN_242 = 242,	// Win10 - never encountered
-		UNKNOWN_243 = 243,	// Win10 aerolite - some id??
+		FILENAME_LITE = 243,	// Win10 aerolite - some id??
 		COLORSCHEMES = 401,
 		SIZES = 402,
 		CHARSET = 403,
@@ -293,7 +293,10 @@ namespace libmsstyle
 		UNKNOWN_5112 = 5112,
 		UNKNOWN_5128 = 5128,
 		UNKNOWN_5129 = 5129,
-		UNKNOWN_5130 = 5130, // Win10 end
+		UNKNOWN_5130 = 5130,
+		IMAGEFILE1_LITE = 5144,
+		IMAGEFILE2_LITE = 5145,
+		IMAGEFILE3_LITE = 5146, // Win10 end
 		TRANSITIONDURATIONS = 6000,
 		SCALEDBACKGROUND = 7001,
 		ATLASIMAGE = 8000,

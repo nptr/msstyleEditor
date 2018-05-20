@@ -67,9 +67,9 @@ namespace libmsstyle
 			} break;
 			// 32 bytes - padding included
 			case IDENTIFIER::FILENAME:
+			case IDENTIFIER::FILENAME_LITE:
 			case IDENTIFIER::DISKSTREAM:
 			case IDENTIFIER::FONT:
-			case IDENTIFIER::UNKNOWN_243:
 			// 40 bytes - padding included
 			case IDENTIFIER::INT:
 			case IDENTIFIER::SIZE:

@@ -15,7 +15,7 @@ namespace libmsstyle
 
 	extern const PartMap PARTS_ADDRESSBAND[2];
 
-	extern const PartMap PARTS_BUTTON[8];
+	extern const PartMap PARTS_BUTTON[11];
 
 	extern const PartMap PARTS_COMBOBOX[9];
 

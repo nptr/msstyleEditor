@@ -162,6 +162,11 @@ namespace libmsstyle
 		data.inttype.value = intVal;
 	}
 
+	void StyleProperty::UpdateIntegerUnchecked(int intVal)
+	{
+		data.inttype.value = intVal;
+	}
+
 	void StyleProperty::UpdateSize(int size)
 	{
 		assert(header.typeID == IDENTIFIER::SIZE);
@@ -241,6 +246,7 @@ namespace libmsstyle
 			return WideToUTF8(text);
 		} break;
 		case IDENTIFIER::INT:
+		case IDENTIFIER::UNKNOWN_241: // if it looks like an int, and behaves like an in, it is an int
 		{
 			return std::to_string(data.inttype.value);
 		} break;

@@ -267,7 +267,8 @@ namespace libmsstyle
 		{
 			Resource r;
 
-			if (prop.GetTypeID() == IDENTIFIER::FILENAME)
+			if (prop.GetTypeID() == IDENTIFIER::FILENAME ||
+				prop.GetTypeID() == IDENTIFIER::FILENAME_LITE)
 			{
 				r = libmsstyle::GetResource(m_moduleHandle, prop.header.shortFlag, "IMAGE");
 				return StyleResource(r.data, r.size, prop.header.nameID, StyleResourceType::IMAGE);

@@ -353,7 +353,8 @@ void MainWindow::OnClassViewTreeSelChanged(wxTreeEvent& event)
 		
 		// Update UI
 		StyleResourceType type;
-		if (selectedImageProp->GetTypeID() == IDENTIFIER::FILENAME)
+		if (selectedImageProp->GetTypeID() == IDENTIFIER::FILENAME ||
+			selectedImageProp->GetTypeID() == IDENTIFIER::FILENAME_LITE)
 			type = StyleResourceType::IMAGE;
 		else if (selectedImageProp->GetTypeID() == IDENTIFIER::DISKSTREAM)
 			type = StyleResourceType::ATLAS;
@@ -439,6 +440,8 @@ void MainWindow::OnPropertyGridChanging(wxPropertyGridEvent& event)
 	} break;
 	case IDENTIFIER::FONT:
 		styleProp->UpdateFont(event.GetValidationInfo().GetValue().GetInteger()); break;
+	case IDENTIFIER::UNKNOWN_241:
+		styleProp->UpdateIntegerUnchecked(event.GetValidationInfo().GetValue().GetInteger()); break;
 	default:
 	{
 		char msg[100];
@@ -498,6 +501,7 @@ void MainWindow::OnPropertyGridItemDelete(wxCommandEvent& event)
 
 	StyleProperty* prop = static_cast<StyleProperty*>(wxprop->GetClientData());
 	if (prop->GetTypeID() == IDENTIFIER::FILENAME ||
+		prop->GetTypeID() == IDENTIFIER::FILENAME_LITE ||
 		prop->GetTypeID() == IDENTIFIER::DISKSTREAM)
 	{
 		wxMessageBox("Cannot remove image properties yet!", "Remove Property", wxICON_INFORMATION);
@@ -560,6 +564,7 @@ void MainWindow::OnImageReplaceClicked(wxCommandEvent& event)
 	switch (selectedImageProp->GetTypeID())
 	{
 	case IDENTIFIER::FILENAME:
+	case IDENTIFIER::FILENAME_LITE:
 		tp = StyleResourceType::IMAGE; break;
 	case IDENTIFIER::DISKSTREAM:
 		tp = StyleResourceType::ATLAS; break;
@@ -1006,7 +1011,9 @@ void MainWindow::FillClassView()
 				for (auto& prop : state.second)
 				{
 					// Add images
-					if (prop->header.typeID == IDENTIFIER::FILENAME || prop->header.typeID == IDENTIFIER::DISKSTREAM)
+					if (prop->header.typeID == IDENTIFIER::FILENAME || 
+						prop->header.typeID == IDENTIFIER::FILENAME_LITE ||
+						prop->header.typeID == IDENTIFIER::DISKSTREAM)
 					{
 						const char* propName = prop->LookupName(); // propnames have to be looked up, but thats fast
 						classView->AppendItem(partNode, propName, -1, -1, static_cast<wxTreeItemData*>(new PropTreeItemData(prop)));

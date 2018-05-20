@@ -115,6 +115,7 @@ namespace libmsstyle
 
 		void UpdateImageLink(int imageID);
 		void UpdateInteger(int intVal);
+		void UpdateIntegerUnchecked(int intVal);
 		void UpdateSize(int size);
 		void UpdateEnum(int enumVal);
 		void UpdateBoolean(bool boolVal);

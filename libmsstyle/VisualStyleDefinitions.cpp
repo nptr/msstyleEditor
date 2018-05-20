@@ -29,11 +29,11 @@ namespace libmsstyle
 		{ 215, { "BITMAPREF", 215, "" } },
 		{ 216, { "FLOAT", 216, "" } },
 		{ 217, { "FLOATLIST", 217, "" } },
-
+		
 		{ 240, { "COLORLIST", 240, "" } },
-		{ 241, { "UNKNOWN_241", 241, "" } },
+		{ 241, { "UNKNOWN_241", 241, "" } }, // integer-like
 		{ 242, { "UNKNOWN_242", 242, "" } },
-		{ 243, { "UNKNOWN_243", 243, "" } }, // some id property
+		{ 243, { "FILENAME_LITE", 243, "" } }, // some id property
 
 		// STRING
 		{ 401, { "COLORSCHEMES", 201, "" } }, // begin propery names
@@ -293,11 +293,32 @@ namespace libmsstyle
 		{ 5100, { "UNKNOWN_5100_COLORLIST", 240, "" } },
 		{ 5101, { "UNKNOWN_5101_COLORLIST", 240, "" } },
 		{ 5102, { "UNKNOWN_5102_ENUM", 200, "" } },
+		{ 5103, { "UNKNOWN_5103_COLORLIST", 240, "" } },
+		{ 5104, { "UNKNOWN_5104_?", 0, "" } },
+		{ 5105, { "UNKNOWN_5105_COLORLIST", 240, "" } },
+		{ 5106, { "UNKNOWN_5106_?", 0, "" } },
+		{ 5107, { "UNKNOWN_5107_MARGINS", 205, "" } },
+		{ 5108, { "UNKNOWN_5108_?", 0, "" } },
+		{ 5109, { "UNKNOWN_5109_?", 0, "" } },
+		{ 5110, { "UNKNOWN_5110_?", 241, "" } },
 		{ 5111, { "UNKNOWN_5111_?", 241, "" } },
 		{ 5112, { "UNKNOWN_5112_?", 241, "" } },
+		{ 5113, { "UNKNOWN_5113_?", 241, "" } },
+		{ 5114, { "UNKNOWN_5114_?", 241, "" } },
+		{ 5115, { "UNKNOWN_5115_?", 241, "" } },
+		{ 5116, { "UNKNOWN_5116_?", 241, "" } },
+		{ 5117, { "UNKNOWN_5117_?", 241, "" } },
+		{ 5118, { "UNKNOWN_5118_?", 241, "" } },
+		{ 5119, { "UNKNOWN_5119_?", 241, "" } },
+		{ 5120, { "UNKNOWN_5120_?", 241, "" } },
+		{ 5121, { "UNKNOWN_5121_?", 241, "" } },
+		{ 5122, { "UNKNOWN_5122_?", 241, "" } },
 		{ 5128, { "UNKNOWN_5128_INT", 202, "" } },
 		{ 5129, { "UNKNOWN_5129_INT", 202, "" } },
 		{ 5130, { "UNKNOWN_5130_INT", 202, "" } },
+		{ 5144, { "IMAGEFILE1_LITE", 243, "" } },
+		{ 5145, { "IMAGEFILE2_LITE", 243, "" } },
+		{ 5146, { "IMAGEFILE3_LITE", 243, "" } },
 		// INTLIST
 		{ 6000, { "TRANSITIONDURATIONS", 211, "" } },
 		// BOOL
