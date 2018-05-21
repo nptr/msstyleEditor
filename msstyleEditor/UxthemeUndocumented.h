@@ -13,7 +13,7 @@ namespace uxtheme
 	// sizeName: eg. "NormalSize"
 	// unknownflags: 0 works fine
 	// Can open the aero.msstyles just fine, but fails on custom themes
-	typedef HRESULT(WINAPI *OpenThemeFilePtr)(LPCWSTR themeFile, LPCWSTR colorName, LPCWSTR sizeName, HANDLE* hThemeFile, int unknownflags);
+	typedef HRESULT(WINAPI *OpenThemeFilePtr)(LPCWSTR themeFile, LPCWSTR colorName, LPCWSTR sizeName, HANDLE* hThemeFile, DWORD unknownFlags);
 
 	// Ordinal 3
 	typedef HRESULT(WINAPI *CloseThemeFilePtr)(HANDLE hThemeFile);
@@ -22,7 +22,7 @@ namespace uxtheme
 	// Ordinal 16
 	typedef HTHEME(WINAPI *OpenThemeDataFromFilePtr)(HANDLE hThemeFile, HWND hwnd, LPCWSTR pszClassList, DWORD flags);
 	// Ordinal 65
-	typedef HRESULT(WINAPI *SetSystemThemePtr)(LPCWSTR themeFile, LPCWSTR colorName, LPCWSTR sizeName, int unknownflags);
+	typedef HRESULT(WINAPI *SetSystemThemePtr)(LPCWSTR themeFile, LPCWSTR colorName, LPCWSTR sizeName, DWORD unknownFlags);
 	// Ordinal 94 - exported by name as well
 	typedef HRESULT(WINAPI *GetCurrentThemeNamePtr)(LPWSTR themeFile, int maxNameChars,
 													LPWSTR colorName, int maxColorChars,

@@ -117,7 +117,9 @@ void AddPropertyDialog::OnTypeSelectionChanged(wxCommandEvent& event)
 	int typeId = typeIdArray[selectedIndex];
 	for (auto& it = PROPERTY_INFO_MAP.begin(); it != PROPERTY_INFO_MAP.end(); ++it)
 	{
-		if (typeId == it->second.type)
+		// Select all properties matching our type, but not the entry of the type itself
+		if (typeId == it->second.type &&
+			typeId != it->first)
 		{
 			propBox->Append(it->second.name, new wxPropertyClientData(it->first, it->second));
 		}

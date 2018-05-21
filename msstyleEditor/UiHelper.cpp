@@ -14,11 +14,31 @@
 
 using namespace libmsstyle;
 
+wxPGProperty* GetWXPropertySpecialProps(StyleProperty& prop)
+{
+	if (prop.GetNameID() == IDENTIFIER::COLORIZATIONCOLOR)
+	{
+		// ARGB -> wxColor(R,G,B,A)
+		wxColor col((prop.data.inttype.value >> 16) & 0xFF,
+			(prop.data.inttype.value >> 8) & 0xFF,
+			(prop.data.inttype.value >> 0) & 0xFF,
+			(prop.data.inttype.value >> 24) & 0xFF);
+
+		wxColourProperty* p = new wxColourProperty(prop.LookupName(), *wxPGProperty::sm_wxPG_LABEL, col);
+		p->SetClientData(&prop);
+		return p;
+	}
+	else return nullptr;
+}
 
 wxPGProperty* GetWXPropertyFromMsStyleProperty(StyleProperty& prop)
 {
 	char str[64];
 	const char* propName = prop.LookupName();
+
+	wxPGProperty* special = GetWXPropertySpecialProps(prop);
+	if (special != nullptr)
+		return special;
 
 	switch (prop.header.typeID)
 	{

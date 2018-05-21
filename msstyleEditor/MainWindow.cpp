@@ -388,6 +388,17 @@ void MainWindow::OnPropertyGridChanging(wxPropertyGridEvent& event)
 	if (!styleProp)
 		return;
 
+	// COLORIZATIONCOLOR is internally an integer...
+	if (styleProp->GetNameID() == IDENTIFIER::COLORIZATIONCOLOR)
+	{
+		wxAny value = event.GetValidationInfo().GetValue();
+		wxColor color = value.As<wxColour>();
+
+		int colargb = color.Alpha() << 24 | color.Red() << 16 | color.Green() << 8 | color.Blue();
+		styleProp->UpdateIntegerUnchecked(colargb);
+		return;
+	}
+
 	switch (styleProp->header.typeID)
 	{
 	case IDENTIFIER::FILENAME:
