@@ -13,7 +13,6 @@ namespace libmsstyle
 			enum Result
 			{
 				Ok,
-				End,
 				SkippedBytes,
 				UnknownType,
 				BadProperty
@@ -23,18 +22,16 @@ namespace libmsstyle
 
 			//
 			// Tries to read a property beginning at "src".
-			// Returns:
-			// - Ok: read a property
-			// - End: reached the end. "out_prop" is not valid!
-			// - SkippedBytes: At "src" was no property.
-			//				   "out_prop" is not valid
-			//				   "out_next" should be the next property
-			// - UnknownProp:  Property at "src" was unknown.
-			//				   "src" < "out_next"
-			//				   "out_prop" is not valid
+			// Returns: pointer to the next location to read from
+			// Result:
+			// - Ok: read a property. "prop" is valid
+			// - End: reached the end. "prop" is not valid!
+			// - SkippedBytes: At "src" was no property. Had to skip more than 4 bytes.
+			//				   "prop" is not valid
+			// - UnknownType:  Property type at "src" was unknown.
+			//				   "prop" header may be valid. data not!
 			// - BadProperty:  Property at "src" was invalid.
-			//				   "src" < "out_next"
-			//				   "out_prop" is not valid
+			//					"prop" header may be valid.data not!
 			const char* ReadNextProperty(const char* src, Result& result, StyleProperty* prop);
 
 			// Does a few range and sanity checks to see if the data could 
@@ -43,7 +40,6 @@ namespace libmsstyle
 			bool IsProbablyValidHeader(const char* source);
 
 		private:
-			char m_textbuffer[64];
 			int m_numClasses;
 		};
 	}

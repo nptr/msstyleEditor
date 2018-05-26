@@ -141,7 +141,7 @@
     <ClInclude Include="PropertyReader.h" />
     <ClInclude Include="PropertyWriter.h" />
     <ClInclude Include="ResourceUtil.h" />
-    <ClInclude Include="StringConvert.h" />
+    <ClInclude Include="StringUtil.h" />
     <ClInclude Include="StyleClass.h" />
     <ClInclude Include="StylePart.h" />
     <ClInclude Include="StyleProperty.h" />
@@ -158,6 +158,7 @@
     <ClCompile Include="PropertyReader.cpp" />
     <ClCompile Include="PropertyWriter.cpp" />
     <ClCompile Include="ResourceUtil.cpp" />
+    <ClCompile Include="StringUtil.cpp" />
     <ClCompile Include="StyleClass.cpp" />
     <ClCompile Include="StylePart.cpp" />
     <ClCompile Include="StyleProperty.cpp" />

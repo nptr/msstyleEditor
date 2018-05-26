@@ -21,7 +21,7 @@ namespace libmsstyle
 
 
 	#pragma pack(push, 1)
-	union PropertyData		// Offset: 20, Size: 20
+	union PropertyData
 	{
 		struct
 		{
@@ -70,7 +70,7 @@ namespace libmsstyle
 			int32_t numInts;
 			int32_t firstInt;
 		}intlist;
-		struct // Type 240, analog to INTLIST?
+		struct // Type 240
 		{
 			int32_t firstColorBGR;	// first BGR color, probably a COLORREF -> 0x00bbggrr
 		}colorlist;

@@ -1,5 +1,5 @@
 #include "VisualStyle.h"
-#include "StringConvert.h"
+#include "StringUtil.h"
 
 #include "VisualStyleEnums.h"
 #include "VisualStyleParts.h"
@@ -12,7 +12,11 @@
 #include <string.h>
 #include <fstream>
 #include <algorithm>
+#include <cstdarg>
+
+#ifndef NDEBUG
 #include <Windows.h>
+#endif
 
 using namespace libmsstyle;
 
@@ -81,14 +85,16 @@ namespace libmsstyle
 
 		void Log(const char* format, ...)
 		{
+#ifndef NDEBUG
 			char textbuffer[100];
 
 			va_list args;
 			va_start(args, format);
-			vsnprintf(textbuffer, 64, format, args);
+			vsnprintf(textbuffer, 99, format, args);
 			va_end(args);
 
 			OutputDebugStringA(textbuffer);
+#endif
 		}
 
 		StyleClass* GetClass(int index)
@@ -127,8 +133,10 @@ namespace libmsstyle
 				std::streampos size = newImg.tellg();
 				newImg.seekg(0, std::ios::beg);
 
-				if (size > UINT32_MAX)
-					throw std::runtime_error("Replacement file is to big!");
+				if (size < 0)
+				{
+					throw std::runtime_error("tellg() failed!");
+				}
 
 				char* imgBuffer = new char[size];
 				newImg.read(imgBuffer, size);
@@ -149,9 +157,8 @@ namespace libmsstyle
 				}
 
 				bool success = libmsstyle::UpdateStyleResource(updateHandle, resName,
-					resource.first.GetNameID(),
-					imgBuffer,
-					size); 
+					resource.first.GetNameID(), imgBuffer,
+					static_cast<unsigned int>(size));
 				if (!success)
 				{
 					throw std::runtime_error("Could not update IMAGE/STREAM resource!");
@@ -246,21 +253,10 @@ namespace libmsstyle
 			int updateError = libmsstyle::EndUpdate(updHandle);
 			if (updateError)
 			{
-				char message[64];
-				sprintf(message, "Could not write the changes to the file! ErrorCode: %d", updateError);
-				throw std::runtime_error(message);
+				std::string msg = format_string("Could not write the changes to the file! ErrorCode: %d", updateError);
+				throw std::runtime_error(msg);
 				return;
 			}
-		}
-
-		Platform GetCompatiblePlatform() const
-		{
-			return m_stylePlatform;
-		}
-
-		std::string GetPath() const
-		{
-			return m_stylePath;
 		}
 
 		StyleResource GetResourceFromProperty(const StyleProperty& prop)
@@ -295,7 +291,7 @@ namespace libmsstyle
 		}
 
 
-		void QueueResourceUpdate(int nameId, StyleResourceType type, std::string pathToNew)
+		void QueueResourceUpdate(int nameId, StyleResourceType type, const std::string& pathToNew)
 		{
 			StyleResource key(nullptr, 0, nameId, type);
 			m_resourceUpdates[key] = pathToNew;
@@ -369,12 +365,9 @@ namespace libmsstyle
 					delete tmpProp;
 					continue;
 				case rw::PropertyReader::BadProperty:
-					sprintf(txtBuffer,"Bad property [N: %d, T: %d] @ 0x%08x\r\n", tmpProp->header.nameID, tmpProp->header.typeID, current - start);
+					sprintf(txtBuffer, "Bad property [N: %d, T: %d] @ 0x%08x\r\n", tmpProp->header.nameID, tmpProp->header.typeID, current - start);
 					delete tmpProp;
 					throw std::runtime_error(txtBuffer);
-					return;
-				case rw::PropertyReader::End:
-					delete tmpProp;
 					return;
 				default:
 					throw std::runtime_error("ReadNextProperty(). Unknown result. Should never happen.");
@@ -409,9 +402,7 @@ namespace libmsstyle
 					}
 					else
 					{
-						char txt[32];
-						sprintf(txt, "Part %d", tmpProp->header.partID);
-						newPart.partName = std::string(txt);
+						newPart.partName = format_string("Part %d", tmpProp->header.partID);
 					}
 
 					part = cls->AddPart(newPart);
@@ -439,9 +430,7 @@ namespace libmsstyle
 						}
 						else
 						{
-							char txt[32];
-							sprintf(txt, "State %d", tmpProp->header.stateID);
-							newState.stateName = std::string(txt);
+							newState.stateName = format_string("State %d", tmpProp->header.stateID);
 						}
 					}
 
@@ -514,7 +503,7 @@ namespace libmsstyle
 
 	Platform VisualStyle::GetCompatiblePlatform() const
 	{
-		return impl->GetCompatiblePlatform();
+		return impl->m_stylePlatform;
 	}
 
 	int VisualStyle::GetPropertyCount() const
@@ -537,9 +526,9 @@ namespace libmsstyle
 		return impl->QueueResourceUpdate(nameId, type, newResource);
 	}
 
-	std::string VisualStyle::GetPath() const
+	const std::string& VisualStyle::GetPath() const
 	{
-		return impl->GetPath();
+		return impl->m_stylePath;
 	}
 
 	void VisualStyle::Load(const std::string& path)

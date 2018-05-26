@@ -1,6 +1,6 @@
 #include "StyleProperty.h"
 #include "VisualStyleDefinitions.h"
-#include "StringConvert.h"
+#include "StringUtil.h"
 #include "Lookup.h"
 
 #include <string.h>
@@ -231,7 +231,6 @@ namespace libmsstyle
 
 	std::string StyleProperty::GetValueAsString() const
 	{
-		char textbuffer[64];
 		switch (header.typeID)
 		{
 		case IDENTIFIER::ENUM:
@@ -258,13 +257,11 @@ namespace libmsstyle
 		} break;
 		case IDENTIFIER::COLOR:
 		{
-			sprintf(textbuffer, "%d, %d, %d", data.colortype.r, data.colortype.g, data.colortype.b);
-			return std::string(textbuffer);
+			return format_string("%d, %d, %d", data.colortype.r, data.colortype.g, data.colortype.b);
 		} break;
 		case IDENTIFIER::MARGINS:
 		{
-			sprintf(textbuffer, "%d, %d, %d, %d", data.margintype.left, data.margintype.top, data.margintype.right, data.margintype.bottom);
-			return std::string(textbuffer);
+			return format_string("%d, %d, %d, %d", data.margintype.left, data.margintype.top, data.margintype.right, data.margintype.bottom);
 		} break;
 		case IDENTIFIER::FILENAME:
 		case IDENTIFIER::DISKSTREAM:
@@ -277,13 +274,11 @@ namespace libmsstyle
 		} break;
 		case IDENTIFIER::POSITION:
 		{
-			sprintf(textbuffer, "%d, %d", data.positiontype.x, data.positiontype.y);
-			return std::string(textbuffer);
+			return format_string("%d, %d", data.positiontype.x, data.positiontype.y);
 		} break;
 		case IDENTIFIER::RECT:
 		{
-			sprintf(textbuffer, "%d, %d, %d, %d", data.recttype.left, data.recttype.top, data.recttype.right, data.recttype.bottom);
-			return std::string(textbuffer);
+			return format_string("%d, %d, %d, %d", data.recttype.left, data.recttype.top, data.recttype.right, data.recttype.bottom);
 		} break;
 		case IDENTIFIER::FONT:
 		{
@@ -293,13 +288,12 @@ namespace libmsstyle
 		{
 			if (data.intlist.numInts >= 3)
 			{
-				sprintf(textbuffer, "Len: %d, Values: %d, %d, %d, ...", data.intlist.numInts
+				return format_string("Len: %d, Values: %d, %d, %d, ...", data.intlist.numInts
 					, *(&data.intlist.firstInt + 0)
 					, *(&data.intlist.firstInt + 1)
 					, *(&data.intlist.firstInt + 2));
 			}
-			else sprintf(textbuffer, "Len: %d, Values omitted", data.intlist.numInts);
-			return std::string(textbuffer);
+			else return format_string("Len: %d, Values omitted", data.intlist.numInts);
 		} break;
 		default:
 		{
@@ -314,8 +308,6 @@ namespace libmsstyle
 		this->header.nameID = ident;
 		this->header.typeID = type;
 
-		// Initialize fields with values which purpose i don't know yet.
-		// They are required, otherwise windows rejects the style.
 		switch (type)
 		{
 		case libmsstyle::DIBDATA:

@@ -39,7 +39,7 @@ namespace libmsstyle
 
 		int GetPropertyCount() const;
 		Platform GetCompatiblePlatform() const;
-		std::string GetPath() const;
+		const std::string& GetPath() const;
 
 		std::string GetQueuedResourceUpdate(int nameId, StyleResourceType type);
 		void QueueResourceUpdate(int nameId, StyleResourceType type, const std::string& pathToNew);

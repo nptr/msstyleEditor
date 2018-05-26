@@ -4,6 +4,8 @@
 #include "VisualStyleParts.h"
 #include "VisualStyleStates.h"
 
+#include "StringUtil.h"
+
 #define MSSTYLE_ARRAY_LENGTH(name) (sizeof(name) / sizeof(name[0]))
 
 namespace libmsstyle
@@ -335,14 +337,10 @@ namespace libmsstyle
 		// TODO: get real data from the XX.msstyles.mui file
 		std::string FindFontName(int fontID)
 		{
-			char txtbuffer[64];
-
 			auto ret = libmsstyle::FONT_MAP.find(fontID);
 			if (ret != libmsstyle::FONT_MAP.end())
-				sprintf(txtbuffer, "%s (%d)", ret->second, fontID);
-			else sprintf(txtbuffer, "UNKNOWN (%d)", fontID);
-			
-			return std::string(txtbuffer);
+				return format_string("%s (%d)", ret->second, fontID);
+			else return format_string("UNKNOWN (%d)", fontID);
 		}
 	}
 }

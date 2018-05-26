@@ -12,7 +12,6 @@
     <ClInclude Include="StylePart.h" />
     <ClInclude Include="StyleState.h" />
     <ClInclude Include="VisualStyle.h" />
-    <ClInclude Include="StringConvert.h" />
     <ClInclude Include="VisualStyleEnums.h" />
     <ClInclude Include="VisualStyleParts.h" />
     <ClInclude Include="VisualStyleStates.h" />
@@ -22,6 +21,7 @@
     <ClInclude Include="PropertyReader.h" />
     <ClInclude Include="PropertyWriter.h" />
     <ClInclude Include="StyleProperty.h" />
+    <ClInclude Include="StringUtil.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ResourceUtil.cpp" />
@@ -38,5 +38,6 @@
     <ClCompile Include="PropertyReader.cpp" />
     <ClCompile Include="PropertyWriter.cpp" />
     <ClCompile Include="StyleProperty.cpp" />
+    <ClCompile Include="StringUtil.cpp" />
   </ItemGroup>
 </Project>

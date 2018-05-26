@@ -31,7 +31,7 @@ Note: Versions prior to 1.3.0.0 required the [Microsoft Visual C++ Redistributab
 
 ## Visual Style Structure
 
-Understanding of the logical structure of visual styles is helpful when using this program. Fortunately its quite simple, so the figure blow should give you the basic understanding required.
+Understanding of the logical structure of visual styles is helpful when using this program. Fortunately its quite simple, so the figure below should give you the basic understanding required.
 ```bash
 ├─ Class 1 (e.g. Button, Window)
 │   └─ Part 1 (e.g. Pushbutton, Left Frame)

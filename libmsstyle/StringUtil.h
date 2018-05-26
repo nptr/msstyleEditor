@@ -16,3 +16,4 @@ inline static std::wstring UTF8ToWide(const std::string& str)
 	return convert.from_bytes(str);
 }
 
+std::string format_string(const char* format, ...);

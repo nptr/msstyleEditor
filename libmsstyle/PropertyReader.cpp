@@ -4,8 +4,6 @@
 
 #include <algorithm>
 
-#undef min
-
 namespace libmsstyle
 {
 	namespace rw

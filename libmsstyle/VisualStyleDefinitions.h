@@ -56,10 +56,10 @@ namespace libmsstyle
 		BITMAPREF = 215,
 		FLOAT = 216,
 		FLOATLIST = 217,
-		COLORLIST = 240,	// Win10 aerolite	
-		UNKNOWN_241 = 241,	// Win10
-		UNKNOWN_242 = 242,	// Win10 - never encountered
-		FILENAME_LITE = 243,	// Win10 aerolite - some id??
+		COLORLIST = 240,		// Win10 aerolite	
+		UNKNOWN_241 = 241,		// Win10
+		UNKNOWN_242 = 242,		// Win10
+		FILENAME_LITE = 243,	// Win10 aerolite
 		COLORSCHEMES = 401,
 		SIZES = 402,
 		CHARSET = 403,
