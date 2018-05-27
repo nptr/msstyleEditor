@@ -15,13 +15,23 @@ namespace libmsstyle
 
 	extern const PartMap PARTS_ADDRESSBAND[2];
 
+	extern const PartMap PARTS_BREADCRUMBBAR[2];
+
 	extern const PartMap PARTS_BUTTON[11];
+
+	extern const PartMap PARTS_COMMANDMODULE[13];
 
 	extern const PartMap PARTS_COMBOBOX[9];
 
 	extern const PartMap PARTS_CONTROLPANEL[20];
 
+	extern const PartMap PARTS_EMPTYMARKUP[2];
+
 	extern const PartMap PARTS_EXPLORERBAR[13];
+
+	extern const PartMap PARTS_INFOBAR[2];
+
+	extern const PartMap PARTS_ITEMSVIEW[6];
 
 	extern const PartMap PARTS_LISTBOX[6];
 
@@ -30,6 +40,8 @@ namespace libmsstyle
 	extern const PartMap PARTS_LINK[2];
 
 	extern const PartMap PARTS_MENU[21];
+
+	extern const PartMap PARTS_NAVIGATION[4];
 
 	extern const PartMap PARTS_TREEVIEW[5];
 
@@ -46,11 +58,17 @@ namespace libmsstyle
 
 	extern const PartMap PARTS_HEADER[8];
 
+	extern const PartMap PARTS_READINGPANE[3];
+
 	extern const PartMap PARTS_REBAR[9];
 
 	extern const PartMap PARTS_AEROWIZARD[6];
 
 	extern const PartMap PARTS_PROGRESS[13];
+
+	extern const PartMap PARTS_PROPERTREE[3];
+
+	extern const PartMap PARTS_PREVIEWPANE[10];
 
 	extern const PartMap PARTS_TRACKBAR[11];
 
@@ -64,7 +82,15 @@ namespace libmsstyle
 
 	extern const PartMap PARTS_TASKBAND2[15];
 
+	extern const PartMap PARTS_TASKBANDEXUI[14];
+
 	extern const PartMap PARTS_TEXTSTYLE[10];
+
+	extern const PartMap PARTS_TRYHARDER[3];
+
+	extern const PartMap PARTS_SEARCHBOX[2];
+
+	extern const PartMap PARTS_SEARCHHOME[3];
 
 	extern const PartMap PARTS_SPIN[5];
 

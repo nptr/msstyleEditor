@@ -107,6 +107,11 @@ namespace libmsstyle
 				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_TOOLBAR);
 				m.parts = PARTS_TOOLBAR;
 			}
+			else if (strstr(className, "::Header")) // match inherited..
+			{
+				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_HEADER);
+				m.parts = PARTS_HEADER;
+			}
 			else if (strstr(className, "Button"))
 			{
 				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_BUTTON);
@@ -122,12 +127,27 @@ namespace libmsstyle
 				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_ADDRESSBAND);
 				m.parts = PARTS_ADDRESSBAND;
 			}
+			else if (strstr(className, "BreadcrumbBar"))
+			{
+				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_BREADCRUMBBAR);
+				m.parts = PARTS_BREADCRUMBBAR;
+			}
+			else if (strstr(className, "ReadingPane"))
+			{
+				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_READINGPANE);
+				m.parts = PARTS_READINGPANE;
+			}
 			else if (strstr(className, "Rebar"))
 			{
 				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_REBAR);
 				m.parts = PARTS_REBAR;
 			}
-			else if (strstr(className, "Combobox"))
+			else if (strstr(className, "CommandModule"))
+			{
+				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_COMMANDMODULE);
+				m.parts = PARTS_COMMANDMODULE;
+			}
+			else if (strstr(className, "Combobox") || strstr(className, "ComboBox"))
 			{
 				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_COMBOBOX);
 				m.parts = PARTS_COMBOBOX;
@@ -136,6 +156,11 @@ namespace libmsstyle
 			{
 				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_CONTROLPANEL);
 				m.parts = PARTS_CONTROLPANEL;
+			}
+			else if (strstr(className, "EmptyMarkup"))
+			{
+				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_EMPTYMARKUP);
+				m.parts = PARTS_EMPTYMARKUP;
 			}
 			else if (strstr(className, "ExplorerBar"))
 			{
@@ -152,6 +177,16 @@ namespace libmsstyle
 				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_LISTVIEW);
 				m.parts = PARTS_LISTVIEW;
 			}
+			else if (strstr(className, "InfoBar"))
+			{
+				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_INFOBAR);
+				m.parts = PARTS_INFOBAR;
+			}
+			else if (strstr(className, "ItemsView")) // after listview since it inherits..
+			{
+				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_ITEMSVIEW);
+				m.parts = PARTS_ITEMSVIEW;
+			}
 			else if (strstr(className, "Link"))
 			{
 				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_LINK);
@@ -161,6 +196,11 @@ namespace libmsstyle
 			{
 				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_MENU);
 				m.parts = PARTS_MENU;
+			}
+			else if (strstr(className, "Navigation"))
+			{
+				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_NAVIGATION);
+				m.parts = PARTS_NAVIGATION;
 			}
 			else if (strstr(className, "TreeView"))
 			{
@@ -217,6 +257,16 @@ namespace libmsstyle
 				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_PROGRESS);
 				m.parts = PARTS_PROGRESS;
 			}
+			else if (strstr(className, "ProperTree"))
+			{
+				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_PROPERTREE);
+				m.parts = PARTS_PROPERTREE;
+			}
+			else if (strstr(className, "PreviewPane"))
+			{
+				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_PREVIEWPANE);
+				m.parts = PARTS_PREVIEWPANE;
+			}
 			else if (strstr(className, "TrackBar"))
 			{
 				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_TRACKBAR);
@@ -242,6 +292,21 @@ namespace libmsstyle
 				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_TEXTSTYLE);
 				m.parts = PARTS_TEXTSTYLE;
 			}
+			else if (strstr(className, "TryHarder"))
+			{
+				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_TRYHARDER);
+				m.parts = PARTS_TRYHARDER;
+			}
+			else if (strstr(className, "SearchBox") || strstr(className, "Searchbox")) // matches HelpSearchBox as well, thats ok
+			{
+				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_SEARCHBOX);
+				m.parts = PARTS_SEARCHBOX;
+			}
+			else if (strstr(className, "SearchHome"))
+			{
+				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_SEARCHHOME);
+				m.parts = PARTS_SEARCHHOME;
+			}
 			else if (strstr(className, "Spin"))
 			{
 				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_SPIN);
@@ -256,6 +321,11 @@ namespace libmsstyle
 			{
 				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_STATUS);
 				m.parts = PARTS_STATUS;
+			}
+			else if (strstr(className, "TaskbandExtendedUI"))
+			{
+				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_TASKBANDEXUI);
+				m.parts = PARTS_TASKBANDEXUI;
 			}
 			else if (strstr(className, "TaskBand2"))
 			{
