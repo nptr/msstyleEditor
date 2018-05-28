@@ -407,6 +407,7 @@ void MainWindow::OnPropertyGridChanging(wxPropertyGridEvent& event)
 		styleProp->UpdateInteger(event.GetValidationInfo().GetValue().GetInteger()); break;
 	case IDENTIFIER::SIZE:
 		styleProp->UpdateSize(event.GetValidationInfo().GetValue().GetInteger()); break;
+	case IDENTIFIER::HIGHCONTRASTCOLORTYPE:
 	case IDENTIFIER::ENUM:
 		styleProp->UpdateEnum(event.GetValidationInfo().GetValue().GetInteger()); break;
 	case IDENTIFIER::BOOL:
@@ -451,8 +452,6 @@ void MainWindow::OnPropertyGridChanging(wxPropertyGridEvent& event)
 	} break;
 	case IDENTIFIER::FONT:
 		styleProp->UpdateFont(event.GetValidationInfo().GetValue().GetInteger()); break;
-	case IDENTIFIER::UNKNOWN_241:
-		styleProp->UpdateIntegerUnchecked(event.GetValidationInfo().GetValue().GetInteger()); break;
 	default:
 	{
 		char msg[100];

@@ -24,4 +24,6 @@ namespace libmsstyle
 	extern const EnumMap ENUM_IMAGESELECT[3];
 	extern const EnumMap ENUM_TRUESIZESCALING[3];
 	extern const EnumMap ENUM_GLYPHFONTSCALING[3];
+
+	extern const EnumMap ENUM_HIGHCONTRASTTYPE[13];
 }

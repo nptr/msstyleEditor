@@ -107,7 +107,7 @@ namespace libmsstyle
 			case IDENTIFIER::COLOR:
 			case IDENTIFIER::ENUM:
 			case IDENTIFIER::POSITION:
-			case IDENTIFIER::UNKNOWN_241:
+			case IDENTIFIER::HIGHCONTRASTCOLORTYPE:
 			// 48 bytes
 			case IDENTIFIER::RECT:
 			case IDENTIFIER::MARGINS:

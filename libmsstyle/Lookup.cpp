@@ -85,6 +85,12 @@ namespace libmsstyle
 				m.enums = (EnumMap*)&libmsstyle::ENUM_TRUESIZESCALING;
 				m.numEnums = MSSTYLE_ARRAY_LENGTH(libmsstyle::ENUM_TRUESIZESCALING);
 			}
+			else if (nameID >= IDENTIFIER::UNKNOWN_5110_HC &&
+					 nameID <= IDENTIFIER::UNKNOWN_5122_HC)
+			{
+				m.enums = (EnumMap*)&libmsstyle::ENUM_HIGHCONTRASTTYPE;
+				m.numEnums = MSSTYLE_ARRAY_LENGTH(libmsstyle::ENUM_HIGHCONTRASTTYPE);
+			}
 			else
 			{
 				m.numEnums = 0;
@@ -141,6 +147,11 @@ namespace libmsstyle
 			{
 				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_REBAR);
 				m.parts = PARTS_REBAR;
+			}
+			else if (strstr(className, "ChartView"))
+			{
+				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_CHARTVIEW);
+				m.parts = PARTS_CHARTVIEW;
 			}
 			else if (strstr(className, "CommandModule"))
 			{
@@ -207,6 +218,16 @@ namespace libmsstyle
 				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_TREEVIEW);
 				m.parts = PARTS_TREEVIEW;
 			}
+			else if (strstr(className, "DWMPen"))
+			{
+				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_DWMPEN);
+				m.parts = PARTS_DWMPEN;
+			}
+			else if (strstr(className, "DWMTouch"))
+			{
+				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_DWMTOUCH);
+				m.parts = PARTS_DWMTOUCH;
+			}
 			else if (strstr(className, "DWMWindow"))
 			{
 				switch (platform)
@@ -216,19 +237,21 @@ namespace libmsstyle
 					m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_DWMWINDOW_WIN7);
 					m.parts = PARTS_DWMWINDOW_WIN7;
 				} break;
-				// TODO: discover and use dedicated partlists
-				// for the respective platforms..
 				case Platform::WIN8:
 				case Platform::WIN81:
-				case Platform::WIN10:
 				{
 					m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_DWMWINDOW_WIN81);
 					m.parts = PARTS_DWMWINDOW_WIN81;
 				} break;
+				case Platform::WIN10:
+				{
+					m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_DWMWINDOW_WIN10);
+					m.parts = PARTS_DWMWINDOW_WIN10;
+				} break;
 				default:
 				{
-					m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_DWMWINDOW_WIN81);
-					m.parts = PARTS_DWMWINDOW_WIN81;
+					m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_DWMWINDOW_WIN10);
+					m.parts = PARTS_DWMWINDOW_WIN10;
 				} break;
 				}
 			}
@@ -336,6 +359,11 @@ namespace libmsstyle
 			{
 				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_TASKBAND);
 				m.parts = PARTS_TASKBAND;
+			}
+			else if (strstr(className, "TaskManager"))
+			{
+				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_TASKMANAGER);
+				m.parts = PARTS_TASKMANAGER;
 			}
 			else if (strstr(className, "Flyout"))
 			{

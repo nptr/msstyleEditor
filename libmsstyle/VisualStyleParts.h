@@ -19,6 +19,8 @@ namespace libmsstyle
 
 	extern const PartMap PARTS_BUTTON[11];
 
+	extern const PartMap PARTS_CHARTVIEW[43];
+
 	extern const PartMap PARTS_COMMANDMODULE[13];
 
 	extern const PartMap PARTS_COMBOBOX[9];
@@ -29,9 +31,9 @@ namespace libmsstyle
 
 	extern const PartMap PARTS_EXPLORERBAR[13];
 
-	extern const PartMap PARTS_INFOBAR[2];
+	extern const PartMap PARTS_INFOBAR[3];
 
-	extern const PartMap PARTS_ITEMSVIEW[6];
+	extern const PartMap PARTS_ITEMSVIEW[7];
 
 	extern const PartMap PARTS_LISTBOX[6];
 
@@ -46,11 +48,16 @@ namespace libmsstyle
 	extern const PartMap PARTS_TREEVIEW[5];
 
 	extern const PartMap PARTS_WINDOW[39];
+	// W8+
+	extern const PartMap PARTS_DWMPEN[25];
+	// W8+
+	extern const PartMap PARTS_DWMTOUCH[9];
 
 	extern const PartMap PARTS_DWMWINDOW_WIN7[72];
 
-	// Incomplete and maybe incorrect list of parts for Win 8.1
 	extern const PartMap PARTS_DWMWINDOW_WIN81[51];
+
+	extern const PartMap PARTS_DWMWINDOW_WIN10[92];
 
 	extern const PartMap PARTS_EDIT[10];
 
@@ -84,11 +91,13 @@ namespace libmsstyle
 
 	extern const PartMap PARTS_TASKBANDEXUI[14];
 
+	extern const PartMap PARTS_TASKMANAGER[47];
+
 	extern const PartMap PARTS_TEXTSTYLE[10];
 
 	extern const PartMap PARTS_TRYHARDER[3];
 
-	extern const PartMap PARTS_SEARCHBOX[2];
+	extern const PartMap PARTS_SEARCHBOX[4];
 
 	extern const PartMap PARTS_SEARCHHOME[3];
 

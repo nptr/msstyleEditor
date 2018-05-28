@@ -30,10 +30,10 @@ namespace libmsstyle
 		{ 216, { "FLOAT", 216, "" } },
 		{ 217, { "FLOATLIST", 217, "" } },
 		
-		{ 240, { "COLORLIST", 240, "" } },
-		{ 241, { "UNKNOWN_241", 241, "" } }, // integer-like
-		{ 242, { "UNKNOWN_242", 242, "" } },
-		{ 243, { "FILENAME_LITE", 243, "" } }, // some id property
+		{ 240, { "SIMPLIFIEDIMAGETYPE", 240, "" } },
+		{ 241, { "HIGHCONTRASTCOLORTYPE", 241, "" } }, // integer-like
+		{ 242, { "BITMAPIMAGETYPE", 242, "" } },
+		{ 243, { "COMPOSEDIMAGETYPE", 243, "" } }, // some id property
 
 		// STRING
 		{ 401, { "COLORSCHEMES", 201, "" } }, // begin propery names
@@ -289,7 +289,7 @@ namespace libmsstyle
 		{ 5005, { "ANIMATIONBUTTONRECT", 209, "" } },
 		// INT
 		{ 5006, { "ANIMATIONDURATION", 202, "" } },
-		// Unknown props found in Win10 styles
+		// Unknown props found in Win10 styles - High contrast mode related?
 		{ 5100, { "UNKNOWN_5100_COLORLIST", 240, "" } },
 		{ 5101, { "UNKNOWN_5101_COLORLIST", 240, "" } },
 		{ 5102, { "UNKNOWN_5102_ENUM", 200, "" } },
@@ -300,19 +300,19 @@ namespace libmsstyle
 		{ 5107, { "UNKNOWN_5107_MARGINS", 205, "" } },
 		{ 5108, { "UNKNOWN_5108_?", 0, "" } },
 		{ 5109, { "UNKNOWN_5109_?", 0, "" } },
-		{ 5110, { "UNKNOWN_5110_?", 241, "" } },
-		{ 5111, { "UNKNOWN_5111_?", 241, "" } },
-		{ 5112, { "UNKNOWN_5112_?", 241, "" } },
-		{ 5113, { "UNKNOWN_5113_?", 241, "" } },
-		{ 5114, { "UNKNOWN_5114_?", 241, "" } },
-		{ 5115, { "UNKNOWN_5115_?", 241, "" } },
-		{ 5116, { "UNKNOWN_5116_?", 241, "" } },
-		{ 5117, { "UNKNOWN_5117_?", 241, "" } },
-		{ 5118, { "UNKNOWN_5118_?", 241, "" } },
-		{ 5119, { "UNKNOWN_5119_?", 241, "" } },
-		{ 5120, { "UNKNOWN_5120_?", 241, "" } },
-		{ 5121, { "UNKNOWN_5121_?", 241, "" } },
-		{ 5122, { "UNKNOWN_5122_?", 241, "" } },
+		{ 5110, { "BORDERCOLOR_HIGHCONTRAST", 241, "" } },
+		{ 5111, { "FILLCOLOR_HIGHCONTRAST", 241, "" } },
+		{ 5112, { "TEXTCOLOR_HIGHCONTRAST", 241, "" } },
+		{ 5113, { "UNKNOWN_5113_HC", 241, "" } },
+		{ 5114, { "UNKNOWN_5114_HC", 241, "" } },
+		{ 5115, { "TEXTBORDERCOLOR_HIGHCONTRAST", 241, "" } }, // ?
+		{ 5116, { "UNKNOWN_5116_HC", 241, "" } },
+		{ 5117, { "UNKNOWN_5117_HC", 241, "" } },
+		{ 5118, { "HEADING1TEXTCOLOR_HIGHCONTRAST", 241, "" } },
+		{ 5119, { "HEADING2TEXTCOLOR_HIGHCONTRAST", 241, "" } },
+		{ 5120, { "BODYTEXTCOLOR_HIGHCONTRAST", 241, "" } },
+		{ 5121, { "UNKNOWN_5121_HC", 241, "" } },
+		{ 5122, { "UNKNOWN_5122_HC", 241, "" } },
 		{ 5128, { "UNKNOWN_5128_INT", 202, "" } },
 		{ 5129, { "UNKNOWN_5129_INT", 202, "" } },
 		{ 5130, { "UNKNOWN_5130_INT", 202, "" } },
@@ -329,9 +329,9 @@ namespace libmsstyle
 		{ 8001, { "ATLASINPUTIMAGE", 201, "" } },
 		// RECT
 		{ 8002, { "ATLASRECT", 209, "" } },
-		// "HIDDEN" - found in aerolite beyond SizeOfResource()-bytes
-		{ 20000, { "HIDDEN_20000", 241, "" } },
-		{ 20100, { "HIDDEN_20100", 242, "" } }
+		// Types found in AMAP
+		{ 20000, { "ANIMATION", 241, "" } },
+		{ 20100, { "TIMINGFUNCTION", 242, "" } }
 	};
 
 	const std::unordered_map<int, const char*> DATATYPE_MAP =
@@ -356,10 +356,10 @@ namespace libmsstyle
 		{ 215, "BITMAPREF" },
 		{ 216, "FLOAT" },
 		{ 217, "FLOATLIST" },
-		{ 240, "COLORLIST" },
-		{ 241, "UNKNOWN_241" },
-		{ 242, "UNKNOWN_242" },
-		{ 243, "UNKNOWN_243" },
+		{ 240, "SIMPLIFIEDIMAGETYPE" },
+		{ 241, "HIGHCONTRASTCOLORTYPE" },
+		{ 242, "BITMAPIMAGETYPE" },
+		{ 243, "COMPOSEDIMAGETYPE" },
 	};
 
 

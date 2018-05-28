@@ -114,4 +114,22 @@ namespace libmsstyle
 		{ 1, "SIZE" },
 		{ 2, "DPI" }
 	};
+
+
+	const EnumMap ENUM_HIGHCONTRASTTYPE[] =
+	{
+		{ 0, "ACTIVECAPTION" },
+		{ 1, "CAPTIONTEXT" },
+		{ 2, "BTNFACE" },
+		{ 3, "BTNTEXT" },
+		{ 4, "DESKTOP" },
+		{ 5, "GRAYTEXT" },
+		{ 6, "HOTLIGHT" },
+		{ 7, "INACTIVECAPTION" },
+		{ 8, "INACTIVECAPTIONTEXT" },
+		{ 9, "HIGHLIGHT" },
+		{ 10, "HIGHLIGHTTEXT" },
+		{ 11, "WINDOW" },
+		{ 12, "WINDOWTEXT" }
+	};
 }

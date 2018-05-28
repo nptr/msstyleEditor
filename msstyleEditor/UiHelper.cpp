@@ -51,6 +51,7 @@ wxPGProperty* GetWXPropertyFromMsStyleProperty(StyleProperty& prop)
 		return p;
 	}
 	case IDENTIFIER::ENUM:
+	case IDENTIFIER::HIGHCONTRASTCOLORTYPE:
 	{
 		wxPGChoices* cp = GetEnumsFromMsStyleProperty(prop);
 		wxPGProperty* p;
@@ -81,7 +82,6 @@ wxPGProperty* GetWXPropertyFromMsStyleProperty(StyleProperty& prop)
 		return p;
 	}
 	case IDENTIFIER::INT:
-	case IDENTIFIER::UNKNOWN_241:
 	{
 		wxIntProperty* p = new wxIntProperty(propName, *wxPGProperty::sm_wxPG_LABEL, prop.data.inttype.value);
 		p->SetClientData(&prop);

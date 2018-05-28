@@ -88,7 +88,7 @@ namespace libmsstyle
 			// string length in bytes including the null terminator
 			return 20 + 8 + 4 + header.sizeInBytes;
 		case 225:					  // Unknown type, since Win7, i think its a mistake. didn't see it again.
-		case IDENTIFIER::UNKNOWN_241: // Unknown type, since Win10
+		case IDENTIFIER::HIGHCONTRASTCOLORTYPE: // Unknown type, since Win10
 			return 40;
 		default:
 			return 40;
@@ -234,6 +234,7 @@ namespace libmsstyle
 		switch (header.typeID)
 		{
 		case IDENTIFIER::ENUM:
+		case IDENTIFIER::HIGHCONTRASTCOLORTYPE:
 		{
 			const char* enumStr = lookup::GetEnumAsString(header.nameID, data.enumtype.enumvalue);
 			if (enumStr != nullptr)
@@ -245,7 +246,6 @@ namespace libmsstyle
 			return WideToUTF8(text);
 		} break;
 		case IDENTIFIER::INT:
-		case IDENTIFIER::UNKNOWN_241: // if it looks like an int, and behaves like an in, it is an int
 		{
 			return std::to_string(data.inttype.value);
 		} break;
