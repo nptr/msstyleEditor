@@ -99,6 +99,12 @@ namespace libmsstyle
 		{ 12, "LIBRARYPANEOVERLAY", VS_STATE_NONE },
 	};
 
+	const PartMap PARTS_COMMUNICATIONS[] =
+	{
+		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 1, "TAB", VS_STATE(STATES_TAB) },
+	};
+
 	const PartMap PARTS_COMBOBOX[] =
 	{
 		{ 0, "Common Properties", VS_STATE_NONE },
@@ -169,10 +175,10 @@ namespace libmsstyle
 	const PartMap PARTS_ITEMSVIEW[] =
 	{
 		{ 0, "Common Properties", VS_STATE_NONE },
-		{ 1, "SEARCHHIT", VS_STATE_NONE },
+		{ 1, "SEARCHHIT", VS_STATE(STATES_ITEMSVIEW_SEARCHHIT) },
 		{ 2, "SUBSETBUTTON", VS_STATE_NONE },
 		{ 3, "FOCUSRECT", VS_STATE_NONE },
-		{ 4, "PROPERTY", VS_STATE_NONE },
+		{ 4, "PROPERTY", VS_STATE(STATES_ITEMSVIEW_PROPERTY) },
 		{ 5, "EMPTYTEXT", VS_STATE_NONE },
 		{ 6, "FOCUSRECTINNER", VS_STATE_NONE }, // W10
 	};
@@ -291,6 +297,7 @@ namespace libmsstyle
 		{ 36, "FRAMEBOTTOMSIZINGTEMPLATE", VS_STATE_NONE },
 		{ 37, "SMALLFRAMEBOTTOMSIZINGTEMPLATE", VS_STATE_NONE },
 		{ 38, "FRAME", VS_STATE(STATES_WINDOW_FRAME_GEN) },
+		{ 39, "BORDER", VS_STATE_NONE },
 	};
 
 	const PartMap PARTS_DWMPEN[] =
@@ -649,6 +656,12 @@ namespace libmsstyle
 		{ 5, "BUTTON", VS_STATE_NONE },
 	};
 
+	const PartMap PARTS_PAUSE[] =
+	{
+		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 1, "PAUSEBUTTON", VS_STATE_NONE },
+	};
+
 	const PartMap PARTS_PROGRESS[] =
 	{
 		{ 0, "Common Properties", VS_STATE_NONE },
@@ -742,6 +755,20 @@ namespace libmsstyle
 		{ 7, "DROPDOWNBUTTONGLYPH", VS_STATE_NONE },
 	};
 
+	const PartMap PARTS_TASKBARPEARL[] =
+	{
+		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 1, "PEARLICON", VS_STATE_NONE },
+		{ 2, "TABLETMODEPEARLICON", VS_STATE_NONE },
+	};
+
+	const PartMap PARTS_TASKBARSHOWDESKTOP[] =
+	{
+		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 1, "SHOWDESKTOPTHEME", VS_STATE_NONE },
+		{ 2, "DIVIDERLINE", VS_STATE_NONE },
+	};
+
 	const PartMap PARTS_TASKBAND[] =
 	{
 		{ 0, "Common Properties", VS_STATE_NONE },
@@ -785,6 +812,9 @@ namespace libmsstyle
 		{ 11, "THUMBBARBUTTONRIGHT", VS_STATE_NONE },
 		{ 12, "CLOSEBUTTON", VS_STATE_NONE },
 		{ 13, "ARROWBUTTON", VS_STATE_NONE },
+		{ 14, "THUMBSHADOWRIGHT", VS_STATE_NONE },
+		{ 15, "THUMBSHADOWBOTTOM", VS_STATE_NONE },
+		{ 16, "WINDOWBORDER", VS_STATE_NONE },
 	};
 
 	const PartMap PARTS_TASKMANAGER[] =
@@ -836,6 +866,12 @@ namespace libmsstyle
 		{ 44, "CHARTLEGEND", VS_STATE_NONE },
 		{ 45, "COLUMNDIVIDERSELECTED", VS_STATE_NONE },
 		{ 46, "COLUMNDIVIDERHOT", VS_STATE_NONE },
+	};
+
+	const PartMap PARTS_TEXTSELECTIONGRIPPER[] =
+	{
+		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 1, "GRIPPER", VS_STATE_NONE },
 	};
 
 	const PartMap PARTS_TEXTSTYLE[] =
@@ -1029,12 +1065,19 @@ namespace libmsstyle
 		{ 2, "BORDERS", VS_STATE_NONE },
 		{ 3, "GRIDBACKGROUND", VS_STATE_NONE },
 		{ 4, "COLHEADERSPLITTER", VS_STATE_NONE },
-		{ 5, "GRIDCELLBACKGROUND", VS_STATE_NONE },
-		{ 6, "GRIDCELL", VS_STATE_NONE },
-		{ 7, "GRIDCELLUPPER", VS_STATE_NONE },
-		{ 8, "TRAILINGGRIDCELL", VS_STATE_NONE },
-		{ 9, "TRAILINGGRIDCELLUPPER", VS_STATE_NONE },
+		{ 5, "GRIDCELLBACKGROUND", VS_STATE(STATES_MONTHCAL_CELL) },
+		{ 6, "GRIDCELL", VS_STATE(STATES_MONTHCAL_CELL) },
+		{ 7, "GRIDCELLUPPER", VS_STATE(STATES_MONTHCAL_CELL) },
+		{ 8, "TRAILINGGRIDCELL", VS_STATE(STATES_MONTHCAL_CELL) },
+		{ 9, "TRAILINGGRIDCELLUPPER", VS_STATE(STATES_MONTHCAL_CELL) },
 		{ 10, "NAVNEXT", VS_STATE_NONE },
 		{ 11, "NAVPREV", VS_STATE_NONE },
+	};
+
+	const PartMap PARTS_USERTILE[] =
+	{
+		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 1, "STROKEBACKGROUND", VS_STATE_NONE },
+		{ 2, "HOVERBACKGROUND", VS_STATE_NONE },
 	};
 }

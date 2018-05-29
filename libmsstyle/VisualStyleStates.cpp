@@ -360,6 +360,33 @@ namespace libmsstyle
 		{ 2, "HOT" },
 	};
 
+	const StateMap STATES_ITEMSVIEW_SEARCHHIT[] =
+	{
+		{ 0, "Common" },
+		{ 1, "START" },
+		{ 2, "FINAL" },
+		{ 3, "STARTSELECTED" },
+		{ 4, "FINALSELECTED" },
+	};
+
+	const StateMap STATES_ITEMSVIEW_PROPERTY[] =
+	{
+		{ 0, "Common" },
+		{ 1, "SUBPROPERTY" },
+		{ 2, "FILENAMEPROPERTY" },
+		{ 3, "FILENAMESELECTEDPROPERTY" },
+		{ 4, "SUBPROPERTYSELECTED" },
+		{ 5, "FILENAMECOMPRESSEDPROPERTY" },
+		{ 6, "FILENAMESELECTEDCOMPRESSEDPROPERTY" },
+		{ 7, "FILENAMEENCRYPTEDPROPERTY" },
+		{ 8, "FILENAMESELECTEDENCRYPTEDPROPERTY" },
+		{ 9, "FILENAMEDISCONNECTEDPROPERTY" },
+		{ 10, "FILENAMESELECTEDDISCONNECTEDPROPERTY" },
+		{ 11, "CONFLICTTILETEXT" },
+		{ 12, "CONFLICTTILETEXTFOCUSED" },
+		{ 13, "PROGRESSBAR" },
+	};
+
 	const StateMap STATES_LISTBOX_SCROLL[] =
 	{
 		{ 0, "Common" },
@@ -467,6 +494,18 @@ namespace libmsstyle
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
 		{ 2, "DISABLED" },
+	};
+
+	const StateMap STATES_MONTHCAL_CELL[] =
+	{
+		{ 0, "Common" },
+		{ 1, "HOT" },
+		{ 2, "HASSTATE" },
+		{ 3, "HASSTATEHOT" },
+		{ 4, "TODAY" },
+		{ 5, "TODAYSELECTED" },
+		{ 6, "SELECTED" },
+		{ 7, "SELECTEDHOT" },
 	};
 
 	const StateMap STATES_GENERAL[] =

@@ -85,6 +85,10 @@ namespace libmsstyle
 
 	extern const StateMap STATES_HEADEROVERFLOWSTATES[3];
 
+	extern const StateMap STATES_ITEMSVIEW_SEARCHHIT[5];
+
+	extern const StateMap STATES_ITEMSVIEW_PROPERTY[14];
+
 	extern const StateMap STATES_LISTBOX_SCROLL[5];
 
 	extern const StateMap STATES_LISTBOX_ITEMS[5];
@@ -106,6 +110,8 @@ namespace libmsstyle
 	extern const StateMap STATES_MENU_POPITEMS[5];
 
 	extern const StateMap STATES_MENU_SYSTEM_GENERAL[3];
+
+	extern const StateMap STATES_MONTHCAL_CELL[8];
 
 	extern const StateMap STATES_GENERAL[5];
 

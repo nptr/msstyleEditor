@@ -23,6 +23,8 @@ namespace libmsstyle
 
 	extern const PartMap PARTS_COMMANDMODULE[13];
 
+	extern const PartMap PARTS_COMMUNICATIONS[2];
+
 	extern const PartMap PARTS_COMBOBOX[9];
 
 	extern const PartMap PARTS_CONTROLPANEL[20];
@@ -47,7 +49,7 @@ namespace libmsstyle
 
 	extern const PartMap PARTS_TREEVIEW[5];
 
-	extern const PartMap PARTS_WINDOW[39];
+	extern const PartMap PARTS_WINDOW[40];
 	// W8+
 	extern const PartMap PARTS_DWMPEN[25];
 	// W8+
@@ -71,6 +73,8 @@ namespace libmsstyle
 
 	extern const PartMap PARTS_AEROWIZARD[6];
 
+	extern const PartMap PARTS_PAUSE[2];
+
 	extern const PartMap PARTS_PROGRESS[13];
 
 	extern const PartMap PARTS_PROPERTREE[3];
@@ -85,15 +89,21 @@ namespace libmsstyle
 
 	extern const PartMap PARTS_TOOLBAR[8];
 
+	extern const PartMap PARTS_TASKBARPEARL[3];
+
+	extern const PartMap PARTS_TASKBARSHOWDESKTOP[3];
+
 	extern const PartMap PARTS_TASKBAND[4];
 
 	extern const PartMap PARTS_TASKBAND2[15];
 
-	extern const PartMap PARTS_TASKBANDEXUI[14];
+	extern const PartMap PARTS_TASKBANDEXUI[17];
 
 	extern const PartMap PARTS_TASKMANAGER[47];
 
 	extern const PartMap PARTS_TEXTSTYLE[10];
+
+	extern const PartMap PARTS_TEXTSELECTIONGRIPPER[2];
 
 	extern const PartMap PARTS_TRYHARDER[3];
 
@@ -122,4 +132,6 @@ namespace libmsstyle
 	extern const PartMap PARTS_STARTPANELPRIV[39];
 
 	extern const PartMap PARTS_MONTHCAL[12];
+
+	extern const PartMap PARTS_USERTILE[3];
 }

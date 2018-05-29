@@ -158,6 +158,11 @@ namespace libmsstyle
 				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_COMMANDMODULE);
 				m.parts = PARTS_COMMANDMODULE;
 			}
+			else if (strstr(className, "CommunicationsStyle"))
+			{
+				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_COMMUNICATIONS);
+				m.parts = PARTS_COMMUNICATIONS;
+			}
 			else if (strstr(className, "Combobox") || strstr(className, "ComboBox"))
 			{
 				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_COMBOBOX);
@@ -275,6 +280,11 @@ namespace libmsstyle
 				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_AEROWIZARD);
 				m.parts = PARTS_AEROWIZARD;
 			}
+			else if (strstr(className, "Pause"))
+			{
+				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_PAUSE);
+				m.parts = PARTS_PAUSE;
+			}
 			else if (strstr(className, "Progress"))
 			{
 				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_PROGRESS);
@@ -315,6 +325,11 @@ namespace libmsstyle
 				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_TEXTSTYLE);
 				m.parts = PARTS_TEXTSTYLE;
 			}
+			else if (strstr(className, "TextSelectionGripper"))
+			{
+				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_TEXTSELECTIONGRIPPER);
+				m.parts = PARTS_TEXTSELECTIONGRIPPER;
+			}
 			else if (strstr(className, "TryHarder"))
 			{
 				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_TRYHARDER);
@@ -344,6 +359,16 @@ namespace libmsstyle
 			{
 				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_STATUS);
 				m.parts = PARTS_STATUS;
+			}
+			else if (strstr(className, "TaskbarPearl"))
+			{
+				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_TASKBARPEARL);
+				m.parts = PARTS_TASKBARPEARL;
+			}
+			else if (strstr(className, "TaskbarShowDesktop"))
+			{
+				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_TASKBARSHOWDESKTOP);
+				m.parts = PARTS_TASKBARSHOWDESKTOP;
 			}
 			else if (strstr(className, "TaskbandExtendedUI"))
 			{
@@ -394,6 +419,11 @@ namespace libmsstyle
 			{
 				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_MONTHCAL);
 				m.parts = PARTS_MONTHCAL;
+			}
+			else if (strstr(className, "UserTile"))
+			{
+				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_USERTILE);
+				m.parts = PARTS_USERTILE;
 			}
 			else
 			{
