@@ -4,6 +4,12 @@
 
 namespace libmsstyle
 {
+	const StateMap STATES_AEROWIZARD_HEADERAREA[] =
+	{
+		{ 0, "Common" },
+		{ 1, "NOMARGIN" },
+	};
+
 	const StateMap STATES_PUSHBUTTON[] =
 	{
 		{ 0, "Common" },

@@ -79,7 +79,7 @@ AddPropertyDialog::AddPropertyDialog(wxWindow* parent, wxWindowID id, const wxSt
 	bSizer14->Add(typeBox, 1, wxALL, 5);
 
 	wxArrayString propBoxChoices;
-	propBox = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, propBoxChoices, 0);
+	propBox = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, propBoxChoices, wxCB_SORT);
 	propBox->SetSelection(0);
 	bSizer14->Add(propBox, 1, wxALL, 5);
 	bSizer13->Add(bSizer14, 0, wxEXPAND, 5);

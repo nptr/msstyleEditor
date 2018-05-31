@@ -133,6 +133,11 @@ namespace libmsstyle
 				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_ADDRESSBAND);
 				m.parts = PARTS_ADDRESSBAND;
 			}
+			else if (strstr(className, "BarrierPage"))
+			{
+				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_BARRIERPAGE);
+				m.parts = PARTS_BARRIERPAGE;
+			}
 			else if (strstr(className, "BreadcrumbBar"))
 			{
 				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_BREADCRUMBBAR);
