@@ -16,6 +16,8 @@ namespace libmsstyle
 
 	extern const StateMap STATES_RADIOBUTTON[9];
 
+	extern const StateMap STATES_CHARTVIEW_LINE[4];
+
 	extern const StateMap STATES_CHECKBOX[21];
 
 	extern const StateMap STATES_GROUPBOX[3];
@@ -87,6 +89,8 @@ namespace libmsstyle
 	extern const StateMap STATES_HEADEROVERFLOWSTATES[3];
 
 	extern const StateMap STATES_ITEMSVIEW_SEARCHHIT[5];
+
+	extern const StateMap STATES_ITEMSVIEW_FOCUSRECT[3];
 
 	extern const StateMap STATES_ITEMSVIEW_PROPERTY[14];
 

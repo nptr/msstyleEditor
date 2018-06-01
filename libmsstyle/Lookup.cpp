@@ -153,6 +153,11 @@ namespace libmsstyle
 				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_REBAR);
 				m.parts = PARTS_REBAR;
 			}
+			else if (strstr(className, "::Clock"))
+			{
+				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_CLOCK);
+				m.parts = PARTS_CLOCK;
+			}
 			else if (strstr(className, "ChartView"))
 			{
 				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_CHARTVIEW);
@@ -177,6 +182,16 @@ namespace libmsstyle
 			{
 				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_CONTROLPANEL);
 				m.parts = PARTS_CONTROLPANEL;
+			}
+			else if (strstr(className, "CopyClose"))
+			{
+				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_COPYCLOSE);
+				m.parts = PARTS_COPYCLOSE;
+			}
+			else if (strstr(className, "DropListControl"))
+			{
+				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_DROPLIST);
+				m.parts = PARTS_DROPLIST;
 			}
 			else if (strstr(className, "EmptyMarkup"))
 			{
@@ -325,6 +340,11 @@ namespace libmsstyle
 				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_TASKBAR);
 				m.parts = PARTS_TASKBAR;
 			}
+			else if (strstr(className, "TextGlow"))
+			{
+				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_TEXTGLOW);
+				m.parts = PARTS_TEXTGLOW;
+			}
 			else if (strstr(className, "TextStyle"))
 			{
 				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_TEXTSTYLE);
@@ -334,6 +354,11 @@ namespace libmsstyle
 			{
 				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_TEXTSELECTIONGRIPPER);
 				m.parts = PARTS_TEXTSELECTIONGRIPPER;
+			}
+			else if (strstr(className, "::TrayNotify"))
+			{
+				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_TRAYNOTIFY);
+				m.parts = PARTS_TRAYNOTIFY;
 			}
 			else if (strstr(className, "TryHarder"))
 			{
@@ -359,6 +384,11 @@ namespace libmsstyle
 			{
 				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_SCROLLBAR);
 				m.parts = PARTS_SCROLLBAR;
+			}
+			else if (strstr(className, "Static"))
+			{
+				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_STATIC);
+				m.parts = PARTS_STATIC;
 			}
 			else if (strstr(className, "Status"))
 			{

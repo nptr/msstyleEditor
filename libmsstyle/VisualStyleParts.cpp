@@ -41,6 +41,12 @@ namespace libmsstyle
 		{ 10, "GROUPBOX_LITE", VS_STATE(STATES_GROUPBOX) },
 	};
 
+	const PartMap PARTS_CLOCK[] =
+	{
+		{ 0, "Common Properties", VS_STATE(STATES_PUSHBUTTON) },
+		{ 1, "TIME", VS_STATE(STATES_PUSHBUTTON) },
+	};
+
 	const PartMap PARTS_CHARTVIEW[] =
 	{
 		{ 0, "Common Properties", VS_STATE_NONE },
@@ -72,12 +78,12 @@ namespace libmsstyle
 		{ 26, "NETWORK_LINE1FILL", VS_STATE_NONE },
 		{ 27, "NETWORK_LINE2", VS_STATE_NONE },
 		{ 28, "NETWORK_LINE2FILL", VS_STATE_NONE },
-		{ 29, "COPY_BORDER", VS_STATE_NONE },
-		{ 30, "COPY_GRID", VS_STATE_NONE },
-		{ 31, "COPY_LINE1", VS_STATE_NONE },
-		{ 32, "COPY_LINE1FILL", VS_STATE_NONE },
-		{ 33, "COPY_LINE2", VS_STATE_NONE },
-		{ 34, "COPY_LINE2FILL", VS_STATE_NONE },
+		{ 29, "COPY_BORDER", VS_STATE(STATES_CHARTVIEW_LINE) },
+		{ 30, "COPY_GRID", VS_STATE(STATES_CHARTVIEW_LINE) },
+		{ 31, "COPY_LINE1", VS_STATE(STATES_CHARTVIEW_LINE) },
+		{ 32, "COPY_LINE1FILL", VS_STATE(STATES_CHARTVIEW_LINE) },
+		{ 33, "COPY_LINE2", VS_STATE(STATES_CHARTVIEW_LINE) },
+		{ 34, "COPY_LINE2FILL", VS_STATE(STATES_CHARTVIEW_LINE) },
 		{ 35, "CPU_SCALELINE", VS_STATE_NONE },
 		{ 36, "CPU_SCALELINETEXT", VS_STATE_NONE },
 		{ 37, "MEMORY_SCALELINE", VS_STATE_NONE },
@@ -148,6 +154,18 @@ namespace libmsstyle
 		{ 19, "BODYTITLE", VS_STATE_NONE },
 	};
 
+	const PartMap PARTS_COPYCLOSE[] =
+	{
+		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 1, "COPYCLOSEBTN", VS_STATE_NONE },
+	};
+
+	const PartMap PARTS_DROPLIST[] =
+	{
+		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 1, "MENUBUTTON", VS_STATE_NONE },
+	};
+
 	const PartMap PARTS_EMPTYMARKUP[] =
 	{
 		{ 0, "Common Properties", VS_STATE_NONE },
@@ -183,10 +201,10 @@ namespace libmsstyle
 		{ 0, "Common Properties", VS_STATE_NONE },
 		{ 1, "SEARCHHIT", VS_STATE(STATES_ITEMSVIEW_SEARCHHIT) },
 		{ 2, "SUBSETBUTTON", VS_STATE_NONE },
-		{ 3, "FOCUSRECT", VS_STATE_NONE },
+		{ 3, "FOCUSRECT", VS_STATE(STATES_ITEMSVIEW_FOCUSRECT) },
 		{ 4, "PROPERTY", VS_STATE(STATES_ITEMSVIEW_PROPERTY) },
 		{ 5, "EMPTYTEXT", VS_STATE_NONE },
-		{ 6, "FOCUSRECTINNER", VS_STATE_NONE }, // W10
+		{ 6, "FOCUSRECTINNER", VS_STATE(STATES_ITEMSVIEW_FOCUSRECT) }, // W10
 	};
 
 	const PartMap PARTS_LISTBOX[] =
@@ -835,7 +853,7 @@ namespace libmsstyle
 		{ 7, "HEATMAP_COLOR4", VS_STATE_NONE },
 		{ 8, "HEATMAP_COLOR5", VS_STATE_NONE },
 		{ 9, "HEATMAP_COLOR6", VS_STATE_NONE },
-		{ 10, "HEATMAP_COLOR8", VS_STATE_NONE },
+		{ 10, "HEATMAP_COLOR7", VS_STATE_NONE },
 		{ 11, "HEATMAP_COLOR8", VS_STATE_NONE },
 		{ 12, "HEATMAP_CONTENTIONMARKER", VS_STATE_NONE },
 		{ 13, "HEATMAP_TEXT", VS_STATE_NONE },
@@ -880,6 +898,12 @@ namespace libmsstyle
 		{ 1, "GRIPPER", VS_STATE_NONE },
 	};
 
+	const PartMap PARTS_TEXTGLOW[] =
+	{
+		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 1, "BACKGROUND", VS_STATE_NONE },
+	};
+
 	const PartMap PARTS_TEXTSTYLE[] =
 	{
 		{ 0, "Common Properties", VS_STATE_NONE },
@@ -892,6 +916,13 @@ namespace libmsstyle
 		{ 7, "EXPANDED", VS_STATE_NONE },
 		{ 8, "LABEL", VS_STATE_NONE },
 		{ 9, "CONTROLLABEL", VS_STATE(STATES_TEXTSTYLE_CTRLLABEL) },
+	};
+
+	const PartMap PARTS_TRAYNOTIFY[] =
+	{
+		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 1, "BACKGROUND", VS_STATE_NONE },
+		{ 2, "ANIMBACKGROUND", VS_STATE_NONE },
 	};
 
 	const PartMap PARTS_TRYHARDER[] =
@@ -940,6 +971,12 @@ namespace libmsstyle
 		{ 10, "SIZEBOX", VS_STATE(STATES_SCROLLBAR_SIZEBOX) },
 	};
 
+	const PartMap PARTS_STATIC[] =
+	{
+		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 1, "TEXT", VS_STATE_NONE },
+	};
+
 	const PartMap PARTS_STATUS[] =
 	{
 		{ 0, "Common Properties", VS_STATE_NONE },
@@ -958,7 +995,7 @@ namespace libmsstyle
 		{ 5, "DIVIDER", VS_STATE_NONE },
 		{ 6, "WINDOW", VS_STATE_NONE },
 		{ 7, "LINKAREA", VS_STATE_NONE },
-		{ 8, "LINKHEADER", VS_STATE_NONE },
+		{ 8, "LINKHEADER", VS_STATE(STATES_FLYOUT_HEADER) },
 	};
 
 	const PartMap PARTS_DRAGDROP[] =

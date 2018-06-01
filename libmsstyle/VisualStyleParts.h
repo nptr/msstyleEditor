@@ -21,6 +21,8 @@ namespace libmsstyle
 
 	extern const PartMap PARTS_BUTTON[11];
 
+	extern const PartMap PARTS_CLOCK[2];
+
 	extern const PartMap PARTS_CHARTVIEW[43];
 
 	extern const PartMap PARTS_COMMANDMODULE[13];
@@ -30,6 +32,10 @@ namespace libmsstyle
 	extern const PartMap PARTS_COMBOBOX[9];
 
 	extern const PartMap PARTS_CONTROLPANEL[20];
+
+	extern const PartMap PARTS_COPYCLOSE[2];
+
+	extern const PartMap PARTS_DROPLIST[2];
 
 	extern const PartMap PARTS_EMPTYMARKUP[2];
 
@@ -103,9 +109,13 @@ namespace libmsstyle
 
 	extern const PartMap PARTS_TASKMANAGER[47];
 
+	extern const PartMap PARTS_TEXTGLOW[2];
+
 	extern const PartMap PARTS_TEXTSTYLE[10];
 
 	extern const PartMap PARTS_TEXTSELECTIONGRIPPER[2];
+
+	extern const PartMap PARTS_TRAYNOTIFY[3];
 
 	extern const PartMap PARTS_TRYHARDER[3];
 
@@ -116,6 +126,8 @@ namespace libmsstyle
 	extern const PartMap PARTS_SPIN[5];
 
 	extern const PartMap PARTS_SCROLLBAR[11];
+
+	extern const PartMap PARTS_STATIC[2];
 
 	extern const PartMap PARTS_STATUS[4];
 

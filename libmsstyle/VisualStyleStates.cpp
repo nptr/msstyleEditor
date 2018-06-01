@@ -34,6 +34,14 @@ namespace libmsstyle
 		{ 8, "CHECKEDDISABLED" },
 	};
 
+	const StateMap STATES_CHARTVIEW_LINE[] =
+	{
+		{ 0, "Common" },
+		{ 1, "ACTIVE" },
+		{ 2, "IDLE" },
+		{ 3, "ERROR" },
+	};
+
 	const StateMap STATES_CHECKBOX[] =
 	{
 		{ 0, "Common" },
@@ -373,6 +381,13 @@ namespace libmsstyle
 		{ 2, "FINAL" },
 		{ 3, "STARTSELECTED" },
 		{ 4, "FINALSELECTED" },
+	};
+
+	const StateMap STATES_ITEMSVIEW_FOCUSRECT[] =
+	{
+		{ 0, "Common" },
+		{ 1, "NORMAL" },
+		{ 2, "HOVER" },
 	};
 
 	const StateMap STATES_ITEMSVIEW_PROPERTY[] =
