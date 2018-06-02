@@ -11,8 +11,9 @@ private:
 			return false;
 
 		wxString extension = wxFileName(filenames[0]).GetExt();
-		if (extension == wxString(".msstyles"))
+		if (extension.Contains("msstyles"))
 		{
+			wnd.CloseStyle();
 			wnd.OpenStyle(filenames[0]);
 			return true;
 		}
