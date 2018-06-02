@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace msstyle
+namespace libmsstyle
 {
 	class VisualStyle;
 }
@@ -10,7 +10,6 @@ namespace msstyle
 class Exporter
 {
 public:
-	static void ExportPropertyCSV(const msstyle::VisualStyle& style);
-	static void ExportLogicalStructure(const std::string& path, const msstyle::VisualStyle& style);
+	static void ExportLogicalStructure(const std::string& path, libmsstyle::VisualStyle& style);
 };
 

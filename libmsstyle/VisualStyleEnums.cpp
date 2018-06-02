@@ -1,36 +1,30 @@
 #pragma once
 
-#include <stdint.h>
+#include "VisualStyleEnums.h"
 
-namespace msstyle
+namespace libmsstyle
 {
-	typedef struct
-	{
-		int32_t key;
-		const char* value;
-	} EnumMap;
-
-	static const EnumMap ENUM_BGTYPE[] =
+	const EnumMap ENUM_BGTYPE[] =
 	{
 		{ 0, "IMAGEFILE" },
 		{ 1, "BORDERFILL" },
 		{ 2, "NONE" }
 	};
 
-	static const EnumMap ENUM_IMAGELAYOUT[] =
+	const EnumMap ENUM_IMAGELAYOUT[] =
 	{
 		{ 0, "VERTICAL" },
 		{ 1, "HORIZONTAL" }
 	};
 
-	static const EnumMap ENUM_BORDERTYPE[] =
+	const EnumMap ENUM_BORDERTYPE[] =
 	{
 		{ 0, "RECT" },
 		{ 1, "ROUNDRECT" },
 		{ 2, "ELLIPSE" }
 	};
 
-	static const EnumMap ENUM_FILLTYPE[] =
+	const EnumMap ENUM_FILLTYPE[] =
 	{
 		{ 0, "SOLID" },
 		{ 1, "VERTGRADIENT" },
@@ -39,28 +33,28 @@ namespace msstyle
 		{ 4, "TILEIMAGE" }
 	};
 
-	static const EnumMap ENUM_SIZINGTYPE[] =
+	const EnumMap ENUM_SIZINGTYPE[] =
 	{
 		{ 0, "TRUESIZE" },
 		{ 1, "STRETCH" },
 		{ 2, "TILE" }
 	};
 
-	static const EnumMap ENUM_ALIGNMENT_H[] =
+	const EnumMap ENUM_ALIGNMENT_H[] =
 	{
 		{ 0, "LEFT" },
 		{ 1, "RIGHT" },
 		{ 2, "CENTER" }
 	};
 
-	static const EnumMap ENUM_ALIGNMENT_V[] =
+	const EnumMap ENUM_ALIGNMENT_V[] =
 	{
 		{ 0, "TOP" },
 		{ 1, "CENTER" },
 		{ 2, "BOTTOM" }
 	};
 
-	static const EnumMap ENUM_OFFSET[] =
+	const EnumMap ENUM_OFFSET[] =
 	{
 		{ 0, "TOPLEFT" },
 		{ 1, "TOPRIGHT" },
@@ -77,7 +71,7 @@ namespace msstyle
 		{ 12, "BELOWLASTBUTTON" }
 	};
 
-	static const EnumMap ENUM_ICONEFFECT[] =
+	const EnumMap ENUM_ICONEFFECT[] =
 	{
 		{ 0, "NONE" },
 		{ 1, "GLOW" },
@@ -86,38 +80,56 @@ namespace msstyle
 		{ 4, "ALPHA" }
 	};
 
-	static const EnumMap ENUM_TEXTSHADOW[] =
+	const EnumMap ENUM_TEXTSHADOW[] =
 	{
 		{ 0, "NONE" },
 		{ 1, "SINGLE" },
 		{ 2, "CONTINUOUS" }
 	};
 
-	static const EnumMap ENUM_GLYPHTYPE[] =
+	const EnumMap ENUM_GLYPHTYPE[] =
 	{
 		{ 0, "NONE" },
 		{ 1, "IMAGEGLYPH" },
 		{ 2, "FONTGLYPH" }
 	};
 
-	static const EnumMap ENUM_IMAGESELECT[] =
+	const EnumMap ENUM_IMAGESELECT[] =
 	{
 		{ 0, "NONE" },
 		{ 1, "SIZE" },
 		{ 2, "DPI" }
 	};
 
-	static const EnumMap ENUM_TRUESIZESCALING[] =
+	const EnumMap ENUM_TRUESIZESCALING[] =
 	{
 		{ 0, "NONE" },
 		{ 1, "SIZE" },
 		{ 2, "DPI" }
 	};
 
-	static const EnumMap ENUM_GLYPHFONTSCALING[] =
+	const EnumMap ENUM_GLYPHFONTSCALING[] =
 	{
 		{ 0, "NONE" },
 		{ 1, "SIZE" },
 		{ 2, "DPI" }
+	};
+
+
+	const EnumMap ENUM_HIGHCONTRASTTYPE[] =
+	{
+		{ 0, "ACTIVECAPTION" },
+		{ 1, "CAPTIONTEXT" },
+		{ 2, "BTNFACE" },
+		{ 3, "BTNTEXT" },
+		{ 4, "DESKTOP" },
+		{ 5, "GRAYTEXT" },
+		{ 6, "HOTLIGHT" },
+		{ 7, "INACTIVECAPTION" },
+		{ 8, "INACTIVECAPTIONTEXT" },
+		{ 9, "HIGHLIGHT" },
+		{ 10, "HIGHLIGHTTEXT" },
+		{ 11, "WINDOW" },
+		{ 12, "WINDOWTEXT" }
 	};
 }

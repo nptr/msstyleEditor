@@ -1,17 +1,16 @@
 #pragma once
 
-#include <stdint.h>
+#include "VisualStyleStates.h"
 
-namespace msstyle
+namespace libmsstyle
 {
-	typedef struct
+	const StateMap STATES_AEROWIZARD_HEADERAREA[] =
 	{
-		int32_t stateID;
-		const char* stateName;
-	} StateMap;
+		{ 0, "Common" },
+		{ 1, "NOMARGIN" },
+	};
 
-
-	static const StateMap STATES_PUSHBUTTON[] =
+	const StateMap STATES_PUSHBUTTON[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
@@ -22,7 +21,7 @@ namespace msstyle
 		{ 6, "DEFAULTED_ANIMATING" }
 	};
 
-	static const StateMap STATES_RADIOBUTTON[] =
+	const StateMap STATES_RADIOBUTTON[] =
 	{
 		{ 0, "Common" },
 		{ 1, "UNCHECKEDNORMAL" },
@@ -35,7 +34,15 @@ namespace msstyle
 		{ 8, "CHECKEDDISABLED" },
 	};
 
-	static const StateMap STATES_CHECKBOX[] =
+	const StateMap STATES_CHARTVIEW_LINE[] =
+	{
+		{ 0, "Common" },
+		{ 1, "ACTIVE" },
+		{ 2, "IDLE" },
+		{ 3, "ERROR" },
+	};
+
+	const StateMap STATES_CHECKBOX[] =
 	{
 		{ 0, "Common" },
 		{ 1, "UNCHECKEDNORMAL" },
@@ -60,14 +67,14 @@ namespace msstyle
 		{ 20, "EXCLUDEDDISABLED" },
 	};
 
-	static const StateMap STATES_GROUPBOX[] =
+	const StateMap STATES_GROUPBOX[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
 		{ 2, "DISABLED" },
 	};
 
-	static const StateMap STATES_COMMANDLINK[] =
+	const StateMap STATES_COMMANDLINK[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
@@ -78,7 +85,7 @@ namespace msstyle
 		{ 6, "DEFAULTED_ANIMATING" }
 	};
 
-	static const StateMap STATES_COMMANDLINKGLYPHS[] =
+	const StateMap STATES_COMMANDLINKGLYPHS[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
@@ -88,7 +95,7 @@ namespace msstyle
 		{ 5, "DEFAULTED" },
 	};
 
-	static const StateMap STATES_CB_STYLE[] =
+	const StateMap STATES_CB_STYLE[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
@@ -97,7 +104,7 @@ namespace msstyle
 		{ 4, "DISABLED" },
 	};
 
-	static const StateMap STATES_CB_DROPDOWNLR[] =
+	const StateMap STATES_CB_DROPDOWNLR[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
@@ -106,7 +113,7 @@ namespace msstyle
 		{ 4, "DISABLED" },
 	};
 
-	static const StateMap STATES_CB_TRANSPARENTBG[] =
+	const StateMap STATES_CB_TRANSPARENTBG[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
@@ -115,7 +122,7 @@ namespace msstyle
 		{ 4, "FOCUSED" },
 	};
 
-	static const StateMap STATES_CB_BORDER[] =
+	const StateMap STATES_CB_BORDER[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
@@ -124,7 +131,7 @@ namespace msstyle
 		{ 4, "DISABLED" },
 	};
 
-	static const StateMap STATES_CB_READONLY[] =
+	const StateMap STATES_CB_READONLY[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
@@ -133,7 +140,7 @@ namespace msstyle
 		{ 4, "DISABLED" },
 	};
 
-	static const StateMap STATES_CB_CUEBANNER[] =
+	const StateMap STATES_CB_CUEBANNER[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
@@ -142,7 +149,7 @@ namespace msstyle
 		{ 4, "DISABLED" },
 	};
 
-	static const StateMap STATES_TAB[] =
+	const StateMap STATES_TAB[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
@@ -150,7 +157,7 @@ namespace msstyle
 		{ 3, "SELECTED" },
 	};
 
-	static const StateMap STATES_LINK_HELP[] =
+	const StateMap STATES_LINK_HELP[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
@@ -160,7 +167,7 @@ namespace msstyle
 
 	};
 
-	static const StateMap STATES_LINK_TASK[] =
+	const StateMap STATES_LINK_TASK[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
@@ -170,7 +177,7 @@ namespace msstyle
 		{ 5, "PAGE" },
 	};
 
-	static const StateMap STATES_LINK_CONTENT[] =
+	const StateMap STATES_LINK_CONTENT[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
@@ -179,14 +186,14 @@ namespace msstyle
 		{ 4, "DISABLED" },
 	};
 
-	static const StateMap STATES_LINK_SECTIONTITLE[] =
+	const StateMap STATES_LINK_SECTIONTITLE[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
 		{ 2, "HOT" },
 	};
 
-	static const StateMap STATES_DATE_TEXT[] =
+	const StateMap STATES_DATE_TEXT[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
@@ -194,7 +201,7 @@ namespace msstyle
 		{ 3, "SELECTED" },
 	};
 
-	static const StateMap STATES_DATE_BORDER[] =
+	const StateMap STATES_DATE_BORDER[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
@@ -203,7 +210,7 @@ namespace msstyle
 		{ 4, "DISABLED" },
 	};
 
-	static const StateMap STATES_DATE_CALENDERBUTTONRIGHT[] =
+	const StateMap STATES_DATE_CALENDERBUTTONRIGHT[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
@@ -212,14 +219,14 @@ namespace msstyle
 		{ 4, "DISABLED" },
 	};
 
-	static const StateMap STATES_DND_GENERAL[] =
+	const StateMap STATES_DND_GENERAL[] =
 	{
 		{ 0, "Common" },
 		{ 1, "HIGHLIGHT" },
 		{ 2, "NOHIGHLIGHT" },
 	};
 
-	static const StateMap STATES_EDITTEXT[] =
+	const StateMap STATES_EDITTEXT[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
@@ -232,7 +239,7 @@ namespace msstyle
 		{ 8, "CUEBANNER" },
 	};
 
-	static const StateMap STATES_EDITTEXT_BG[] =
+	const StateMap STATES_EDITTEXT_BG[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
@@ -244,7 +251,7 @@ namespace msstyle
 
 	};
 
-	static const StateMap STATES_EDITTEXT_BGWITHBORDER[] =
+	const StateMap STATES_EDITTEXT_BGWITHBORDER[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
@@ -253,7 +260,7 @@ namespace msstyle
 		{ 4, "FOCUSED" },
 	};
 
-	static const StateMap STATES_EDITTEXT_GENERAL[] =
+	const StateMap STATES_EDITTEXT_GENERAL[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
@@ -262,7 +269,7 @@ namespace msstyle
 		{ 4, "DISABLED" },
 	};
 
-	static const StateMap STATES_EXPLORERBAR_HDRPIN[] =
+	const StateMap STATES_EXPLORERBAR_HDRPIN[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
@@ -273,7 +280,7 @@ namespace msstyle
 		{ 6, "SELECTEDPRESSED" },
 	};
 
-	static const StateMap STATES_EXPLORERBAR_GENERAL[] =
+	const StateMap STATES_EXPLORERBAR_GENERAL[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
@@ -281,7 +288,7 @@ namespace msstyle
 		{ 3, "PRESSED" },
 	};
 
-	static const StateMap STATES_FLYOUT_LABEL[] =
+	const StateMap STATES_FLYOUT_LABEL[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
@@ -290,28 +297,28 @@ namespace msstyle
 		{ 4, "DISABLED" },
 	};
 
-	static const StateMap STATES_FLYOUT_LINK[] =
+	const StateMap STATES_FLYOUT_LINK[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
 		{ 2, "HOVER" },
 	};
 
-	static const StateMap STATES_FLYOUT_BODY[] =
+	const StateMap STATES_FLYOUT_BODY[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
 		{ 2, "EMPHASIZED" },
 	};
 
-	static const StateMap STATES_FLYOUT_HEADER[] =
+	const StateMap STATES_FLYOUT_HEADER[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
 		{ 2, "HOVER" },
 	};
 
-	static const StateMap STATES_HEADER_ITEMSTATES[] =
+	const StateMap STATES_HEADER_ITEMSTATES[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
@@ -328,7 +335,7 @@ namespace msstyle
 		{ 12, "ICONSORTEDPRESSED" },
 	};
 
-	static const StateMap STATES_HEADER_LEFT_AND_RIGHT[] =
+	const StateMap STATES_HEADER_LEFT_AND_RIGHT[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
@@ -336,14 +343,14 @@ namespace msstyle
 		{ 3, "PRESSED" },
 	};
 
-	static const StateMap STATES_HEADERSORTARROWSTATES[] =
+	const StateMap STATES_HEADERSORTARROWSTATES[] =
 	{
 		{ 0, "Common" },
 		{ 1, "SORTEDUP" },
 		{ 2, "SORTEDDOWN" },
 	};
 
-	static const StateMap STATES_HEADERDROPDOWNSTATES[] =
+	const StateMap STATES_HEADERDROPDOWNSTATES[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
@@ -352,7 +359,7 @@ namespace msstyle
 
 	};
 
-	static const StateMap STATES_HEADERDROPDOWNFILTERSTATES[] =
+	const StateMap STATES_HEADERDROPDOWNFILTERSTATES[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
@@ -360,14 +367,48 @@ namespace msstyle
 		{ 3, "HOT" },
 	};
 
-	static const StateMap STATES_HEADEROVERFLOWSTATES[] =
+	const StateMap STATES_HEADEROVERFLOWSTATES[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
 		{ 2, "HOT" },
 	};
 
-	static const StateMap STATES_LISTBOX_SCROLL[] =
+	const StateMap STATES_ITEMSVIEW_SEARCHHIT[] =
+	{
+		{ 0, "Common" },
+		{ 1, "START" },
+		{ 2, "FINAL" },
+		{ 3, "STARTSELECTED" },
+		{ 4, "FINALSELECTED" },
+	};
+
+	const StateMap STATES_ITEMSVIEW_FOCUSRECT[] =
+	{
+		{ 0, "Common" },
+		{ 1, "NORMAL" },
+		{ 2, "HOVER" },
+	};
+
+	const StateMap STATES_ITEMSVIEW_PROPERTY[] =
+	{
+		{ 0, "Common" },
+		{ 1, "SUBPROPERTY" },
+		{ 2, "FILENAMEPROPERTY" },
+		{ 3, "FILENAMESELECTEDPROPERTY" },
+		{ 4, "SUBPROPERTYSELECTED" },
+		{ 5, "FILENAMECOMPRESSEDPROPERTY" },
+		{ 6, "FILENAMESELECTEDCOMPRESSEDPROPERTY" },
+		{ 7, "FILENAMEENCRYPTEDPROPERTY" },
+		{ 8, "FILENAMESELECTEDENCRYPTEDPROPERTY" },
+		{ 9, "FILENAMEDISCONNECTEDPROPERTY" },
+		{ 10, "FILENAMESELECTEDDISCONNECTEDPROPERTY" },
+		{ 11, "CONFLICTTILETEXT" },
+		{ 12, "CONFLICTTILETEXTFOCUSED" },
+		{ 13, "PROGRESSBAR" },
+	};
+
+	const StateMap STATES_LISTBOX_SCROLL[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
@@ -376,7 +417,7 @@ namespace msstyle
 		{ 4, "DISABLED" },
 	};
 
-	static const StateMap STATES_LISTBOX_ITEMS[] =
+	const StateMap STATES_LISTBOX_ITEMS[] =
 	{
 		{ 0, "Common" },
 		{ 1, "HOT" },
@@ -385,7 +426,7 @@ namespace msstyle
 		{ 4, "SELECTEDNOTFOCUS" },
 	};
 
-	static const StateMap STATES_LISTVIEW_ITEMS[] =
+	const StateMap STATES_LISTVIEW_ITEMS[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
@@ -396,7 +437,7 @@ namespace msstyle
 		{ 6, "HOTSELECTED" },
 	};
 
-	static const StateMap STATES_LISTVIEW_GROUPHEADER_GENERAL[] =
+	const StateMap STATES_LISTVIEW_GROUPHEADER_GENERAL[] =
 	{
 		{ 0, "Common" },
 		{ 1, "OPEN" },
@@ -417,7 +458,7 @@ namespace msstyle
 		{ 16, "CLOSEMIXEDSELECTIONHOT" },
 	};
 
-	static const StateMap STATES_LISTVIEW_EXPCOLLAPSE[] =
+	const StateMap STATES_LISTVIEW_EXPCOLLAPSE[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
@@ -425,14 +466,14 @@ namespace msstyle
 		{ 3, "PUSHED" },
 	};
 
-	static const StateMap STATES_MENU_BARBG[] =
+	const StateMap STATES_MENU_BARBG[] =
 	{
 		{ 0, "Common" },
 		{ 1, "ACTIVE" },
 		{ 2, "INACTIVE" },
 	};
 
-	static const StateMap STATES_MENU_BARITEM[] =
+	const StateMap STATES_MENU_BARITEM[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
@@ -443,7 +484,7 @@ namespace msstyle
 		{ 6, "DISABLEDPUSHED" },
 	};
 
-	static const StateMap STATES_MENU_POPCHECK[] =
+	const StateMap STATES_MENU_POPCHECK[] =
 	{
 		{ 0, "Common" },
 		{ 1, "CHECKMARKNORMAL" },
@@ -452,7 +493,7 @@ namespace msstyle
 		{ 4, "BULLETDISABLED" },
 	};
 
-	static const StateMap STATES_MENU_POPCHECKBG[] =
+	const StateMap STATES_MENU_POPCHECKBG[] =
 	{
 		{ 0, "Common" },
 		{ 1, "DISABLED" },
@@ -460,7 +501,7 @@ namespace msstyle
 		{ 3, "BITMAP" },
 	};
 
-	static const StateMap STATES_MENU_POPITEMS[] =
+	const StateMap STATES_MENU_POPITEMS[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
@@ -469,14 +510,26 @@ namespace msstyle
 		{ 4, "DISABLEDHOT" },
 	};
 
-	static const StateMap STATES_MENU_SYSTEM_GENERAL[] =
+	const StateMap STATES_MENU_SYSTEM_GENERAL[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
 		{ 2, "DISABLED" },
 	};
 
-	static const StateMap STATES_GENERAL[] =
+	const StateMap STATES_MONTHCAL_CELL[] =
+	{
+		{ 0, "Common" },
+		{ 1, "HOT" },
+		{ 2, "HASSTATE" },
+		{ 3, "HASSTATEHOT" },
+		{ 4, "TODAY" },
+		{ 5, "TODAYSELECTED" },
+		{ 6, "SELECTED" },
+		{ 7, "SELECTEDHOT" },
+	};
+
+	const StateMap STATES_GENERAL[] =
 	{
 		{ 0, "Common" },
 		{ 1, "BB_NORMAL" },
@@ -485,14 +538,14 @@ namespace msstyle
 		{ 4, "BB_DISABLED" },
 	};
 
-	static const StateMap STATES_PROGRESS_TRANSPARENT_GENERAL[] =
+	const StateMap STATES_PROGRESS_TRANSPARENT_GENERAL[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
 		{ 2, "PARTIAL" },
 	};
 
-	static const StateMap STATES_PROGRESS_FILL_GENERAL[] =
+	const StateMap STATES_PROGRESS_FILL_GENERAL[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
@@ -501,7 +554,7 @@ namespace msstyle
 		{ 4, "PARTIAL" },
 	};
 
-	static const StateMap STATES_REBAR_GENERAL[] =
+	const StateMap STATES_REBAR_GENERAL[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
@@ -509,7 +562,7 @@ namespace msstyle
 		{ 3, "PRESSED" },
 	};
 
-	static const StateMap STATES_SCROLLBAR_ARROWBTN[] =
+	const StateMap STATES_SCROLLBAR_ARROWBTN[] =
 	{
 		{ 0, "Common" },
 		{ 1, "UPNORMAL" },
@@ -535,7 +588,7 @@ namespace msstyle
 
 	};
 
-	static const StateMap STATES_SCROLLBAR_STYLE[] =
+	const StateMap STATES_SCROLLBAR_STYLE[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
@@ -545,7 +598,7 @@ namespace msstyle
 		{ 5, "HOVER" },
 	};
 
-	static const StateMap STATES_SCROLLBAR_SIZEBOX[] =
+	const StateMap STATES_SCROLLBAR_SIZEBOX[] =
 	{
 		{ 0, "Common" },
 		{ 1, "RIGHTALIGN" },
@@ -558,8 +611,7 @@ namespace msstyle
 		{ 8, "HALFTOPLEFTALIGN" },
 	};
 
-
-	static const StateMap STATES_SPIN_GENERAL[] =
+	const StateMap STATES_SPIN_GENERAL[] =
 	{
 		{ 0, "Common" },
 		{ 1, "Normal" },
@@ -568,7 +620,7 @@ namespace msstyle
 		{ 4, "Disabled" },
 	};
 
-	static const StateMap STATES_TABITEM_GENERAL[] =
+	const StateMap STATES_TABITEM_GENERAL[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
@@ -578,7 +630,7 @@ namespace msstyle
 		{ 5, "FOCUSED" },
 	};
 
-	static const StateMap STATES_TASKDLG_EXPANDOBUTTON[] =
+	const StateMap STATES_TASKDLG_EXPANDOBUTTON[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
@@ -591,7 +643,7 @@ namespace msstyle
 		{ 8, "EXPANDEDDISABLED" },
 	};
 
-	static const StateMap STATES_TEXTSTYLE_HLINK[] =
+	const StateMap STATES_TEXTSTYLE_HLINK[] =
 	{
 		{ 0, "Common" },
 		{ 1, "HYPERLINK_NORMAL" },
@@ -600,14 +652,14 @@ namespace msstyle
 		{ 4, "HYPERLINK_DISABLED" },
 	};
 
-	static const StateMap STATES_TEXTSTYLE_CTRLLABEL[] =
+	const StateMap STATES_TEXTSTYLE_CTRLLABEL[] =
 	{
 		{ 0, "Common" },
 		{ 1, "CONTROLLABEL_NORMAL" },
 		{ 2, "CONTROLLABEL_DISABLED" },
 	};
 
-	static const StateMap STATES_TOOLBARSTYLE[] =
+	const StateMap STATES_TOOLBARSTYLE[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
@@ -621,7 +673,7 @@ namespace msstyle
 
 	};
 
-	static const StateMap STATES_TOOLTIP_CLOSE[] =
+	const StateMap STATES_TOOLTIP_CLOSE[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
@@ -629,14 +681,14 @@ namespace msstyle
 		{ 3, "PRESSED" },
 	};
 
-	static const StateMap STATES_TOOLTIP_BALLOON_AND_STANDARD[] =
+	const StateMap STATES_TOOLTIP_BALLOON_AND_STANDARD[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
 		{ 2, "LINK" },
 	};
 
-	static const StateMap STATES_TOOLTIP_BALLOONSTEM[] =
+	const StateMap STATES_TOOLTIP_BALLOONSTEM[] =
 	{
 		{ 0, "Common" },
 		{ 1, "POINTINGUPLEFTWALL" },
@@ -647,7 +699,7 @@ namespace msstyle
 		{ 6, "POINTINGDOWNLEFTWALL" },
 	};
 
-	static const StateMap STATES_TOOLTIP_WRENCH[] =
+	const StateMap STATES_TOOLTIP_WRENCH[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
@@ -655,14 +707,14 @@ namespace msstyle
 		{ 3, "PRESSED" },
 	};
 
-	static const StateMap STATES_TRACKBAR_GENERAL[] =
+	const StateMap STATES_TRACKBAR_GENERAL[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
 
 	};
 
-	static const StateMap STATES_TRACKBAR_THUMB_GEN[] =
+	const StateMap STATES_TRACKBAR_THUMB_GEN[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
@@ -672,7 +724,7 @@ namespace msstyle
 		{ 5, "DISABLED" },
 	};
 
-	static const StateMap STATES_TREEVIEW_ITEM[] =
+	const StateMap STATES_TREEVIEW_ITEM[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
@@ -683,15 +735,14 @@ namespace msstyle
 		{ 6, "HOTSELECTED" },
 	};
 
-	static const StateMap STATES_TREEVIEW_GLYPH[] =
+	const StateMap STATES_TREEVIEW_GLYPH[] =
 	{
 		{ 0, "Common" },
 		{ 1, "CLOSED" },
 		{ 2, "OPENED" },
 	};
 
-
-	static const StateMap HOVERBACKGROUNDSTATES[] =
+	const StateMap STATES_USERTILE_HOVERBACKGROUND[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
@@ -699,21 +750,21 @@ namespace msstyle
 		{ 3, "PRESSED" },
 	};
 
-	static const StateMap STATES_GRIPPER[] =
+	const StateMap STATES_GRIPPER[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
 		{ 2, "CENTERED" },
 	};
 
-	static const StateMap STATES_WINDOW_FRAME_GEN[] =
+	const StateMap STATES_WINDOW_FRAME_GEN[] =
 	{
 		{ 0, "Common" },
 		{ 1, "ACTIVE" },
 		{ 2, "INACTIVE" },
 	};
 
-	static const StateMap STATES_WINDOW_CAPTION_GEN[] =
+	const StateMap STATES_WINDOW_CAPTION_GEN[] =
 	{
 		{ 0, "Common" },
 		{ 1, "ACTIVE" },
@@ -721,7 +772,7 @@ namespace msstyle
 		{ 3, "DISABLED" },
 	};
 
-	static const StateMap STATES_WINDOW_BTN_AND_THUMB[] =
+	const StateMap STATES_WINDOW_BTN_AND_THUMB[] =
 	{
 		{ 0, "Common" },
 		{ 1, "NORMAL" },
@@ -730,7 +781,7 @@ namespace msstyle
 		{ 4, "DISABLED" },
 	};
 
-	static const StateMap STATES_WINDOW_CAPTION_SMALL[] =
+	const StateMap STATES_WINDOW_CAPTION_SMALL[] =
 	{
 		{ 0, "Common" },
 		{ 1, "ACTIVE" },

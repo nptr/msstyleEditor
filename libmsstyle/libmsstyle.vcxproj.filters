@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Ressourcendateien">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ResourceUtil.h" />
+    <ClInclude Include="StyleClass.h" />
+    <ClInclude Include="StylePart.h" />
+    <ClInclude Include="StyleState.h" />
+    <ClInclude Include="VisualStyle.h" />
+    <ClInclude Include="VisualStyleEnums.h" />
+    <ClInclude Include="VisualStyleParts.h" />
+    <ClInclude Include="VisualStyleStates.h" />
+    <ClInclude Include="Lookup.h" />
+    <ClInclude Include="VisualStyleDefinitions.h" />
+    <ClInclude Include="StyleResource.h" />
+    <ClInclude Include="PropertyReader.h" />
+    <ClInclude Include="PropertyWriter.h" />
+    <ClInclude Include="StyleProperty.h" />
+    <ClInclude Include="StringUtil.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ResourceUtil.cpp" />
+    <ClCompile Include="StyleClass.cpp" />
+    <ClCompile Include="StylePart.cpp" />
+    <ClCompile Include="StyleState.cpp" />
+    <ClCompile Include="VisualStyle.cpp" />
+    <ClCompile Include="VisualStyleEnums.cpp" />
+    <ClCompile Include="VisualStyleParts.cpp" />
+    <ClCompile Include="VisualStyleStates.cpp" />
+    <ClCompile Include="Lookup.cpp" />
+    <ClCompile Include="VisualStyleDefinitions.cpp" />
+    <ClCompile Include="StyleResource.cpp" />
+    <ClCompile Include="PropertyReader.cpp" />
+    <ClCompile Include="PropertyWriter.cpp" />
+    <ClCompile Include="StyleProperty.cpp" />
+    <ClCompile Include="StringUtil.cpp" />
+  </ItemGroup>
+</Project>

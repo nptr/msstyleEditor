@@ -2,7 +2,7 @@
 
 AboutDialog::AboutDialog(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style) : wxDialog(parent, id, title, pos, size, style)
 {
-	this->SetSizeHints(wxSize(200, 138), wxSize(-1, -1));
+	this->SetSizeHints(wxSize(-1, -1), wxSize(-1, -1));
 
 	wxBoxSizer* bSizer4;
 	bSizer4 = new wxBoxSizer(wxVERTICAL);
@@ -22,11 +22,11 @@ AboutDialog::AboutDialog(wxWindow* parent, wxWindowID id, const wxString& title,
 
 	bSizer4->Add(bSizer7, 0, wxEXPAND, 5);
 
-	m_staticText2 = new wxStaticText(this, wxID_ANY, wxT("Version 1.2.3.0"), wxDefaultPosition, wxDefaultSize, 0);
+	m_staticText2 = new wxStaticText(this, wxID_ANY, wxT("Version 1.3.0.0"), wxDefaultPosition, wxDefaultSize, 0);
 	m_staticText2->Wrap(-1);
 	bSizer4->Add(m_staticText2, 0, wxBOTTOM | wxLEFT, 5);
 
-	m_staticText3 = new wxStaticText(this, wxID_ANY, wxT("Copyright (C) 2015-2017 Jakob K."), wxDefaultPosition, wxDefaultSize, 0);
+	m_staticText3 = new wxStaticText(this, wxID_ANY, wxT("Copyright (C) 2015-2018, Jakob K."), wxDefaultPosition, wxDefaultSize, 0);
 	m_staticText3->Wrap(-1);
 	bSizer4->Add(m_staticText3, 0, wxBOTTOM | wxLEFT, 5);
 

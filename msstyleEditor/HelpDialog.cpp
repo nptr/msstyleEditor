@@ -15,7 +15,7 @@ HelpDialog::HelpDialog(wxWindow* parent, wxWindowID id, const wxString& title, c
 	wxBoxSizer* bSizer6;
 	bSizer6 = new wxBoxSizer(wxVERTICAL);
 
-	helpBox = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY | wxTE_MULTILINE);
+	helpBox = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY | wxTE_MULTILINE | wxNO_BORDER );
 	bSizer6->Add(helpBox, 1, wxALL | wxEXPAND, 5);
 
 

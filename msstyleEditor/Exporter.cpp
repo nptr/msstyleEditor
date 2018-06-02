@@ -1,11 +1,11 @@
 #include "Exporter.h"
+#include "libmsstyle\VisualStyle.h"
 
 #include <fstream>
 #include <iostream>
 #include <string>
 #include <codecvt>
 
-#include "VisualStyle.h"
 
 std::string WStringToUTF8(const std::wstring& str)
 {
@@ -13,12 +13,7 @@ std::string WStringToUTF8(const std::wstring& str)
 	return myconv.to_bytes(str);
 }
 
-void Exporter::ExportPropertyCSV(const msstyle::VisualStyle& style)
-{
-
-}
-
-void Exporter::ExportLogicalStructure(const std::string& path, const msstyle::VisualStyle& style)
+void Exporter::ExportLogicalStructure(const std::string& path, libmsstyle::VisualStyle& style)
 {
 	std::ofstream file(path);
 	if (!file.is_open())
@@ -29,56 +24,54 @@ void Exporter::ExportLogicalStructure(const std::string& path, const msstyle::Vi
 	std::string txt;
 	txt.reserve(1024 * 1024 * 4);
 
-	txt.append("File: "); txt.append(WStringToUTF8(style.GetFileName()));
+	txt.append("File: "); txt.append(style.GetPath());
 	sprintf(buffer, "\nProperties: %d", style.GetPropertyCount());
 	txt.append(buffer);
 
 	switch (style.GetCompatiblePlatform())
 	{
-		case msstyle::WIN7:
+		case libmsstyle::WIN7:
 		{
 			txt.append("\nPlatform: Windows 7\n\n");
 		} break;
-		case msstyle::WIN8:
-		case msstyle::WIN81:
+		case libmsstyle::WIN8:
+		case libmsstyle::WIN81:
 		{
 			txt.append("\nPlatform: Windows 8 / 8.1\n\n");
 		} break;
-		case msstyle::WIN10:
+		case libmsstyle::WIN10:
 		{
 			txt.append("\nPlatform: Windows 10\n\n");
 		} break;
 		default:
 		{
-			txt.append("\nPlatform: This should never happen.\n\n");
+			txt.append("\nPlatform: Unknown!\n\n");
 		} break;
 	}
 
 	txt.append("BEGIN STRUCTURE"); txt.append("\n");
 
-	const std::unordered_map<int32_t, msstyle::MsStyleClass*>* classes = style.GetClasses();
-
-	for (auto& classIt : *classes)
+	for (auto& cls : style)
 	{
-		txt.append("Class: "); txt.append(classIt.second->className);
+		txt.append("Class: "); txt.append(cls.second.className);
 		txt.append("\n");
 
-		for (auto& partIt : classIt.second->parts)
+		for (auto& part : cls.second)
 		{
-			txt.append("\tPart: "); txt.append(partIt.second->partName);
+			txt.append("\tPart: "); txt.append(part.second.partName);
 			txt.append("\n");
 
-			for (auto& stateIt : partIt.second->states)
+			for (auto& state : part.second)
 			{
-				txt.append("\t\tState: "); txt.append(stateIt.second->stateName);
+				txt.append("\t\tState: "); txt.append(state.second.stateName);
 				txt.append("\n");
 
-				for (auto& propIt : stateIt.second->properties)
+				for (auto& prop : state.second)
 				{
-					sprintf(buffer, "\t\t\tProp @ 0x%.6x, %s (%s) (%s)"	, &propIt->nameID - (int32_t*)style.GetPropertyBaseAddress()
-																	, msstyle::VisualStyle::FindPropName(propIt->nameID)
-																	, msstyle::VisualStyle::FindPropName(propIt->typeID)
-																	, msstyle::VisualStyle::GetPropertyValueAsString(*propIt).c_str());
+					sprintf(buffer, "\t\t\tProp %s (%s) (%s)"
+						, prop->LookupName()
+						, prop->LookupTypeName()
+						, prop->GetValueAsString().c_str());
 					txt.append(buffer);
 					txt.append("\n");
 				}
