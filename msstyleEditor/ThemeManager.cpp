@@ -3,7 +3,7 @@
 
 #include "libmsstyle\VisualStyle.h"
 
-#include <shlobj.h> // SHGetKnownFolderPath()
+#include <shlobj.h>	// SHGetKnownFolderPath()
 
 #include <string>
 #include <codecvt>	// codecvt_utf8_utf16
@@ -52,8 +52,8 @@ void ThemeManager::ApplyTheme(libmsstyle::VisualStyle& style)
 	if (!m_valid)
 		return;
 
-	// Applying a style located from any folder in /Users/<currentuser>/ breaks Win8.1 badly. (Issue #9)
-	// This means Desktop, AppData, Temp, ...
+	// Applying a style from any folder in /Users/<currentuser>/ breaks Win8.1 badly. (Issue #9)
+	// This means /Desktop/, /AppData/, /Temp/, etc. cannot be used; weird...
 	// A writeable alternative that doesn't crash Win8.1 is anything inside /Users/Public/.
 	// TODO: What does happen when being logged in as "Public" ?
 	wchar_t* publicFolder = nullptr;
@@ -73,7 +73,7 @@ void ThemeManager::ApplyTheme(libmsstyle::VisualStyle& style)
 
 	style.Save(newPathUTF8);
 
-	// For the fourth parameter i saw recommendations for: 0, 32, 33, 65
+	// I saw the following values being recommended for the fourth parameter: 0, 32, 33, 65
 	if (uxtheme::SetSystemTheme(newPathUTF16.c_str(), L"NormalColor", L"NormalSize", 33) != S_OK)
 	{
 		DeleteFileW(newPath);
@@ -81,7 +81,7 @@ void ThemeManager::ApplyTheme(libmsstyle::VisualStyle& style)
 	}
 	else
 	{
-		// Remove previous tmp theme now that it's not
+		// Remove the previous temporary theme now that it's not
 		// in use by the OS anymore.
 		if (m_usertheme)
 		{

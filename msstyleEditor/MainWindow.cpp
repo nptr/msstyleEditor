@@ -887,7 +887,7 @@ wxTreeItemId MainWindow::FindNext(const SearchProperties& search, wxTreeItemId n
 	wxTreeItemId originalNode = node;
 	while (node.IsOk())
 	{
-		// see whether the node contains "str" somewhere.
+		// see whether the node contains "search.value" somewhere.
 		// skip the first node to not get stuck.
 		if (node != originalNode)
 		{
@@ -931,7 +931,7 @@ wxTreeItemId MainWindow::FindNext(const SearchProperties& search, wxTreeItemId n
 
 				if (nextNode.IsOk()) // parent ok, so we have a sibling
 					nextNode = classView->GetNextSibling(nextNode);
-				//else parent was not ok, so we hit the root node -> no nodes left anymore -> search done
+				//else: parent was not ok because we reached the root node -> no nodes left anymore -> search done
 			}
 		}
 

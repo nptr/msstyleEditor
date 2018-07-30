@@ -121,7 +121,7 @@ namespace libmsstyle
 				Resource pmap = GetResource(m_moduleHandle, "NORMAL", "VARIANT");
 				LoadProperties(pmap);
 			}
-			else throw std::runtime_error("Couldn't open file as PE resource!");
+			else throw std::runtime_error("Could not open file as PE resource!");
 		}
 
 		void SaveResources(UpdateHandle updateHandle)
@@ -340,10 +340,6 @@ namespace libmsstyle
 
 			libmsstyle::rw::PropertyReader::Result result;
 
-			// This end condition would be nice if SizeOfResource() would return
-			// the correct resource size. Unfortunately, it returns less
-			// than there is data returned by LockResource(). That makes me 
-			// miss the last few props; Saving it creates a bunch of new problems..
 			while (current < end - 4)
 			{
 				StyleProperty* tmpProp = new StyleProperty();

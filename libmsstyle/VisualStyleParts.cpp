@@ -1056,8 +1056,6 @@ namespace libmsstyle
 		{ 19, "LOGOFFSPLITBUTTONDROPDOWN", VS_STATE_NONE },
 	};
 
-	// incomplete list, derived from PARTS_STARTPANEL
-	// with a bit of guessing. Works best for Win7.
 	const PartMap PARTS_STARTPANELPRIV[] =
 	{
 		{ 0, "Common Properties", VS_STATE_NONE },

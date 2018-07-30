@@ -141,8 +141,6 @@ namespace libmsstyle
 
 	extern const PartMap PARTS_STARTPANEL[20];
 
-	// incomplete list, derived from PARTS_STARTPANEL
-	// with a bit of guessing. Works best for Win7.
 	extern const PartMap PARTS_STARTPANELPRIV[39];
 
 	extern const PartMap PARTS_MONTHCAL[12];

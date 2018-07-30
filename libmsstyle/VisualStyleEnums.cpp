@@ -115,7 +115,6 @@ namespace libmsstyle
 		{ 2, "DPI" }
 	};
 
-
 	const EnumMap ENUM_HIGHCONTRASTTYPE[] =
 	{
 		{ 0, "ACTIVECAPTION" },

@@ -31,7 +31,7 @@ namespace libmsstyle
 			// - UnknownType:  Property type at "src" was unknown.
 			//				   "prop" header may be valid. data not!
 			// - BadProperty:  Property at "src" was invalid.
-			//					"prop" header may be valid.data not!
+			//				   "prop" header may be valid. data not!
 			const char* ReadNextProperty(const char* src, Result& result, StyleProperty* prop);
 
 			// Does a few range and sanity checks to see if the data could 
