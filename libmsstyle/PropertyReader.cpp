@@ -103,13 +103,13 @@ namespace libmsstyle
 			// 40 bytes
 			case IDENTIFIER::INT:
 			case IDENTIFIER::SIZE:
-			case IDENTIFIER::BOOL:
+			case IDENTIFIER::BOOLTYPE:
 			case IDENTIFIER::COLOR:
 			case IDENTIFIER::ENUM:
 			case IDENTIFIER::POSITION:
 			case IDENTIFIER::HIGHCONTRASTCOLORTYPE:
 			// 48 bytes
-			case IDENTIFIER::RECT:
+			case IDENTIFIER::RECTTYPE:
 			case IDENTIFIER::MARGINS:
 			{
 				// Copy the data of known props to the PropertyData field.

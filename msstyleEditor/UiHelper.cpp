@@ -87,7 +87,7 @@ wxPGProperty* GetWXPropertyFromMsStyleProperty(StyleProperty& prop)
 		p->SetClientData(&prop);
 		return p;
 	}
-	case IDENTIFIER::BOOL:
+	case IDENTIFIER::BOOLTYPE:
 	{
 		wxIntProperty* p = new wxIntProperty(propName, *wxPGProperty::sm_wxPG_LABEL, prop.data.booltype.boolvalue);
 		p->SetClientData(&prop);
@@ -100,7 +100,7 @@ wxPGProperty* GetWXPropertyFromMsStyleProperty(StyleProperty& prop)
 		p->SetClientData(&prop);
 		return p;
 	}
-	case IDENTIFIER::RECT:
+	case IDENTIFIER::RECTTYPE:
 	{
 		sprintf(str, "%d, %d, %d, %d", prop.data.recttype.left, prop.data.recttype.top, prop.data.recttype.right, prop.data.recttype.bottom);
 		wxStringProperty* p = new wxStringProperty(propName, *wxPGProperty::sm_wxPG_LABEL, str);

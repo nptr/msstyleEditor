@@ -43,7 +43,7 @@ SearchDialog::SearchDialog(wxWindow* parent, wxWindowID id, const wxString& titl
 	typeBox->Append("MARGINS",	(void*)libmsstyle::IDENTIFIER::MARGINS);
 	typeBox->Append("SIZE",		(void*)libmsstyle::IDENTIFIER::SIZE);
 	typeBox->Append("POSITION", (void*)libmsstyle::IDENTIFIER::POSITION);
-	typeBox->Append("RECT",		(void*)libmsstyle::IDENTIFIER::RECT);
+	typeBox->Append("RECT",		(void*)libmsstyle::IDENTIFIER::RECTTYPE);
 	typeBox->Select(0);
 
 	this->SetSizer(bSizer9);
@@ -96,7 +96,7 @@ void SearchDialog::OnSearchTypeChanged(wxCommandEvent& evt)
 			searchBar->SetDescriptiveText("size");
 		} break;
 		case libmsstyle::IDENTIFIER::MARGINS:
-		case libmsstyle::IDENTIFIER::RECT:
+		case libmsstyle::IDENTIFIER::RECTTYPE:
 		{
 			searchBar->SetDescriptiveText("l, t, r, b");
 		} break;

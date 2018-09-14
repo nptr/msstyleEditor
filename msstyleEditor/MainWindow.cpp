@@ -410,7 +410,7 @@ void MainWindow::OnPropertyGridChanging(wxPropertyGridEvent& event)
 	case IDENTIFIER::HIGHCONTRASTCOLORTYPE:
 	case IDENTIFIER::ENUM:
 		styleProp->UpdateEnum(event.GetValidationInfo().GetValue().GetInteger()); break;
-	case IDENTIFIER::BOOL:
+	case IDENTIFIER::BOOLTYPE:
 		styleProp->UpdateBoolean(event.GetValidationInfo().GetValue().GetBool()); break;
 	case IDENTIFIER::COLOR:
 	{
@@ -418,7 +418,7 @@ void MainWindow::OnPropertyGridChanging(wxPropertyGridEvent& event)
 		wxColor color = value.As<wxColour>();
 		styleProp->UpdateColor(color.Red(), color.Green(), color.Blue());
 	} break;
-	case IDENTIFIER::RECT:
+	case IDENTIFIER::RECTTYPE:
 	case IDENTIFIER::MARGINS:
 	{
 		int l, t, r, b;
@@ -430,7 +430,7 @@ void MainWindow::OnPropertyGridChanging(wxPropertyGridEvent& event)
 		}
 		else
 		{
-			if (styleProp->header.typeID == IDENTIFIER::RECT)
+			if (styleProp->header.typeID == IDENTIFIER::RECTTYPE)
 				styleProp->UpdateRectangle(l, t, r, b);
 			if (styleProp->header.typeID == IDENTIFIER::MARGINS)
 				styleProp->UpdateMargin(l, t, r, b);
@@ -817,7 +817,7 @@ bool ContainsProperty(const SearchProperties& search, wxTreeItemData* treeItemDa
 					if (ContainsStringInvariant(std::string(propMargin), tmp))
 						return true;
 				} break;
-				case IDENTIFIER::RECT:
+				case IDENTIFIER::RECTTYPE:
 				{
 					char propRect[32];
 					sprintf(propRect, "%d,%d,%d,%d",

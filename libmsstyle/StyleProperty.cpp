@@ -69,11 +69,11 @@ namespace libmsstyle
 			return 40;
 		case IDENTIFIER::SIZE:
 			return 40;
-		case IDENTIFIER::BOOL:
+		case IDENTIFIER::BOOLTYPE:
 			return 40;
 		case IDENTIFIER::COLOR:
 			return 40;
-		case IDENTIFIER::RECT:
+		case IDENTIFIER::RECTTYPE:
 			return 48;
 		case IDENTIFIER::MARGINS:
 			return 48;
@@ -181,7 +181,7 @@ namespace libmsstyle
 
 	void StyleProperty::UpdateBoolean(bool boolVal)
 	{
-		assert(header.typeID == IDENTIFIER::BOOL);
+		assert(header.typeID == IDENTIFIER::BOOLTYPE);
 		data.booltype.boolvalue = boolVal;
 	}
 
@@ -195,7 +195,7 @@ namespace libmsstyle
 
 	void StyleProperty::UpdateRectangle(int left, int top, int right, int bottom)
 	{
-		assert(header.typeID == IDENTIFIER::RECT);
+		assert(header.typeID == IDENTIFIER::RECTTYPE);
 		data.recttype.left = left;
 		data.recttype.top = top;
 		data.recttype.right = right;
@@ -249,7 +249,7 @@ namespace libmsstyle
 		{
 			return std::to_string(data.inttype.value);
 		} break;
-		case IDENTIFIER::BOOL:
+		case IDENTIFIER::BOOLTYPE:
 		{
 			if (data.booltype.boolvalue > 0)
 				return std::string("true");
@@ -276,7 +276,7 @@ namespace libmsstyle
 		{
 			return format_string("%d, %d", data.positiontype.x, data.positiontype.y);
 		} break;
-		case IDENTIFIER::RECT:
+		case IDENTIFIER::RECTTYPE:
 		{
 			return format_string("%d, %d, %d, %d", data.recttype.left, data.recttype.top, data.recttype.right, data.recttype.bottom);
 		} break;
@@ -323,7 +323,7 @@ namespace libmsstyle
 		case libmsstyle::INT:
 			this->header.sizeInBytes = 0x4;
 			break;
-		case libmsstyle::BOOL:
+		case libmsstyle::BOOLTYPE:
 			this->header.sizeInBytes = 0x4;
 			break;
 		case libmsstyle::COLOR:
@@ -341,7 +341,7 @@ namespace libmsstyle
 		case libmsstyle::POSITION:
 			this->header.sizeInBytes = 0x8;
 			break;
-		case libmsstyle::RECT:
+		case libmsstyle::RECTTYPE:
 			this->header.sizeInBytes = 0x10;
 			break;
 		case libmsstyle::FONT:
