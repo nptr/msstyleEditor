@@ -36,6 +36,21 @@ private:
 	libmsstyle::VisualStyle* m_currentStyle;
 	libmsstyle::StyleResource m_selectedImage;
 
+	HMENU m_imageViewMenu;
+
+	struct SelectionModel
+	{
+		SelectionModel()
+			: ClassId(-1)
+			, PartId(-1)
+			, StateId(-1)
+		{}
+
+		int ClassId;
+		int PartId;
+		int StateId;
+	} selection;
+
 public:
 	DECLARE_FRAME_WND_CLASS(_T("mseWndClass"), IDR_MAINFRAME)
 
@@ -62,7 +77,10 @@ public:
 	BEGIN_MSG_MAP(CMainFrame)
 		MESSAGE_HANDLER(WM_CREATE, OnCreate)
 		MESSAGE_HANDLER(WM_DESTROY, OnDestroy)
+		MESSAGE_HANDLER(WM_CONTEXTMENU, OnContextMenu)
+
 		NOTIFY_CODE_HANDLER(TVN_SELCHANGED, OnTreeViewSelectionChanged)
+		NOTIFY_CODE_HANDLER(PIN_ITEMCHANGING, OnPropGridItemChanging)
 
 		COMMAND_ID_HANDLER(ID_APP_EXIT, OnFileExit)
 		COMMAND_ID_HANDLER(ID_FILE_NEW, OnFileNew)
@@ -77,6 +95,9 @@ public:
 		COMMAND_ID_HANDLER(ID_VIEW_THEMEFOLDER, OnViewThemeFolder)
 		COMMAND_ID_HANDLER(ID_VIEW_STATUS_BAR, OnViewStatusBar)
 		COMMAND_ID_HANDLER(ID_APP_ABOUT, OnAppAbout)
+
+		COMMAND_HANDLER(WM_CONTEXTMENU, ID_IMGBG_CHESS, );
+
 
 		CHAIN_MSG_MAP(CUpdateUI<CMainFrame>)
 		CHAIN_MSG_MAP(CFrameWindowImpl<CMainFrame>)
@@ -97,6 +118,9 @@ public:
 	LRESULT OnDestroy(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& bHandled);
 
 	LRESULT OnTreeViewSelectionChanged(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/);
+	LRESULT OnPropGridItemChanging(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/);
+
+	LRESULT OnContextMenu(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 
 	//
 	// MENU ITEMS
@@ -131,6 +155,8 @@ private:
 	void ShowImageFromFile(LPCWSTR path);
 	void ShowImageFromResource(libmsstyle::StyleProperty& prop);
 	void ClearImageView();
+
+	void SetStatusText(LPCWSTR text);
 
 	LPARAM RegUserData(void* data, int type);
 

@@ -9,18 +9,30 @@
 class CImageCtrl : public CScrollWindowImpl<CImageCtrl>
 {
 public:
+
+	enum BackgroundStyle
+	{
+		White,
+		LightGrey,
+		Chessboard,
+		Black
+	};
+
 	DECLARE_WND_CLASS_EX(NULL, 0, -1)
 
 	Gdiplus::Image* m_image;
-	SIZE m_area;
 	SIZE m_drawAt;
-
 	SIZE m_size;
+	SIZE m_cellSize;
+	BackgroundStyle m_bgStyle;
 
 	CImageCtrl()
+		: m_image(NULL)
+		, m_drawAt()
+		, m_bgStyle(LightGrey)
 	{
-		m_image = NULL;
 		m_size.cx = m_size.cy = 1;
+		m_cellSize.cx = m_cellSize.cy = 12;
 	}
 
 	~CImageCtrl()
@@ -37,6 +49,11 @@ public:
 		return FALSE;
 	}
 
+	void SetBackgroundStyle(BackgroundStyle style)
+	{
+		m_bgStyle = style;
+	}
+
 	void SetBitmap(Gdiplus::Image* image)
 	{
 		if (m_image != NULL)
@@ -50,6 +67,15 @@ public:
 		{
 			m_size.cx = image->GetWidth();
 			m_size.cy = image->GetHeight();
+
+			RECT rect;
+			GetClientRect(&rect);
+
+			SIZE areaSize;
+			areaSize.cx = rect.right - rect.left;
+			areaSize.cy = rect.bottom - rect.top;
+
+			AdjustImageOrigin(areaSize, m_size, m_drawAt);
 		}
 		else
 		{
@@ -57,8 +83,6 @@ public:
 		}
 
 		this->Invalidate();
-		//SetScrollOffset(0, 0, FALSE);
-		//SetScrollSize(m_size);
 	}
 
 	BEGIN_MSG_MAP(CImageCtrl)
@@ -73,31 +97,20 @@ public:
 
 	void DoSize(int x, int y)
 	{
-		m_area.cx = x;
-		m_area.cy = y;
-
-		if (m_image == NULL)
+		if (m_image != NULL)
 		{
-			return;
+			SIZE newArea;
+			newArea.cx = x;
+			newArea.cy = y;
+
+			SIZE imageSize;
+			imageSize.cx = m_image->GetWidth();
+			imageSize.cy = m_image->GetHeight();
+
+			AdjustImageOrigin(newArea, imageSize, m_drawAt);
+
+			this->Invalidate();
 		}
-
-		bool couldFit = false;
-
-		// try center X
-		if (m_image->GetWidth() < m_area.cx)
-		{
-			m_drawAt.cx = (m_area.cx / 2) - (m_image->GetWidth() / 2);
-			couldFit = true;
-		}
-
-		// try center y
-		if (m_image->GetWidth() < m_area.cx)
-		{
-			m_drawAt.cy = (m_area.cy / 2) - (m_image->GetHeight() / 2);
-			couldFit = true;
-		}
-
-		this->Invalidate();
 	}
 
 	void DoPaint(CDCHandle dc)
@@ -107,12 +120,49 @@ public:
 		Gdiplus::Bitmap memBmp(rc.right, rc.bottom);
 		Gdiplus::Graphics gMem(&memBmp);
 
-		COLORREF bgColor = GetSysColor(COLOR_WINDOW);
-		Gdiplus::SolidBrush bgBrush(Gdiplus::Color(
-			GetRValue(bgColor)
-			, GetGValue(bgColor)
-			, GetBValue(bgColor)));
-		gMem.FillRectangle(&bgBrush, (INT)rc.left, (INT)rc.top, (INT)rc.right, (INT)rc.bottom);
+		switch (m_bgStyle)
+		{
+		case BackgroundStyle::White:
+		{
+			Gdiplus::SolidBrush bgBrush(Gdiplus::Color(255, 255, 255));
+			gMem.FillRectangle(&bgBrush, (INT)rc.left, (INT)rc.top, (INT)rc.right, (INT)rc.bottom);
+		} break;
+		case BackgroundStyle::LightGrey:
+		{
+			Gdiplus::SolidBrush bgBrush(Gdiplus::Color(230, 230, 230));
+			gMem.FillRectangle(&bgBrush, (INT)rc.left, (INT)rc.top, (INT)rc.right, (INT)rc.bottom);
+		} break;
+		case BackgroundStyle::Black:
+		{
+			Gdiplus::SolidBrush bgBrush(Gdiplus::Color(0, 0, 0));
+			gMem.FillRectangle(&bgBrush, (INT)rc.left, (INT)rc.top, (INT)rc.right, (INT)rc.bottom);
+		} break;
+		case BackgroundStyle::Chessboard:
+		{
+			Gdiplus::SolidBrush bgWhite(Gdiplus::Color(255, 255, 255));
+			Gdiplus::SolidBrush bgGrey(Gdiplus::Color(192, 192, 192));
+			Gdiplus::SolidBrush* currentBg;
+
+			int numXCells = (rc.right - rc.left) / m_cellSize.cx + 1;
+			int numYCells = (rc.bottom - rc.top) / m_cellSize.cy + 1;
+
+			for (int x = 0; x < numXCells; ++x)
+			{
+				for (int y = 0; y < numYCells; ++y)
+				{
+					if ((x + y) % 2 > 0)
+						currentBg = &bgWhite;
+					else currentBg = &bgGrey;
+
+					gMem.FillRectangle(currentBg
+						, x * m_cellSize.cx
+						, y * m_cellSize.cy
+						, m_cellSize.cx
+						, m_cellSize.cy);
+				}
+			}
+		} break;
+		}
 
 		if (m_image != NULL)
 		{
@@ -129,5 +179,21 @@ public:
 
 		Gdiplus::Graphics g(dc);
 		g.DrawImage(&memBmp, 0, 0);
+	}
+
+private:
+	void AdjustImageOrigin(SIZE areaSize, SIZE imageSize, SIZE& result)
+	{
+		// try center X
+		if (imageSize.cx < areaSize.cx)
+		{
+			result.cx = (areaSize.cx / 2) - (imageSize.cx / 2);
+		}
+
+		// try center y
+		if (imageSize.cy < areaSize.cy)
+		{
+			result.cy = (areaSize.cy / 2) - (imageSize.cy / 2);
+		}
 	}
 };

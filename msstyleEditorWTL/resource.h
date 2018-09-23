@@ -4,6 +4,8 @@
 //
 #define IDD_ABOUTBOX                    100
 #define IDR_MAINFRAME                   128
+#define IDR_MENU1                       201
+#define IDR_IMAGEVIEW                   201
 #define IDC_IPADDRESS1                  1000
 #define IDC_SYSLINK1                    1001
 #define ID_VIEW_EXPANDALL               32775
@@ -16,12 +18,16 @@
 #define ID_IMAGE_REPLACE                32782
 #define ID_FILE_EXPORT                  32783
 #define ID_EXPORT_STYLEINFO             32784
+#define ID_IMGBG_WHITE                  32800
+#define ID_IMGBG_LGREY                  32801
+#define ID_IMGBG_BLACK                  32802
+#define ID_IMGBG_CHESS                  32803
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        201
+#define _APS_NEXT_RESOURCE_VALUE        202
 #define _APS_NEXT_COMMAND_VALUE         32785
 #define _APS_NEXT_CONTROL_VALUE         1002
 #define _APS_NEXT_SYMED_VALUE           101

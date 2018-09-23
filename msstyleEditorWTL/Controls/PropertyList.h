@@ -881,17 +881,27 @@ public:
       IProperty* prop = reinterpret_cast<IProperty*>(TBase::GetItemData(m_iInplaceIndex));
       ATLASSERT(prop);
       if( prop == NULL ) return 0;
+
+	  // Save old value
+	  CComVariant prevValue;
+	  prop->GetValue(&prevValue);
+
+	  // Set new value
+	  if (!prop->SetValue(hWnd)) ::MessageBeep((UINT)-1);
+
       // Ask owner about change
       NMPROPERTYITEM nmh = { m_hWnd, GetDlgCtrlID(), PIN_ITEMCHANGING, prop };
       if( ::SendMessage(GetParent(), WM_NOTIFY, nmh.hdr.idFrom, (LPARAM) &nmh) == 0 ) {
-         // Set new value
-         if( !prop->SetValue(hWnd) ) ::MessageBeep((UINT)-1);
          // Let owner know
          nmh.hdr.code = PIN_ITEMCHANGED;
          ::SendMessage(GetParent(), WM_NOTIFY, nmh.hdr.idFrom, (LPARAM) &nmh);
          // Repaint item
          InvalidateItem(m_iInplaceIndex);
       }
+	  else {
+		  // Validation failed, reset to old value
+		  prop->SetValue(prevValue);
+	  }
       // Destroy inplace editor
       _DestroyInplaceWindow();
       return 0;
@@ -923,16 +933,25 @@ public:
       VARIANT* pVariant = reinterpret_cast<VARIANT*>(wParam);
       ATLASSERT(prop && pVariant);
       if( prop == NULL || pVariant == NULL ) return 0;
-      // Ask owner about change
+      
+	  // Save old value
+	  CComVariant prevValue;
+	  prop->GetValue(&prevValue);
+
+	  // Set new value
+	  if (!prop->SetValue(*pVariant)) ::MessageBeep((UINT)-1);
+
+	  // Ask owner about change
       NMPROPERTYITEM nmh = { m_hWnd, GetDlgCtrlID(), PIN_ITEMCHANGING, prop };
       if( ::SendMessage(GetParent(), WM_NOTIFY, nmh.hdr.idFrom, (LPARAM) &nmh) == 0 ) {
-         // Set new value
-         // NOTE: Do not call this from IProperty::SetValue(VARIANT*) = endless loop
-         if( !prop->SetValue(*pVariant) ) ::MessageBeep((UINT)-1);
          // Let owner know
          nmh.hdr.code = PIN_ITEMCHANGED;
          ::SendMessage(GetParent(), WM_NOTIFY, nmh.hdr.idFrom, (LPARAM) &nmh);
       }
+	  else {
+		  // Validation failed, reset to old value
+		  prop->SetValue(prevValue);
+	  }
       // Locate the updated property index
       int idx = FindProperty(prop);
       // Repaint item

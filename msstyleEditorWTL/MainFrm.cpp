@@ -17,6 +17,9 @@
 #define ITEM_STATE 3
 #define ITEM_PROPERTY 4
 
+#define CHANGE_OK 0
+#define CHANGE_VETO 1
+
 CMainFrame::CMainFrame()
 	: m_currentStyle(nullptr)
 {
@@ -85,7 +88,7 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 
 	m_imageView.Create(m_splitRight, rcDefault, NULL, COMMON_WND_STYLE);
 	m_imageView.SetBitmap(NULL);
-
+	m_imageViewMenu = GetSubMenu(LoadMenu(NULL, MAKEINTRESOURCE(IDR_IMAGEVIEW)), 0);
 
 	m_propListBase.Create(m_splitRight, rcDefault, NULL, COMMON_WND_STYLE
 		| WS_VSCROLL
@@ -137,25 +140,77 @@ LRESULT CMainFrame::OnDestroy(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*
 
 #pragma region Control Handling
 
+LRESULT CMainFrame::OnContextMenu(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+{
+	POINT curPoint;
+	GetCursorPos(&curPoint);
+
+	RECT rectImgView;
+	m_imageView.GetWindowRect(&rectImgView);
+
+	if (PtInRect(&rectImgView, curPoint))
+	{
+		HWND source = reinterpret_cast<HWND>(wParam);
+		BOOL res = TrackPopupMenu(m_imageViewMenu, TPM_RETURNCMD
+			, curPoint.x
+			, curPoint.y
+			, 0
+			, source
+			, NULL);
+
+		switch (res)
+		{
+		case ID_IMGBG_WHITE:
+			m_imageView.SetBackgroundStyle(CImageCtrl::White);
+			m_imageView.Invalidate();
+			break;
+		case ID_IMGBG_LGREY:
+			m_imageView.SetBackgroundStyle(CImageCtrl::LightGrey);
+			m_imageView.Invalidate();
+			break;
+		case ID_IMGBG_BLACK:
+			m_imageView.SetBackgroundStyle(CImageCtrl::Black);
+			m_imageView.Invalidate();
+			break;
+		case ID_IMGBG_CHESS:
+			m_imageView.SetBackgroundStyle(CImageCtrl::Chessboard);
+			m_imageView.Invalidate();
+			break;
+		}
+	}
+
+	return TRUE;
+}
+
 LRESULT CMainFrame::OnTreeViewSelectionChanged(int idCtrl, LPNMHDR pnmh, BOOL& bHandled)
 {
+	USES_CONVERSION;
+
 	LPNM_TREEVIEW evt = (LPNM_TREEVIEW)pnmh;
+
+	WCHAR statusText[255];
 
 	TreeItemData* data = reinterpret_cast<TreeItemData*>(evt->itemNew.lParam);
 	if (data == nullptr)
 		return 0;
+
+	HTREEITEM parentItem = m_treeView.GetParentItem(evt->itemNew.hItem);
+	TreeItemData* parentData = reinterpret_cast<TreeItemData*>(m_treeView.GetItemData(parentItem));
+
+	HTREEITEM grandparentItem = m_treeView.GetParentItem(parentItem);
+	TreeItemData* grandparentData = reinterpret_cast<TreeItemData*>(m_treeView.GetItemData(grandparentItem));
 
 	// Class Node
 	if (data->type == ITEM_CLASS)
 	{
 		libmsstyle::StyleClass* classData = static_cast<libmsstyle::StyleClass*>(data->object);
 
-		//// Track selection
-		//selection.ClassId = classData->GetClass()->classID;
-		//selection.PartId = -1;
-		//selection.StateId = -1;
+		selection.ClassId = classData->classID;
+		selection.PartId = -1;
+		selection.StateId = -1;
 
-		//statusBar->SetStatusText(wxString::Format("C: %d", selection.ClassId));
+		wsprintf(statusText, L"C: %d", selection.ClassId);
+		SetStatusText(statusText);
 
 		// Update UI
 		ClearPropView();
@@ -166,18 +221,17 @@ LRESULT CMainFrame::OnTreeViewSelectionChanged(int idCtrl, LPNMHDR pnmh, BOOL& b
 	{
 		libmsstyle::StylePart* part = static_cast<libmsstyle::StylePart*>(data->object);
 
-		//// Track selection
-		//classData = dynamic_cast<ClassTreeItemData*>(
-		//	classView->GetItemData(
-		//	classView->GetItemParent(treeItemID)));
+		if (parentData->type == ITEM_CLASS)
+		{
+			selection.ClassId = static_cast<libmsstyle::StyleClass*>(parentData->object)->classID;
+		}
 
-		//selection.ClassId = classData->GetClass()->classID;
-		//selection.PartId = part->partID;
-		//selection.StateId = -1;
+		selection.PartId = part->partID;
+		selection.StateId = -1;
 
-		//// Update UI
-		//statusBar->SetStatusText(wxString::Format("C: %d, P: %d", selection.ClassId, part->partID));
-		
+		wsprintf(statusText, L"C: %d, P: %d", selection.ClassId, part->partID);
+		SetStatusText(statusText);
+
 		ClearPropView();
 		FillPropView(*part);
 	}
@@ -187,45 +241,132 @@ LRESULT CMainFrame::OnTreeViewSelectionChanged(int idCtrl, LPNMHDR pnmh, BOOL& b
 	{
 		libmsstyle::StyleProperty* selectedImageProp = static_cast<libmsstyle::StyleProperty*>(data->object);
 
-		// Track selection
-		//partData = dynamic_cast<PartTreeItemData*>(
-		//	classView->GetItemData(
-		//	classView->GetItemParent(treeItemID)));
+		if (parentData->type == ITEM_CLASS)
+		{
+			selection.ClassId = static_cast<libmsstyle::StyleClass*>(grandparentData->object)->classID;
+		}
 
-		//classData = dynamic_cast<ClassTreeItemData*>(
-		//	classView->GetItemData(
-		//	classView->GetItemParent(
-		//	classView->GetItemParent(treeItemID))));
+		if (parentData->type == ITEM_PART)
+		{
+			selection.PartId = static_cast<libmsstyle::StylePart*>(parentData->object)->partID;
+		}
 
-		//selection.ClassId = classData->GetClass()->classID;
-		//selection.PartId = partData->GetPart()->partID;
-		//selection.StateId = -1;
+		selection.StateId = -1;
 
-		//// Update UI
-		//StyleResourceType type;
-		//if (selectedImageProp->GetTypeID() == IDENTIFIER::FILENAME ||
-		//	selectedImageProp->GetTypeID() == IDENTIFIER::FILENAME_LITE)
-		//	type = StyleResourceType::IMAGE;
-		//else if (selectedImageProp->GetTypeID() == IDENTIFIER::DISKSTREAM)
-		//	type = StyleResourceType::ATLAS;
-		//else type = StyleResourceType::NONE;
+		// Update UI
+		libmsstyle::StyleResourceType type;
+		if (selectedImageProp->GetTypeID() == libmsstyle::IDENTIFIER::FILENAME ||
+			selectedImageProp->GetTypeID() == libmsstyle::IDENTIFIER::FILENAME_LITE)
+			type = libmsstyle::StyleResourceType::IMAGE;
+		else if (selectedImageProp->GetTypeID() == libmsstyle::IDENTIFIER::DISKSTREAM)
+			type = libmsstyle::StyleResourceType::ATLAS;
+		else type = libmsstyle::StyleResourceType::NONE;
 
-		//std::string file = m_currentStyle->GetQueuedResourceUpdate(selectedImageProp->GetResourceID(), type);
-		//if (!file.empty())
-		//{
-		//	wxString tmpFile(file);
-		//	ShowImageFromFile(tmpFile);
+		std::string file = m_currentStyle->GetQueuedResourceUpdate(selectedImageProp->GetResourceID(), type);
+		if (!file.empty())
+		{
+			ShowImageFromFile(A2W(file.c_str()));
 
-		//	statusBar->SetStatusText(wxString::Format("C: %d, P: %d, Img: %d*", selection.ClassId, selection.PartId, selectedImageProp->GetResourceID()));
-		//}
-		//else
+			wsprintf(statusText, L"C: %d, P: %d, Img: %d*", selection.ClassId, selection.PartId, selectedImageProp->GetResourceID());
+			SetStatusText(statusText);
+		}
+		else
 		{
 			ShowImageFromResource(*selectedImageProp);
-			//statusBar->SetStatusText(wxString::Format("C: %d, P: %d, Img: %d", selection.ClassId, selection.PartId, selectedImageProp->GetResourceID()));
+
+			wsprintf(statusText, L"C: %d, P: %d, Img: %d", selection.ClassId, selection.PartId, selectedImageProp->GetResourceID());
+			SetStatusText(statusText);
 		}
 	}
 
 	return 0;
+}
+
+
+LRESULT CMainFrame::OnPropGridItemChanging(int idCtrl, LPNMHDR pnmh, BOOL& bHandled)
+{
+	LPNMPROPERTYITEM evt = (LPNMPROPERTYITEM)pnmh;
+	
+	IProperty* gridProp = evt->prop;
+	libmsstyle::StyleProperty* styleProp = (libmsstyle::StyleProperty*)gridProp->GetItemData();
+
+	if (!styleProp)
+		return CHANGE_VETO;
+
+	CComVariant propValue;;
+	gridProp->GetValue(&propValue);
+
+	// COLORIZATIONCOLOR is internally an integer...
+	if (styleProp->GetNameID() == libmsstyle::IDENTIFIER::COLORIZATIONCOLOR)
+	{
+		int colorARGB = 
+			GetRValue(propValue.uintVal) << 16 |
+			GetGValue(propValue.uintVal) << 8 |
+			GetBValue(propValue.uintVal) << 0;
+		styleProp->UpdateIntegerUnchecked(colorARGB);
+		return CHANGE_OK;
+	}
+
+	switch (styleProp->header.typeID)
+	{
+	case libmsstyle::IDENTIFIER::FILENAME:
+		styleProp->UpdateImageLink(propValue.uintVal); break;
+	case libmsstyle::IDENTIFIER::INT:
+		styleProp->UpdateInteger(propValue.intVal); break;
+	case libmsstyle::IDENTIFIER::SIZE:
+		styleProp->UpdateSize(propValue.intVal); break;
+	case libmsstyle::IDENTIFIER::HIGHCONTRASTCOLORTYPE:
+	case libmsstyle::IDENTIFIER::ENUM:
+		styleProp->UpdateEnum(propValue.uintVal); break;
+	case libmsstyle::IDENTIFIER::BOOLTYPE:
+		styleProp->UpdateBoolean((propValue.uintVal > 0)); break;
+	case libmsstyle::IDENTIFIER::COLOR:
+	{
+		styleProp->UpdateColor(GetRValue(propValue.uintVal), GetGValue(propValue.uintVal), GetBValue(propValue.uintVal));
+	} break;
+	case libmsstyle::IDENTIFIER::RECTTYPE:
+	case libmsstyle::IDENTIFIER::MARGINS:
+	{
+		int l, t, r, b;
+		if (swscanf(propValue.bstrVal, L"%d, %d, %d, %d", &l, &t, &r, &b) != 4)
+		{
+			MessageBoxW(L"Invalid format! expected: a, b, c, d", L"format error", MB_OK | MB_ICONERROR);
+			return CHANGE_VETO;
+		}
+		else
+		{
+			if (styleProp->header.typeID == libmsstyle::IDENTIFIER::RECTTYPE)
+				styleProp->UpdateRectangle(l, t, r, b);
+			if (styleProp->header.typeID == libmsstyle::IDENTIFIER::MARGINS)
+				styleProp->UpdateMargin(l, t, r, b);
+		}
+	} break;
+	case libmsstyle::IDENTIFIER::POSITION:
+	{
+		int x, y;
+		if (swscanf(propValue.bstrVal, L"%d, %d", &x, &y) != 2)
+		{
+			MessageBoxW(L"Invalid format! expected: a, b", L"format error", MB_OK | MB_ICONERROR);
+			return CHANGE_VETO;
+		}
+		else
+		{
+			styleProp->UpdatePosition(x, y);
+		}
+	} break;
+	case libmsstyle::IDENTIFIER::FONT:
+		styleProp->UpdateFont(propValue.uintVal); break;
+	default:
+	{
+		WCHAR msg[100];
+		wsprintf(msg, L"Changing properties of type '%s' is not supported yet!", libmsstyle::lookup::FindTypeName(styleProp->GetTypeID()));
+		MessageBoxW(msg, L"Unsupported", MB_OK | MB_ICONINFORMATION);
+		
+		return CHANGE_VETO;
+	} break;
+	}
+
+	return CHANGE_OK;
 }
 
 LPARAM CMainFrame::RegUserData(void* data, int type)
@@ -347,11 +488,18 @@ void CMainFrame::ShowImageFromResource(libmsstyle::StyleProperty& prop)
 
 void CMainFrame::ClearImageView()
 {
+	m_imageView.SetBitmap(NULL);
+}
+
+void CMainFrame::SetStatusText(LPCWSTR text)
+{
+	CStatusBarCtrl bar(m_hWndStatusBar);
+	bar.SetText(0, text);
 }
 
 #pragma endregion
 
-#pragma region Menu File
+#pragma region Menu Handling
 
 LRESULT CMainFrame::OnFileNew(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
 {
@@ -401,18 +549,12 @@ LRESULT CMainFrame::OnFileExit(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCt
 	return 0;
 }
 
-#pragma endregion
-
-#pragma region Menu Theme
 
 LRESULT CMainFrame::OnThemeTest(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
 {
 	return 0;
 }
 
-#pragma endregion
-
-#pragma region Menu Image
 
 LRESULT CMainFrame::OnImageExport(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
 {
@@ -424,9 +566,6 @@ LRESULT CMainFrame::OnImageReplace(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hW
 	return 0;
 }
 
-#pragma endregion
-
-#pragma region Menu View
 
 LRESULT CMainFrame::OnViewExpand(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
 {
@@ -481,9 +620,6 @@ LRESULT CMainFrame::OnViewStatusBar(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*h
 	return 0;
 }
 
-#pragma endregion
-
-#pragma region Menu Help
 
 LRESULT CMainFrame::OnAppLicense(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
 {
