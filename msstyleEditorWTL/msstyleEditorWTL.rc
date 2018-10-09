@@ -65,7 +65,7 @@ BEGIN
     END
     POPUP "&Theme"
     BEGIN
-        MENUITEM "&Test >",                     ID_THEME_TEST
+        MENUITEM "&Test ?",                     ID_THEME_TEST, CHECKED
     END
     POPUP "&Image"
     BEGIN
@@ -99,6 +99,15 @@ BEGIN
     END
 END
 
+IDR_PROPVIEW MENU
+BEGIN
+    POPUP "PropView"
+    BEGIN
+        MENUITEM "Add",                         ID_PROP_ADD
+        MENUITEM "Remove",                      ID_PROP_REMOVE
+    END
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -108,6 +117,7 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDR_MAINFRAME           ICON                    "res\\msstyleEditorWTL.ico"
+IDI_FIND                ICON                    "res\\Find.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -127,6 +137,18 @@ BEGIN
                     "SysLink",WS_TABSTOP,16,43,127,12
 END
 
+IDD_SEARCHDIALOG DIALOGEX 0, 0, 137, 47
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "Search"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    COMBOBOX        IDC_SEARCH_LOCATION,7,7,57,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_SEARCH_TYPE,71,7,57,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_SEARCH_TEXT,7,25,101,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "",IDC_SEARCH_GO,110,24,20,16,BS_ICON | BS_FLAT
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -142,6 +164,14 @@ BEGIN
         RIGHTMARGIN, 154
         TOPMARGIN, 7
         BOTTOMMARGIN, 82
+    END
+
+    IDD_SEARCHDIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 130
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 40
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -167,6 +197,7 @@ BEGIN
     "S",            ID_FILE_SAVE,           VIRTKEY, CONTROL, NOINVERT
     VK_F6,          ID_NEXT_PANE,           VIRTKEY, NOINVERT
     VK_F6,          ID_PREV_PANE,           VIRTKEY, SHIFT, NOINVERT
+    "F",            ID_FIND,                VIRTKEY, CONTROL, NOINVERT
 END
 
 
@@ -207,6 +238,33 @@ BEGIN
     END
 END
 
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Toolbar
+//
+
+IDR_MAINFRAME TOOLBAR 16, 15
+BEGIN
+    BUTTON      ID_FILE_OPEN
+    BUTTON      ID_FILE_SAVE_AS
+    BUTTON      ID_IMAGE_EXPORT
+    BUTTON      ID_IMAGE_REPLACE
+    BUTTON      ID_APP_ABOUT
+    BUTTON      ID_VIEW_THEMEFOLDER
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDR_MAINFRAME           BITMAP                  "res\\toolicons.bmp"
+IDB_PROP_ADD            BITMAP                  "res\\Add.bmp"
+IDB_PROP_REMOVE         BITMAP                  "res\\Remove.bmp"
+IDB_THEME_START         BITMAP                  "res\\Start.bmp"
+IDB_THEME_STOP          BITMAP                  "res\\Stop.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //

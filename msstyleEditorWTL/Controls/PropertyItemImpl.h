@@ -489,10 +489,19 @@ public:
 		RECT rcText = di.rcItem;
 		rcText.left += PROP_TEXT_INDENT + 16 + 4;
 
-		HBRUSH colorBrush = CreateSolidBrush(m_val.uintVal);
-		dc.FillRect(&rcColor, colorBrush);
+		HBRUSH fillBrush = CreateSolidBrush(m_val.uintVal);
+		HBRUSH oldBrush = dc.SelectBrush(fillBrush);
+
+		HPEN borderPen = CreatePen(PS_SOLID, 1, 0x00000000);
+		HPEN oldPen = dc.SelectPen(borderPen);
+
 		dc.Rectangle(&rcColor);
-		DeleteObject(colorBrush);
+
+		dc.SelectBrush(oldBrush);
+		dc.SelectPen(oldPen);
+
+		DeleteObject(fillBrush);
+		DeleteObject(borderPen);
 
 		dc.DrawText(pszText, -1, &rcText, DT_LEFT | DT_SINGLELINE | DT_EDITCONTROL | DT_NOPREFIX | DT_END_ELLIPSIS | DT_VCENTER);
 	}
@@ -505,30 +514,37 @@ public:
 		ATLASSERT(pszText);
 		if (!GetDisplayValue(pszText, cchMax)) return NULL;
 		// Create EDIT control
-		CPropertyEditWindow* win = new CPropertyEditWindow();
+		CPropertyEditButtonWindow* win = new CPropertyEditButtonWindow();
+		win->m_prop = this;
 		ATLASSERT(win);
 		
 		RECT rcWin = rc;
 		rcWin.left += 16 + 4;
 
 		m_hwndEdit = win->Create(hWnd, rcWin, pszText, WS_VISIBLE | WS_CHILD | ES_LEFT | ES_AUTOHSCROLL);
-		
+		win->m_bReadOnly = false;
+
 		ATLASSERT(::IsWindow(m_hwndEdit));
-		// Simple hack to validate numbers
-		switch (m_val.vt) {
-		case VT_UI1:
-		case VT_UI2:
-		case VT_UI4:
-			win->ModifyStyle(0, ES_NUMBER);
-			break;
-		}
 		return m_hwndEdit;
 	}
 
 	BOOL SetValue(const VARIANT& value)
 	{
-		if (m_val.vt == VT_EMPTY) m_val = value;
-		return SUCCEEDED(m_val.ChangeType(m_val.vt, &value));
+		if (value.vt & VT_BSTR)
+		{
+			int r, g, b;
+			if (swscanf(value.bstrVal, L"%d, %d, %d", &r, &g, &b) != 3)
+				return FALSE;
+			
+			m_val = CComVariant(RGB(r, g, b));
+			return TRUE;
+		}
+		else if (value.vt & VT_UI4)
+		{
+			m_val = value;
+			return TRUE;
+		}
+		else return FALSE;
 	}
 
 	BOOL SetValue(HWND hWnd)
@@ -553,6 +569,46 @@ public:
 			if (::IsWindow(m_hwndEdit)) {
 				::SetFocus(m_hwndEdit);
 				::SendMessage(m_hwndEdit, EM_SETSEL, 0, -1);
+			}
+			break;
+		case PACT_BROWSE:
+			{
+				COLORREF defaultColors[] =
+				{
+					// Grayscale
+					0x00000000,
+					0x00404040,
+					0x00808080,
+					0x00FFFFFF,
+					// Red
+					0x00400000,
+					0x00800000,
+					0x00C00000,
+					0x00FF0000,
+					// Green
+					0x00004000,
+					0x00008000,
+					0x0000C000,
+					0x0000FF00,
+					// Blue
+					0x00000040,
+					0x00000080,
+					0x000000C0,
+					0x000000FF
+				};
+
+				CHOOSECOLOR init;
+				ZeroMemory(&init, sizeof(CHOOSECOLOR));
+				init.lStructSize = sizeof(CHOOSECOLOR);
+				init.Flags = CC_RGBINIT | CC_SOLIDCOLOR | CC_FULLOPEN;
+				init.rgbResult = m_val.uintVal;
+				init.lpCustColors = defaultColors;
+			
+				if (ChooseColor(&init))
+				{
+					CComVariant v(init.rgbResult);
+					::SendMessage(m_hWndOwner, WM_USER_PROP_CHANGEDPROPERTY, (WPARAM)(VARIANT*)&v, (LPARAM) this);
+				}
 			}
 			break;
 		}

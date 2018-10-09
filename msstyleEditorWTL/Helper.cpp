@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "Helper.h"
 
 #include <atlctrls.h>

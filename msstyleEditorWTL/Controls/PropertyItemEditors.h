@@ -741,5 +741,120 @@ public:
    }
 };
 
+/////////////////////////////////////////////////////////////////////////////
+// Plain editor with a EDIT box
+
+class CPropertyCategoryEditor :
+	public CWindowImpl< CPropertyCategoryEditor, CWindow, CControlWinTraits >
+{
+public:
+	DECLARE_WND_CLASS(_T("WTL_InplacePropertyCategory"))
+
+	CButton m_addButton;
+	CButton m_delButton;
+
+	bool m_fCancel;
+
+	CPropertyCategoryEditor() : m_fCancel(false)
+	{
+	}
+
+	virtual void OnFinalMessage(HWND /*hWnd*/)
+	{
+		delete this;
+	}
+
+	BEGIN_MSG_MAP(CPropertyEditWindow)
+		MESSAGE_HANDLER(WM_CREATE, OnCreate)
+		COMMAND_CODE_HANDLER(BN_CLICKED, OnButtonClicked)
+	END_MSG_MAP()
+
+	LRESULT OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
+	{
+		RECT rcClient = { 0 };
+		GetClientRect(&rcClient);
+
+		LONG btHeight = rcClient.bottom - rcClient.top - 2;
+		LONG btWidth = btHeight;
+
+		RECT rcDelButton =
+		{
+			rcClient.right - btWidth - 1,
+			rcClient.top + 1,
+			btWidth,
+			btHeight
+		};
+
+		RECT rcAddButton =
+		{
+			rcClient.right - 2 * btWidth - 2,
+			rcClient.top + 1,
+			btWidth,
+			btHeight
+		};
+
+		m_delButton.Create(m_hWnd, &rcDelButton, NULL, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | BS_PUSHBUTTON);
+		m_addButton.Create(m_hWnd, &rcAddButton, NULL, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | BS_PUSHBUTTON);
+
+		m_delButton.SetFocus();
+		m_addButton.SetFocus();
+
+		//LRESULT lRes = DefWindowProc();
+		//return lRes;
+		return 0;
+	}
+
+	LRESULT OnButtonClicked(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+	{
+ 		return 0;
+	}
+};
+
+/////////////////////////////////////////////////////////////////////////////
+// Color Editor with browse button
+
+class CPropertyEditButtonWindow :
+	public CPropertyDropWindowImpl<CPropertyEditButtonWindow>
+{
+public:
+	DECLARE_WND_SUPERCLASS(_T("WTL_InplacePropertyEditButton"), CEdit::GetWndClassName())
+
+	IProperty* m_prop; // BUG: Dangerous reference
+
+	typedef CPropertyDropWindowImpl<CPropertyEditButtonWindow> baseClass;
+	bool m_fCancel = false;
+
+	BEGIN_MSG_MAP(CPropertyEditButtonWindow)
+		// Button
+		COMMAND_CODE_HANDLER(BN_CLICKED, OnButtonClicked)
+		MESSAGE_HANDLER(WM_DRAWITEM, OnDrawItem)
+
+		CHAIN_MSG_MAP(baseClass)
+		ALT_MSG_MAP(1) // Button
+		CHAIN_MSG_MAP_ALT(baseClass, 1)
+	END_MSG_MAP()
+
+	LRESULT OnButtonClicked(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+	{
+		ATLASSERT(m_prop);
+		// Call Property class' implementation of BROWSE action
+		// Activate() will do WM_USER_PROP_CHANGEDPROPERTY if its necessary
+		m_prop->Activate(PACT_BROWSE, 0);
+		return 0;
+	}
+
+	LRESULT OnDrawItem(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM lParam, BOOL& /*bHandled*/)
+	{
+		LPDRAWITEMSTRUCT lpdis = (LPDRAWITEMSTRUCT)lParam;
+		if (m_wndButton != lpdis->hwndItem) return 0;
+		CDCHandle dc(lpdis->hDC);
+		// Paint as ellipsis button
+		dc.DrawFrameControl(&lpdis->rcItem, DFC_BUTTON, (lpdis->itemState & ODS_SELECTED) != 0 ? DFCS_BUTTONPUSH | DFCS_PUSHED : DFCS_BUTTONPUSH);
+		dc.SetBkMode(TRANSPARENT);
+		LPCTSTR pstrEllipsis = _T("...");
+		dc.DrawText(pstrEllipsis, ::lstrlen(pstrEllipsis), &lpdis->rcItem, DT_CENTER | DT_EDITCONTROL | DT_SINGLELINE | DT_VCENTER);
+		return 0;
+	}
+};
 
 #endif // __PROPERTYITEMEDITORS__H

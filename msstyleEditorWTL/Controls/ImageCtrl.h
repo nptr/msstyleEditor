@@ -18,7 +18,7 @@ public:
 		Black
 	};
 
-	DECLARE_WND_CLASS_EX(NULL, 0, -1)
+	DECLARE_WND_CLASS_EX(_T("MsstyleImageView"), 0, -1)
 
 	Gdiplus::Image* m_image;
 	SIZE m_drawAt;

@@ -91,11 +91,13 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_WINDOWS;STRICT;_DEBUG;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeaderFile>precompiled.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>precompiled.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(OutputPath)\libmsstyle.lib;Shlwapi.lib;Gdiplus.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(OutputPath)\libmsstyle.lib;Shlwapi.lib;Gdiplus.lib;Comdlg32.lib</AdditionalDependencies>
     </Link>
     <ResourceCompile>
       <Culture>0x0409</Culture>
@@ -124,11 +126,13 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_WINDOWS;STRICT;_DEBUG;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeaderFile>precompiled.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>precompiled.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(OutputPath)\libmsstyle.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(OutputPath)\libmsstyle.lib;Shlwapi.lib;Gdiplus.lib;Comdlg32.lib</AdditionalDependencies>
     </Link>
     <ResourceCompile>
       <Culture>0x0409</Culture>
@@ -156,10 +160,12 @@
       <DebugInformationFormat />
       <PreprocessorDefinitions>WIN32;_WINDOWS;STRICT;NDEBUG;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeaderFile>precompiled.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>precompiled.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>$(OutputPath)\libmsstyle.lib;Shlwapi.lib;Gdiplus.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(OutputPath)\libmsstyle.lib;Shlwapi.lib;Gdiplus.lib;Comdlg32.lib</AdditionalDependencies>
     </Link>
     <ResourceCompile>
       <Culture>0x0409</Culture>
@@ -189,10 +195,12 @@
       </DebugInformationFormat>
       <PreprocessorDefinitions>WIN32;_WINDOWS;STRICT;NDEBUG;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeaderFile>precompiled.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>precompiled.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>$(OutputPath)\libmsstyle.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(OutputPath)\libmsstyle.lib;Shlwapi.lib;Gdiplus.lib;Comdlg32.lib</AdditionalDependencies>
     </Link>
     <ResourceCompile>
       <Culture>0x0409</Culture>
@@ -212,36 +220,48 @@
     </Midl>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Dialogs\MainFrm.cpp" />
     <ClCompile Include="Helper.cpp" />
-    <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="msstyleEditorWTL.cpp" />
-    <ClCompile Include="stdafx.cpp">
+    <ClCompile Include="precompiled.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="SearchLogic.cpp" />
+    <ClCompile Include="ThemeManager.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AboutDlg.h" />
-    <ClInclude Include="Controls\CImageCtrl.h" />
-    <ClInclude Include="Controls\GradientLabel.h" />
+    <ClInclude Include="Controls\ImageCtrl.h" />
     <ClInclude Include="Controls\PropertyItem.h" />
     <ClInclude Include="Controls\PropertyItemEditors.h" />
+    <ClInclude Include="Controls\PropertyItemEditorsCustom.h" />
     <ClInclude Include="Controls\PropertyItemImpl.h" />
     <ClInclude Include="Controls\PropertyList.h" />
+    <ClInclude Include="Dialogs\AboutDlg.h" />
+    <ClInclude Include="Dialogs\MainFrm.h" />
+    <ClInclude Include="Dialogs\SearchDlg.h" />
     <ClInclude Include="Helper.h" />
-    <ClInclude Include="MainFrm.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="precompiled.h" />
+    <ClInclude Include="SearchLogic.h" />
+    <ClInclude Include="ThemeManager.h" />
     <ClInclude Include="TreeItemData.h" />
+    <ClInclude Include="UxthemeUndocumented.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="msstyleEditorWTL.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="res\Add.bmp" />
+    <Image Include="res\bitmap2.bmp" />
+    <Image Include="res\Find.ico" />
     <Image Include="res\msstyleEditorWTL.ico" />
-    <Image Include="res\toolbar.bmp" />
+    <Image Include="res\Remove.bmp" />
+    <Image Include="res\Start.bmp" />
+    <Image Include="res\Stop.bmp" />
+    <Image Include="res\toolicons.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

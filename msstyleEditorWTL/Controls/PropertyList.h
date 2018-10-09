@@ -58,6 +58,7 @@
 
 // Include property implementations
 #include "PropertyItemEditors.h"
+#include "PropertyItemEditorsCustom.h"
 #include "PropertyItemImpl.h"
 
 
@@ -179,6 +180,16 @@ public:
    {
       if( iIndex < 0 || iIndex >= m_arrItems.GetSize() ) return NULL;
       return m_arrItems[iIndex];
+   }
+
+   virtual HWND CreateInplaceControl(HWND hWnd, const RECT& rc)
+   {
+ 	   CPropertyCategoryEditor* win = new CPropertyCategoryEditor();
+	   ATLASSERT(win);
+	   RECT rcWin = rc;
+	   HWND tmp = win->Create(hWnd, rcWin, L"", WS_VISIBLE | WS_CHILD | ES_LEFT | ES_AUTOHSCROLL);
+	   win->Invalidate();
+	   return tmp;
    }
 };
 

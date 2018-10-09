@@ -1,27 +1,28 @@
-#include "stdafx.h"
 #include "MainFrm.h"
 #include "AboutDlg.h"
+#include "SearchDlg.h"
 
-#include "TreeItemData.h"
-
-#include "Helper.h"
+#include "..\SearchLogic.h"
+#include "..\TreeItemData.h"
+#include "..\Helper.h"
 
 #include <gdiplus.h>
 #include <gdiplusgraphics.h>
 
-#define COMMON_WND_STYLE WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN
-#define NOT_A_MENU 1
+#define COMMON_WND_STYLE	(WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN)
+#define NOT_A_MENU			1
 
-#define ITEM_CLASS 1
-#define ITEM_PART 2
-#define ITEM_STATE 3
-#define ITEM_PROPERTY 4
+#define CHANGE_OK			0
+#define CHANGE_VETO			1
 
-#define CHANGE_OK 0
-#define CHANGE_VETO 1
+#define TEXT_PLAY L"&Start Test"
+#define TEXT_STOP L"&Stop Test"
 
 CMainFrame::CMainFrame()
-	: m_currentStyle(nullptr)
+	: m_currentStyle(NULL)
+	, m_selectedProperty(NULL)
+	, m_imageViewMenu(NULL)
+	, m_searchDialog(NULL)
 {
 }
 
@@ -50,7 +51,7 @@ void CMainFrame::CloseStyle()
 	if (m_currentStyle != nullptr)
 	{
 		try {
-			//themeManager.Rollback();
+			m_themeManager.Rollback();
 			//themeMenu->SetLabel(ID_THEME_APPLY, wxT(TEXT_PLAY));
 		}
 		catch (...)
@@ -66,11 +67,67 @@ void CMainFrame::CloseStyle()
 	}
 }
 
+HBITMAP MakeBitMapTransparent(HBITMAP hbmSrc)
+{
+	HDC hdcSrc, hdcDst;
+	HBITMAP hbmOld, hbmNew;
+	BITMAP bm;
+	COLORREF clrTP, clrBK;
+
+	if ((hdcSrc = CreateCompatibleDC(NULL)) != NULL) {
+		if ((hdcDst = CreateCompatibleDC(NULL)) != NULL) {
+			int nRow, nCol;
+			GetObject(hbmSrc, sizeof(bm), &bm);
+			hbmOld = (HBITMAP)SelectObject(hdcSrc, hbmSrc);
+			hbmNew = CreateBitmap(bm.bmWidth, bm.bmHeight, bm.bmPlanes, bm.bmBitsPixel, NULL);
+			SelectObject(hdcDst, hbmNew);
+
+			BitBlt(hdcDst, 0, 0, bm.bmWidth, bm.bmHeight, hdcSrc, 0, 0, SRCCOPY);
+
+			clrTP = GetPixel(hdcDst, 0, 0);// Get color of first pixel at 0,0
+			clrBK = GetSysColor(COLOR_MENU);// Get the current background color of the menu
+
+			for (nRow = 0; nRow < bm.bmHeight; nRow++)// work our way through all the pixels changing their color
+				for (nCol = 0; nCol < bm.bmWidth; nCol++)// when we hit our set transparency color.
+					if (GetPixel(hdcDst, nCol, nRow) == clrTP)
+						SetPixel(hdcDst, nCol, nRow, clrBK);
+
+			DeleteDC(hdcDst);
+		}
+		DeleteDC(hdcSrc);
+
+	}
+	return hbmNew;// return our transformed bitmap.
+}
+
 LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 {
-	Gdiplus::GdiplusStartupInput gdiplusStartupInput;
 	ULONG_PTR gdiplusToken;
+	Gdiplus::GdiplusStartupInput gdiplusStartupInput;
 	GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+
+	// create command bar window
+	HWND hWndCmdBar = m_commandBar.Create(m_hWnd, rcDefault, NULL, ATL_SIMPLE_CMDBAR_PANE_STYLE);
+	m_commandBar.AttachMenu(GetMenu());
+	m_commandBar.LoadImages(IDR_MAINFRAME);
+	SetMenu(NULL);
+
+
+	m_themeSubMenu = GetSubMenu(m_commandBar.GetMenu(), 1);
+	m_bmpStart = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_THEME_START), IMAGE_BITMAP, 16, 16, LR_SHARED);
+	m_bmpStop = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_THEME_STOP), IMAGE_BITMAP, 16, 16, LR_SHARED);
+
+	m_bmpStart = MakeBitMapTransparent(m_bmpStart);
+	m_bmpStop = MakeBitMapTransparent(m_bmpStop);
+
+	SetMenuItemBitmaps(m_themeSubMenu, 0, MF_BYPOSITION, m_bmpStart, m_bmpStop);
+
+
+	//HWND hWndToolBar = CreateSimpleToolBarCtrl(m_hWnd, IDR_MAINFRAME, FALSE, ATL_SIMPLE_TOOLBAR_PANE_STYLE);
+
+	CreateSimpleReBar(ATL_SIMPLE_REBAR_NOBORDER_STYLE);
+	AddSimpleReBarBand(hWndCmdBar);
+	//AddSimpleReBarBand(hWndToolBar, NULL, TRUE);
 
 	CreateSimpleStatusBar();
 
@@ -99,7 +156,17 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 		, NOT_A_MENU // Important! Required for REFLECT_NOTIFICATION()
 		, NULL);
 	m_propList.SubclassWindow(m_propListBase);
-	m_propList.SetExtendedListStyle(PLS_EX_CATEGORIZED);
+	m_propList.SetExtendedListStyle(PLS_EX_CATEGORIZED | LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
+	m_propListMenu = GetSubMenu(LoadMenu(NULL, MAKEINTRESOURCE(IDR_PROPVIEW)), 0);
+
+	HBITMAP hbmpPropAdd = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_PROP_ADD), IMAGE_BITMAP, 16, 16, LR_SHARED);
+	HBITMAP hbmpPropRem = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_PROP_REMOVE), IMAGE_BITMAP, 16, 16, LR_SHARED);
+	
+	hbmpPropAdd = MakeBitMapTransparent(hbmpPropAdd);
+	hbmpPropRem = MakeBitMapTransparent(hbmpPropRem);
+
+	SetMenuItemBitmaps(m_propListMenu, 0, MF_BYPOSITION, hbmpPropAdd, hbmpPropAdd);
+	SetMenuItemBitmaps(m_propListMenu, 1, MF_BYPOSITION, hbmpPropRem, hbmpPropRem);
 
 	m_splitLeft.SetSplitterPanes(m_treeView, m_splitRight);
 	m_splitRight.SetSplitterPanes(m_imageView, m_propList);
@@ -108,6 +175,9 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 
 	UISetCheck(ID_VIEW_TOOLBAR, 1);
 	UISetCheck(ID_VIEW_STATUS_BAR, 1);
+
+	// Resource editor has some unicode quirks?
+	SetThemeTestMenuItemText(TEXT_PLAY, false);
 
 	// register object for message filtering and idle updates
 	CMessageLoop* pLoop = _Module.GetMessageLoop();
@@ -145,8 +215,9 @@ LRESULT CMainFrame::OnContextMenu(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL&
 	POINT curPoint;
 	GetCursorPos(&curPoint);
 
-	RECT rectImgView;
+	RECT rectImgView, rectPropList;
 	m_imageView.GetWindowRect(&rectImgView);
+	m_propList.GetWindowRect(&rectPropList);
 
 	if (PtInRect(&rectImgView, curPoint))
 	{
@@ -178,8 +249,155 @@ LRESULT CMainFrame::OnContextMenu(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL&
 			break;
 		}
 	}
+	else if (PtInRect(&rectPropList, curPoint))
+	{
+		POINT pt = { 0 };
+		pt.x = GET_X_LPARAM(lParam);
+		pt.y = GET_Y_LPARAM(lParam);
+		m_propListBase.ScreenToClient(&pt);
+
+		LRESULT res = ::SendMessage(m_propList, LB_ITEMFROMPOINT, 0, MAKELPARAM(pt.x, pt.y));
+
+		int index = LOWORD(res);
+		if (HIWORD(res) == 0)
+		{
+			m_propList.SetFocus();
+			m_propList.SetCurSel(index);
+
+			HWND source = reinterpret_cast<HWND>(wParam);
+			BOOL res = TrackPopupMenu(m_propListMenu, TPM_RETURNCMD
+				, curPoint.x
+				, curPoint.y
+				, 0
+				, source
+				, NULL);
+
+			switch (res)
+			{
+			case ID_PROP_ADD:
+				break;
+			case ID_PROP_REMOVE:
+				break;
+			}
+		}
+	}
 
 	return TRUE;
+}
+
+LRESULT CMainFrame::OnFindOpen(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+{
+	if (!m_searchDialog)
+	{
+		m_searchDialog = new CSearchDlg();
+		m_searchDialog->Create(m_hWnd);
+	}
+
+	if (!m_searchDialog->IsWindowVisible())
+	{
+		m_searchDialog->ShowWindow(SW_SHOWNORMAL);
+	}
+
+	return 0;
+}
+
+HTREEITEM CMainFrame::DoFindNext(const SearchProperties* search, HTREEITEM node)
+{
+	HTREEITEM originalNode = node;
+	while (node != NULL)
+	{
+		//CTreeItem aaa(node, &m_treeView);
+		//CString strrr;
+		//aaa.GetText(strrr);
+		//MessageBox(strrr.GetString());
+
+		// see whether the node contains "search.value" somewhere.
+		// skip the first node to not get stuck.
+		if (node != originalNode)
+		{
+			TreeItemData* data = reinterpret_cast<TreeItemData*>(m_treeView.GetItemData(node));
+			switch (search->mode)
+			{
+			case SearchProperties::MODE_NAME:
+			{
+				if (ContainsName(search->text, data))
+					return node;
+			} break;
+			case SearchProperties::MODE_PROPERTY:
+			{
+				if (ContainsProperty(*search, data))
+					return node;
+			} break;
+			default:
+				break;
+			}
+		}
+
+		// find nodes: depth
+		HTREEITEM nextNode = m_treeView.GetChildItem(node);
+		if (!nextNode)
+		{
+			// find nodes: breadth
+			nextNode = m_treeView.GetNextSiblingItem(node);
+			if (!nextNode)
+			{
+				// TODO: the root node is one of the sibling and not a single parent
+
+				// back out and try finding a node in the breadth
+				HTREEITEM previous = node;
+				nextNode = m_treeView.GetParentItem(node);
+				while (nextNode && nextNode != m_treeView.GetRootItem() && !m_treeView.GetNextSiblingItem(nextNode))
+				{
+					nextNode = m_treeView.GetParentItem(nextNode);
+				}
+
+				if (nextNode) // parent ok, so we have a sibling
+					nextNode = m_treeView.GetNextSiblingItem(nextNode);
+
+				if (!nextNode)
+					return NULL;
+			}
+		}
+
+		node = nextNode;
+	}
+
+	return NULL;
+}
+
+bool endReached = false;
+LRESULT CMainFrame::OnFindNext(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& /*bHandled*/)
+{
+	if (m_currentStyle == nullptr)
+		return 0;
+
+	SearchProperties* props = (SearchProperties*)wParam;
+	if (lstrlenW(props->text) == 0)
+		return 0;
+
+	HTREEITEM startItem = m_treeView.GetSelectedItem();
+	if (startItem == NULL || endReached)
+	{
+		endReached = false;
+		startItem = m_treeView.GetRootItem();
+		if (startItem == NULL)
+			return 0;
+	}
+
+	HTREEITEM item = DoFindNext(props, startItem);
+	if (item != NULL)
+	{
+		m_treeView.SelectItem(item);
+	}
+	else
+	{
+		WCHAR textbuffer[128];
+		wsprintf(textbuffer, L"No further match for \"%s\" !\nSearch will begin from top again.", props->text);
+		MessageBox(textbuffer, L"Search - End reached", MB_OK | MB_ICONINFORMATION);
+		endReached = true;
+	}
+
+	return 0;
 }
 
 LRESULT CMainFrame::OnTreeViewSelectionChanged(int idCtrl, LPNMHDR pnmh, BOOL& bHandled)
@@ -189,6 +407,10 @@ LRESULT CMainFrame::OnTreeViewSelectionChanged(int idCtrl, LPNMHDR pnmh, BOOL& b
 	LPNM_TREEVIEW evt = (LPNM_TREEVIEW)pnmh;
 
 	WCHAR statusText[255];
+
+	m_selectedProperty = nullptr;
+	m_imageView.SetBitmap(NULL);
+	SetStatusText(L"");
 
 	TreeItemData* data = reinterpret_cast<TreeItemData*>(evt->itemNew.lParam);
 	if (data == nullptr)
@@ -239,7 +461,7 @@ LRESULT CMainFrame::OnTreeViewSelectionChanged(int idCtrl, LPNMHDR pnmh, BOOL& b
 	// Image Node
 	if (data->type == ITEM_PROPERTY)
 	{
-		libmsstyle::StyleProperty* selectedImageProp = static_cast<libmsstyle::StyleProperty*>(data->object);
+		m_selectedProperty = static_cast<libmsstyle::StyleProperty*>(data->object);
 
 		if (parentData->type == ITEM_CLASS)
 		{
@@ -255,26 +477,33 @@ LRESULT CMainFrame::OnTreeViewSelectionChanged(int idCtrl, LPNMHDR pnmh, BOOL& b
 
 		// Update UI
 		libmsstyle::StyleResourceType type;
-		if (selectedImageProp->GetTypeID() == libmsstyle::IDENTIFIER::FILENAME ||
-			selectedImageProp->GetTypeID() == libmsstyle::IDENTIFIER::FILENAME_LITE)
+		if (m_selectedProperty->GetTypeID() == libmsstyle::IDENTIFIER::FILENAME ||
+			m_selectedProperty->GetTypeID() == libmsstyle::IDENTIFIER::FILENAME_LITE)
+		{
 			type = libmsstyle::StyleResourceType::IMAGE;
-		else if (selectedImageProp->GetTypeID() == libmsstyle::IDENTIFIER::DISKSTREAM)
+		}
+		else if (m_selectedProperty->GetTypeID() == libmsstyle::IDENTIFIER::DISKSTREAM)
+		{
 			type = libmsstyle::StyleResourceType::ATLAS;
-		else type = libmsstyle::StyleResourceType::NONE;
+		}
+		else
+		{
+			type = libmsstyle::StyleResourceType::NONE;
+		}
 
-		std::string file = m_currentStyle->GetQueuedResourceUpdate(selectedImageProp->GetResourceID(), type);
+		std::string file = m_currentStyle->GetQueuedResourceUpdate(m_selectedProperty->GetResourceID(), type);
 		if (!file.empty())
 		{
 			ShowImageFromFile(A2W(file.c_str()));
 
-			wsprintf(statusText, L"C: %d, P: %d, Img: %d*", selection.ClassId, selection.PartId, selectedImageProp->GetResourceID());
+			wsprintf(statusText, L"C: %d, P: %d, Img: %d*", selection.ClassId, selection.PartId, m_selectedProperty->GetResourceID());
 			SetStatusText(statusText);
 		}
 		else
 		{
-			ShowImageFromResource(*selectedImageProp);
+			ShowImageFromResource(*m_selectedProperty);
 
-			wsprintf(statusText, L"C: %d, P: %d, Img: %d", selection.ClassId, selection.PartId, selectedImageProp->GetResourceID());
+			wsprintf(statusText, L"C: %d, P: %d, Img: %d", selection.ClassId, selection.PartId, m_selectedProperty->GetResourceID());
 			SetStatusText(statusText);
 		}
 	}
@@ -497,6 +726,25 @@ void CMainFrame::SetStatusText(LPCWSTR text)
 	bar.SetText(0, text);
 }
 
+void CMainFrame::SetThemeTestMenuItemText(LPWSTR text, bool checked)
+{
+	WCHAR menuItemText[48];
+
+	MENUITEMINFO themeTestItem = { 0 };
+	themeTestItem.cbSize = sizeof(MENUITEMINFO);
+	themeTestItem.dwTypeData = menuItemText;
+	themeTestItem.cch = 48;
+	themeTestItem.fMask = MIIM_TYPE | MIIM_DATA | MIIM_STATE;
+
+	HMENU mainMenu = m_commandBar.GetMenu();
+	HMENU themeMenu = GetSubMenu(mainMenu, 1);
+	GetMenuItemInfo(themeMenu, ID_THEME_TEST, FALSE, &themeTestItem);
+
+	themeTestItem.dwTypeData = text;
+	themeTestItem.fState = checked ? MFS_CHECKED : MFS_UNCHECKED;
+	SetMenuItemInfo(themeMenu, ID_THEME_TEST, FALSE, &themeTestItem);
+}
+
 #pragma endregion
 
 #pragma region Menu Handling
@@ -535,6 +783,35 @@ LRESULT CMainFrame::OnFileOpen(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCt
 
 LRESULT CMainFrame::OnFileSave(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
 {
+	COMDLG_FILTERSPEC filter[] =
+	{
+		{ _T("Visual Style(*.msstyles)"), _T("*.msstyles") }
+	};
+
+	CShellFileSaveDialog saveDialog(NULL
+		, FOS_FORCEFILESYSTEM | FOS_FILEMUSTEXIST | FOS_PATHMUSTEXIST
+		, _T("txt")
+		, filter
+		, _countof(filter));
+
+	if (saveDialog.DoModal() == IDOK)
+	{
+		CString filePath;
+		saveDialog.GetFilePath(filePath);
+
+		try
+		{
+			std::wstring tmp(filePath.GetString());
+			m_currentStyle->Save(StdWideToUTF8(tmp));
+
+			SetStatusText(L"Style saved successfully!");
+		}
+		catch (std::runtime_error err)
+		{
+			MessageBoxA(m_hWnd, err.what(), "Error saving file!", MB_OK | MB_ICONERROR);
+		}
+	}
+
 	return 0;
 }
 
@@ -552,17 +829,188 @@ LRESULT CMainFrame::OnFileExit(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCt
 
 LRESULT CMainFrame::OnThemeTest(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
 {
+	if (m_currentStyle == nullptr)
+		return 0;
+
+
+	if (m_themeManager.IsThemeInUse())
+	{
+		try
+		{
+			m_themeManager.Rollback();
+			SetThemeTestMenuItemText(TEXT_PLAY, false);
+			Sleep(300); // prevent doubleclicks
+			return 0;
+		}
+		catch (...)
+		{
+		}
+	}
+
+	bool needConfirmation = false;
+	OSVERSIONINFO version;
+	ZeroMemory(&version, sizeof(OSVERSIONINFO));
+	version.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+
+#pragma warning( disable : 4996 )
+	GetVersionEx(&version);
+
+	libmsstyle::Platform styleplatform = m_currentStyle->GetCompatiblePlatform();
+
+	if (version.dwMajorVersion == 6 &&
+		version.dwMinorVersion == 1 &&
+		styleplatform != libmsstyle::Platform::WIN7)
+	{
+		needConfirmation = true;
+	}
+
+	if (version.dwMajorVersion == 6 &&
+		version.dwMinorVersion >= 2 &&
+		styleplatform != libmsstyle::Platform::WIN8 &&
+		styleplatform != libmsstyle::Platform::WIN81)
+	{
+		needConfirmation = true;
+	}
+
+	if (version.dwMajorVersion == 10 &&
+		version.dwMinorVersion >= 0 &&
+		styleplatform != libmsstyle::Platform::WIN10)
+	{
+		needConfirmation = true;
+	}
+
+	if (needConfirmation)
+	{
+		if (MessageBoxW(L"It looks like the style was not made for this windows version. Try to apply it anyways?", L"msstyleEditor", MB_YESNO | MB_ICONQUESTION) == IDNO)
+		{
+			return 0;
+		}
+	}
+
+	try
+	{
+		m_themeManager.ApplyTheme(*m_currentStyle);
+		SetThemeTestMenuItemText(TEXT_STOP, true);
+		Sleep(300); // prevent doubleclicks
+	}
+	catch (std::runtime_error& err)
+	{
+		MessageBoxA(m_hWnd, err.what(), "Error applying style!", MB_OK | MB_ICONERROR);
+	}
+	catch (std::exception& ex)
+	{
+		MessageBoxA(m_hWnd, ex.what(), "Error applying style!", MB_OK | MB_ICONERROR);
+	}
+	catch (...)
+	{
+		MessageBoxA(m_hWnd, "Unknown exception!", "Error applying style!", MB_OK | MB_ICONERROR);
+	}
 	return 0;
 }
 
 
 LRESULT CMainFrame::OnImageExport(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
 {
+	if (m_selectedImage.GetSize() == 0 || m_selectedImage.GetData() == 0 || m_selectedProperty == nullptr)
+	{
+		MessageBoxW(L"Select an image first!", L"Export Image", MB_OK | MB_ICONERROR);
+		return 0;
+	}
+
+	COMDLG_FILTERSPEC filter[] =
+	{
+		{ _T("PNG Image(*.png)"), _T("*.png") }
+	};
+
+	CShellFileSaveDialog saveDialog(NULL
+		, FOS_FORCEFILESYSTEM | FOS_FILEMUSTEXIST | FOS_PATHMUSTEXIST
+		, _T("txt")
+		, filter
+		, _countof(filter));
+
+	if (saveDialog.DoModal() == IDOK)
+	{
+		CString filePath;
+		saveDialog.GetFilePath(filePath);
+
+		HANDLE hFile = CreateFileW(filePath.GetString()
+			, GENERIC_READ | GENERIC_WRITE
+			, FILE_SHARE_READ
+			, NULL
+			, CREATE_ALWAYS
+			, FILE_ATTRIBUTE_NORMAL
+			, NULL);
+
+		if (hFile == INVALID_HANDLE_VALUE)
+		{
+			MessageBoxW(L"Creating imagefile at target location failed!", L"Export Image", MB_OK | MB_ICONERROR);
+			return 0;
+		}
+
+		DWORD bytesWritten = 0;
+		BOOL success = WriteFile(hFile
+			, m_selectedImage.GetData()
+			, m_selectedImage.GetSize()
+			, &bytesWritten
+			, NULL);
+
+		if (!success)
+		{
+			MessageBoxW(L"Error while writing to the file!", L"Export Image", MB_OK | MB_ICONERROR);
+		}
+		else
+		{
+			SetStatusText(L"Image exported successfully!");
+		}
+
+		CloseHandle(hFile);
+	}
+
 	return 0;
 }
 
 LRESULT CMainFrame::OnImageReplace(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
 {
+	if (m_selectedProperty == nullptr)
+	{
+		MessageBoxW(L"Select an image resource first!", L"Replace Image", MB_OK | MB_ICONERROR);
+		return 1;
+	}
+
+
+	COMDLG_FILTERSPEC filter[] =
+	{
+		{ _T("PNG Image(*.png)"), _T("*.png") },
+		{ _T("All Files(*.*)"), _T("*.*") }
+	};
+
+	CShellFileOpenDialog openDialog(NULL
+		, FOS_FORCEFILESYSTEM | FOS_FILEMUSTEXIST | FOS_PATHMUSTEXIST
+		, _T("txt")
+		, filter
+		, _countof(filter));
+
+	if (openDialog.DoModal() == IDOK)
+	{
+		libmsstyle::StyleResourceType tp;
+		switch (m_selectedProperty->GetTypeID())
+		{
+		case libmsstyle::IDENTIFIER::FILENAME:
+		case libmsstyle::IDENTIFIER::FILENAME_LITE:
+			tp = libmsstyle::StyleResourceType::IMAGE; break;
+		case libmsstyle::IDENTIFIER::DISKSTREAM:
+			tp = libmsstyle::StyleResourceType::ATLAS; break;
+		default:
+			tp = libmsstyle::StyleResourceType::NONE; break;
+		}
+
+		CString filePath;
+		openDialog.GetFilePath(filePath);
+
+		std::wstring tmp(filePath.GetString());
+		m_currentStyle->QueueResourceUpdate(m_selectedProperty->GetResourceID(), tp, StdWideToUTF8(tmp));
+	}
+
 	return 0;
 }
 

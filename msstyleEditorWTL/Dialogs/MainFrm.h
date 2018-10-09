@@ -9,16 +9,19 @@
 #include <atlctrlx.h>
 #include <atldlgs.h>
 
-#include "Controls\PropertyList.h"
-#include "Controls\CImageCtrl.h"
-#include "resource.h"
-
+#include "..\ThemeManager.h"
+#include "..\Controls\PropertyList.h"
+#include "..\Controls\ImageCtrl.h"
+#include "..\resource.h"
 
 #include "libmsstyle\VisualStyle.h"
 
 #include <vector>
 
 struct TreeItemData;
+struct SearchProperties;
+
+class CSearchDlg;
 
 class CMainFrame : 
 	public CFrameWindowImpl<CMainFrame>, 
@@ -26,6 +29,7 @@ class CMainFrame :
 	public CMessageFilter, public CIdleHandler
 {
 private:
+	CCommandBarCtrl		m_commandBar;
 	CSplitterWindow		m_splitLeft;
 	CSplitterWindow		m_splitRight;
 	CTreeViewCtrlEx		m_treeView;
@@ -33,10 +37,20 @@ private:
 	CPropertyListCtrl	m_propList;
 	CImageCtrl			m_imageView;
 
-	libmsstyle::VisualStyle* m_currentStyle;
-	libmsstyle::StyleResource m_selectedImage;
+	CSearchDlg*			m_searchDialog;
+
+	libmsstyle::VisualStyle*	m_currentStyle;
+	libmsstyle::StyleProperty*	m_selectedProperty;
+	libmsstyle::StyleResource	m_selectedImage;
+
+	ThemeManager m_themeManager;
 
 	HMENU m_imageViewMenu;
+	HMENU m_propListMenu;
+
+	HMENU m_themeSubMenu;
+	HBITMAP m_bmpStart;
+	HBITMAP m_bmpStop;
 
 	struct SelectionModel
 	{
@@ -78,6 +92,7 @@ public:
 		MESSAGE_HANDLER(WM_CREATE, OnCreate)
 		MESSAGE_HANDLER(WM_DESTROY, OnDestroy)
 		MESSAGE_HANDLER(WM_CONTEXTMENU, OnContextMenu)
+		MESSAGE_HANDLER(WM_USER + 44, OnFindNext)
 
 		NOTIFY_CODE_HANDLER(TVN_SELCHANGED, OnTreeViewSelectionChanged)
 		NOTIFY_CODE_HANDLER(PIN_ITEMCHANGING, OnPropGridItemChanging)
@@ -95,9 +110,7 @@ public:
 		COMMAND_ID_HANDLER(ID_VIEW_THEMEFOLDER, OnViewThemeFolder)
 		COMMAND_ID_HANDLER(ID_VIEW_STATUS_BAR, OnViewStatusBar)
 		COMMAND_ID_HANDLER(ID_APP_ABOUT, OnAppAbout)
-
-		COMMAND_HANDLER(WM_CONTEXTMENU, ID_IMGBG_CHESS, );
-
+		COMMAND_ID_HANDLER(ID_FIND, OnFindOpen)
 
 		CHAIN_MSG_MAP(CUpdateUI<CMainFrame>)
 		CHAIN_MSG_MAP(CFrameWindowImpl<CMainFrame>)
@@ -121,6 +134,8 @@ public:
 	LRESULT OnPropGridItemChanging(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/);
 
 	LRESULT OnContextMenu(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
+	LRESULT OnFindOpen(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnFindNext(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 
 	//
 	// MENU ITEMS
@@ -157,7 +172,9 @@ private:
 	void ClearImageView();
 
 	void SetStatusText(LPCWSTR text);
+	void SetThemeTestMenuItemText(LPWSTR text, bool checked);
 
+	HTREEITEM DoFindNext(const SearchProperties* p, HTREEITEM node);
 	LPARAM RegUserData(void* data, int type);
 
 	std::vector<TreeItemData*> m_treeItemData;

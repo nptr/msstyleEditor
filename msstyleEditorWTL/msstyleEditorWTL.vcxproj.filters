@@ -8,18 +8,22 @@
     <Filter Include="Controls">
       <UniqueIdentifier>{3daeeeb4-a4f0-4045-8bbb-b71410d7d5cb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Dialogs">
+      <UniqueIdentifier>{b2a3e529-68b8-441b-8141-69e4fa872104}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="msstyleEditorWTL.cpp" />
-    <ClCompile Include="stdafx.cpp" />
-    <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="Helper.cpp" />
+    <ClCompile Include="ThemeManager.cpp" />
+    <ClCompile Include="Dialogs\MainFrm.cpp">
+      <Filter>Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="precompiled.cpp" />
+    <ClCompile Include="SearchLogic.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AboutDlg.h" />
-    <ClInclude Include="MainFrm.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="stdafx.h" />
     <ClInclude Include="Controls\PropertyItem.h">
       <Filter>Controls</Filter>
     </ClInclude>
@@ -32,14 +36,27 @@
     <ClInclude Include="Controls\PropertyList.h">
       <Filter>Controls</Filter>
     </ClInclude>
-    <ClInclude Include="Controls\GradientLabel.h">
-      <Filter>Controls</Filter>
-    </ClInclude>
-    <ClInclude Include="Controls\CImageCtrl.h">
-      <Filter>Controls</Filter>
-    </ClInclude>
     <ClInclude Include="Helper.h" />
     <ClInclude Include="TreeItemData.h" />
+    <ClInclude Include="Controls\ImageCtrl.h">
+      <Filter>Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="ThemeManager.h" />
+    <ClInclude Include="UxthemeUndocumented.h" />
+    <ClInclude Include="Dialogs\AboutDlg.h">
+      <Filter>Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="Dialogs\MainFrm.h">
+      <Filter>Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="Dialogs\SearchDlg.h">
+      <Filter>Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="precompiled.h" />
+    <ClInclude Include="SearchLogic.h" />
+    <ClInclude Include="Controls\PropertyItemEditorsCustom.h">
+      <Filter>Controls</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="msstyleEditorWTL.rc">
@@ -47,10 +64,28 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="res\toolbar.bmp">
+    <Image Include="res\msstyleEditorWTL.ico">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="res\msstyleEditorWTL.ico">
+    <Image Include="res\toolicons.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\Find.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\bitmap2.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\Add.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\Remove.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\Start.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\Stop.bmp">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
