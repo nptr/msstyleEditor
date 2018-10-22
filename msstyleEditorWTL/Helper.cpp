@@ -5,6 +5,8 @@
 #include "Controls\PropertyItemEditors.h"
 #include "Controls\PropertyItemImpl.h"
 
+#include "ItemData.h"
+
 #include "libmsstyle\Lookup.h"
 
 #include <codecvt>	// codecvt_utf8_utf16
@@ -12,48 +14,18 @@
 
 using namespace libmsstyle;
 
-std::string StdWideToUTF8(const std::wstring& str)
+LPARAM MkItemData(StyleProperty* prop)
 {
-	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> convert;
-	return convert.to_bytes(str);
-}
-
-std::wstring StdUTF8ToWide(const std::string& str)
-{
-	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> convert;
-	return convert.from_bytes(str);
-}
-
-char* WideToUTF8(const wchar_t* str)
-{
-	if (str == nullptr)
-		return nullptr;
-
-	int size_needed = WideCharToMultiByte(CP_UTF8, 0, &str[0], -1, NULL, 0, NULL, NULL);
-	
-	char* resultBuffer = new char[size_needed];
-	WideCharToMultiByte(CP_UTF8, 0, &str[0], -1, &resultBuffer[0], size_needed, NULL, NULL);
-	return resultBuffer;
-}
-
-wchar_t* UTF8ToWide(const char* str)
-{
-	if (str == nullptr)
-		return nullptr;
-
-	int size_needed = MultiByteToWideChar(CP_UTF8, 0, &str[0], -1, NULL, 0);
-	
-	wchar_t* resultBuffer = new wchar_t[size_needed];
-	MultiByteToWideChar(CP_UTF8, 0, &str[0], -1, &resultBuffer[0], size_needed);
-	return resultBuffer;
+	return reinterpret_cast<LPARAM>(new ItemData(prop, ITEM_PROPERTY));
 }
 
 HPROPERTY GetPropertyItemSpecialCases(StyleProperty& prop)
 {
+	USES_CONVERSION;
+
 	if (prop.GetNameID() == IDENTIFIER::COLORIZATIONCOLOR)
 	{
-		std::wstring tmp = UTF8ToWide(prop.LookupName());
-		HPROPERTY p = new CPropertyColorItem(tmp.c_str(), prop.data.inttype.value, (LPARAM)&prop);
+		HPROPERTY p = new CPropertyColorItem(A2W(prop.LookupName()), prop.data.inttype.value, MkItemData(&prop));
 		return p;
 	}
 	else return nullptr;
@@ -77,7 +49,7 @@ HPROPERTY GetEnumPropertyItem(libmsstyle::StyleProperty& prop)
 	}
 	list[i] = NULL;
 
-	HPROPERTY p = new CPropertyListItem(A2W(prop.LookupName()), list, 0, (LPARAM)&prop);
+	HPROPERTY p = new CPropertyListItem(A2W(prop.LookupName()), list, 0, MkItemData(&prop));
 
 	delete[] list;
 	return p;
@@ -98,7 +70,7 @@ HPROPERTY GetFontsPropertyItem(libmsstyle::StyleProperty& prop)
 	}
 	list[i] = NULL;
 
-	HPROPERTY p = new CPropertyListItem(A2W(prop.LookupName()), list, 0, (LPARAM)&prop);
+	HPROPERTY p = new CPropertyListItem(A2W(prop.LookupName()), list, 0, MkItemData(&prop));
 
 	delete[] list;
 	return p;
@@ -122,7 +94,7 @@ HPROPERTY GetPropertyItemFromStyleProperty(StyleProperty& prop)
 	case IDENTIFIER::FILENAME_LITE:
 	case IDENTIFIER::DISKSTREAM:
 	{
-		HPROPERTY p = new CPropertyEditItem(propName, CComVariant(prop.GetResourceID()), (LPARAM)&prop);
+		HPROPERTY p = new CPropertyEditItem(propName, CComVariant(prop.GetResourceID()), MkItemData(&prop));
 		return p;
 	}
 	case IDENTIFIER::ENUM:
@@ -131,46 +103,46 @@ HPROPERTY GetPropertyItemFromStyleProperty(StyleProperty& prop)
 		HPROPERTY p = GetEnumPropertyItem(prop);
 		if (p == nullptr)
 		{
-			p = new CPropertyEditItem(propName, CComVariant(prop.data.enumtype.enumvalue), (LPARAM)&prop);
+			p = new CPropertyEditItem(propName, CComVariant(prop.data.enumtype.enumvalue), MkItemData(&prop));
 		}
 		return p;
 	}
 	case IDENTIFIER::SIZE:
 	{
-		HPROPERTY p = new CPropertyEditItem(propName, CComVariant(prop.data.sizetype.size), (LPARAM)&prop);
+		HPROPERTY p = new CPropertyEditItem(propName, CComVariant(prop.data.sizetype.size), MkItemData(&prop));
 		return p;
 	}
 	case IDENTIFIER::COLOR:
 	{
-		HPROPERTY p = new CPropertyColorItem(propName, RGB(prop.data.colortype.r, prop.data.colortype.g, prop.data.colortype.b), (LPARAM)&prop);
+		HPROPERTY p = new CPropertyColorItem(propName, RGB(prop.data.colortype.r, prop.data.colortype.g, prop.data.colortype.b), MkItemData(&prop));
 		return p;
 	}
 	case IDENTIFIER::INT:
 	{
-		HPROPERTY p = new CPropertyEditItem(propName, CComVariant(prop.data.inttype.value), (LPARAM)&prop);
+		HPROPERTY p = new CPropertyEditItem(propName, CComVariant(prop.data.inttype.value), MkItemData(&prop));
 		return p;
 	}
 	case IDENTIFIER::BOOLTYPE:
 	{
-		HPROPERTY p = new CPropertyEditItem(propName, CComVariant(prop.data.booltype.boolvalue), (LPARAM)&prop);
+		HPROPERTY p = new CPropertyEditItem(propName, CComVariant(prop.data.booltype.boolvalue), MkItemData(&prop));
 		return p;
 	}
 	case IDENTIFIER::MARGINS:
 	{
 		wsprintf(str, L"%d, %d, %d, %d", prop.data.margintype.left, prop.data.margintype.top, prop.data.margintype.right, prop.data.margintype.bottom);
-		HPROPERTY p = new CPropertyEditItem(propName, CComVariant(str), (LPARAM)&prop);
+		HPROPERTY p = new CPropertyEditItem(propName, CComVariant(str), MkItemData(&prop));
 		return p;
 	}
 	case IDENTIFIER::RECTTYPE:
 	{
 		wsprintf(str, L"%d, %d, %d, %d", prop.data.recttype.left, prop.data.recttype.top, prop.data.recttype.right, prop.data.recttype.bottom);
-		HPROPERTY p = new CPropertyEditItem(propName, CComVariant(str), (LPARAM)&prop);
+		HPROPERTY p = new CPropertyEditItem(propName, CComVariant(str), MkItemData(&prop));
 		return p;
 	}
 	case IDENTIFIER::POSITION:
 	{
 		wsprintf(str, L"%d, %d", prop.data.positiontype.x, prop.data.positiontype.y);
-		HPROPERTY p = new CPropertyEditItem(propName, CComVariant(str), (LPARAM)&prop);
+		HPROPERTY p = new CPropertyEditItem(propName, CComVariant(str), MkItemData(&prop));
 		return p;
 	}
 	case IDENTIFIER::FONT:
@@ -178,13 +150,13 @@ HPROPERTY GetPropertyItemFromStyleProperty(StyleProperty& prop)
 		HPROPERTY p = GetFontsPropertyItem(prop);
 		if (p == nullptr)
 		{
-			p = new CPropertyEditItem(propName, CComVariant(prop.GetResourceID()), (LPARAM)&prop);
+			p = new CPropertyEditItem(propName, CComVariant(prop.GetResourceID()), MkItemData(&prop));
 		}
 		return p;
 	}
 	case IDENTIFIER::STRING:
 	{
-		HPROPERTY p = new CPropertyEditItem(propName, CComVariant(&prop.data.texttype.firstChar), (LPARAM)&prop);
+		HPROPERTY p = new CPropertyEditItem(propName, CComVariant(&prop.data.texttype.firstChar), MkItemData(&prop));
 		return p;
 	}
 	case IDENTIFIER::INTLIST:
@@ -197,11 +169,11 @@ HPROPERTY GetPropertyItemFromStyleProperty(StyleProperty& prop)
 				, *(&prop.data.intlist.firstInt + 2));
 		}
 		else wsprintf(str, L"Len: %d, Values omitted", prop.data.intlist.numInts);
-		HPROPERTY p = new CPropertyEditItem(propName, CComVariant(str), (LPARAM)&prop);
+		HPROPERTY p = new CPropertyEditItem(propName, CComVariant(str), MkItemData(&prop));
 		return p;
 	}
 	default:
-		HPROPERTY p = new CPropertyEditItem(propName, CComVariant(L"VALUE"), (LPARAM)&prop);
+		HPROPERTY p = new CPropertyEditItem(propName, CComVariant(L"VALUE"), MkItemData(&prop));
 		return p;
 	}
 }

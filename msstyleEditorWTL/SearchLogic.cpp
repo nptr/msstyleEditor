@@ -1,10 +1,10 @@
 #include "SearchLogic.h"
 
-#include "TreeItemData.h"
+#include "ItemData.h"
 #include "libmsstyle\VisualStyle.h"
 #include "Dialogs\SearchDlg.h"
 
-bool ContainsProperty(const SearchProperties& search, TreeItemData* treeItemData)
+bool ContainsProperty(const SearchProperties& search, ItemData* treeItemData)
 {
 	USES_CONVERSION;
 
@@ -91,7 +91,7 @@ bool ContainsProperty(const SearchProperties& search, TreeItemData* treeItemData
 	return false;
 }
 
-bool ContainsName(LPCWSTR str, TreeItemData* treeItemData)
+bool ContainsName(LPCWSTR str, ItemData* treeItemData)
 {
 	USES_CONVERSION;
 

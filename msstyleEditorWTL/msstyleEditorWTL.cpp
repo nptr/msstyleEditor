@@ -38,12 +38,9 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
-	HRESULT hRes = ::CoInitialize(NULL);
+	// we need COM
+	HRESULT hRes = OleInitialize(NULL);
 
-	// If you are running on NT 4.0 or higher you can use the following call instead to 
-	// make the EXE free threaded. This means that calls come in on a random RPC thread.
-	//	HRESULT hRes = ::CoInitializeEx(NULL, COINIT_MULTITHREADED);
-	
 	ATLASSERT(SUCCEEDED(hRes));
 
 	// this resolves ATL window thunking problem when Microsoft Layer for Unicode (MSLU) is used

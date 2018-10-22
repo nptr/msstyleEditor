@@ -200,7 +200,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>$(OutputPath)\libmsstyle.lib;Shlwapi.lib;Gdiplus.lib;Comdlg32.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(OutputPath)\libmsstyle.lib;Gdiplus.lib;Comdlg32.lib</AdditionalDependencies>
     </Link>
     <ResourceCompile>
       <Culture>0x0409</Culture>
@@ -221,6 +221,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Dialogs\MainFrm.cpp" />
+    <ClCompile Include="Exporter.cpp" />
     <ClCompile Include="Helper.cpp" />
     <ClCompile Include="msstyleEditorWTL.cpp" />
     <ClCompile Include="precompiled.cpp">
@@ -233,6 +234,7 @@
     <ClCompile Include="ThemeManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Controls\DropTarget.h" />
     <ClInclude Include="Controls\ImageCtrl.h" />
     <ClInclude Include="Controls\PropertyItem.h" />
     <ClInclude Include="Controls\PropertyItemEditors.h" />
@@ -240,14 +242,16 @@
     <ClInclude Include="Controls\PropertyItemImpl.h" />
     <ClInclude Include="Controls\PropertyList.h" />
     <ClInclude Include="Dialogs\AboutDlg.h" />
+    <ClInclude Include="Dialogs\AddPropDlg.h" />
     <ClInclude Include="Dialogs\MainFrm.h" />
     <ClInclude Include="Dialogs\SearchDlg.h" />
+    <ClInclude Include="Exporter.h" />
     <ClInclude Include="Helper.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="precompiled.h" />
     <ClInclude Include="SearchLogic.h" />
     <ClInclude Include="ThemeManager.h" />
-    <ClInclude Include="TreeItemData.h" />
+    <ClInclude Include="ItemData.h" />
     <ClInclude Include="UxthemeUndocumented.h" />
   </ItemGroup>
   <ItemGroup>
@@ -255,7 +259,6 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\Add.bmp" />
-    <Image Include="res\bitmap2.bmp" />
     <Image Include="res\Find.ico" />
     <Image Include="res\msstyleEditorWTL.ico" />
     <Image Include="res\Remove.bmp" />

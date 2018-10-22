@@ -1,7 +1,7 @@
 #pragma once
 
 struct SearchProperties;
-struct TreeItemData;
+struct ItemData;
 
-bool ContainsProperty(const SearchProperties& search, TreeItemData* treeItemData);
-bool ContainsName(LPCWSTR str, TreeItemData* treeItemData);
+bool ContainsProperty(const SearchProperties& search, ItemData* treeItemData);
+bool ContainsName(LPCWSTR str, ItemData* treeItemData);

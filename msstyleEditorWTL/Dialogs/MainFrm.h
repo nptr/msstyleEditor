@@ -12,21 +12,24 @@
 #include "..\ThemeManager.h"
 #include "..\Controls\PropertyList.h"
 #include "..\Controls\ImageCtrl.h"
+#include "..\Controls\DropTarget.h"
 #include "..\resource.h"
 
 #include "libmsstyle\VisualStyle.h"
 
 #include <vector>
 
-struct TreeItemData;
+struct ItemData;
 struct SearchProperties;
 
 class CSearchDlg;
 
-class CMainFrame : 
-	public CFrameWindowImpl<CMainFrame>, 
+class CMainFrame :
+	public CFrameWindowImpl<CMainFrame>,
 	public CUpdateUI<CMainFrame>,
-	public CMessageFilter, public CIdleHandler
+	public CMessageFilter,
+	public CIdleHandler,
+	public CDropTarget
 {
 private:
 	CCommandBarCtrl		m_commandBar;
@@ -48,6 +51,7 @@ private:
 	HMENU m_imageViewMenu;
 	HMENU m_propListMenu;
 
+	HMENU m_fileSubMenu;
 	HMENU m_themeSubMenu;
 	HBITMAP m_bmpStart;
 	HBITMAP m_bmpStop;
@@ -122,11 +126,18 @@ public:
 	//	LRESULT CommandHandler(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
 	//	LRESULT NotifyHandler(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/)
 
+	HRESULT STDMETHODCALLTYPE QueryInterface(REFIID refiid, void FAR* FAR* ppvObject);
+	ULONG STDMETHODCALLTYPE AddRef(void);
+	ULONG STDMETHODCALLTYPE Release(void);
+
+	HRESULT STDMETHODCALLTYPE DragEnter(IDataObject *pDataObj, DWORD grfKeyState, POINTL pt, DWORD *pdwEffect);
+	HRESULT STDMETHODCALLTYPE DragOver(DWORD grfKeyState, POINTL pt, DWORD *pdwEffect);
+	HRESULT STDMETHODCALLTYPE DragLeave(void);
+	HRESULT STDMETHODCALLTYPE Drop(IDataObject *pDataObj, DWORD grfKeyState, POINTL pt, DWORD *pdwEffect);
 
 	//
 	// APP
 	//
-
 	LRESULT OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 	LRESULT OnDestroy(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& bHandled);
 
@@ -137,10 +148,12 @@ public:
 	LRESULT OnFindOpen(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnFindNext(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 
+	LRESULT OnAddProperty(int32_t stateId);
+	LRESULT OnRemoveProperty(libmsstyle::StyleProperty* selectedProp);
+
 	//
 	// MENU ITEMS
 	//
-
 	LRESULT OnFileNew(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnFileOpen(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnFileSave(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
@@ -157,7 +170,6 @@ public:
 	LRESULT OnViewThemeFolder(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnViewStatusBar(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 
-	LRESULT OnAppLicense(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnAppAbout(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 
 private:
@@ -177,5 +189,5 @@ private:
 	HTREEITEM DoFindNext(const SearchProperties* p, HTREEITEM node);
 	LPARAM RegUserData(void* data, int type);
 
-	std::vector<TreeItemData*> m_treeItemData;
+	std::vector<ItemData*> m_treeItemData;
 };

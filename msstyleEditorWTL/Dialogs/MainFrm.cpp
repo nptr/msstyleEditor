@@ -1,13 +1,18 @@
 #include "MainFrm.h"
 #include "AboutDlg.h"
+#include "AddPropDlg.h"
 #include "SearchDlg.h"
 
 #include "..\SearchLogic.h"
-#include "..\TreeItemData.h"
+#include "..\Exporter.h"
+#include "..\ItemData.h"
 #include "..\Helper.h"
 
 #include <gdiplus.h>
 #include <gdiplusgraphics.h>
+
+#include <shellapi.h>
+#include <atlcom.h>
 
 #define COMMON_WND_STYLE	(WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN)
 #define NOT_A_MENU			1
@@ -15,8 +20,8 @@
 #define CHANGE_OK			0
 #define CHANGE_VETO			1
 
-#define TEXT_PLAY L"&Start Test"
-#define TEXT_STOP L"&Stop Test"
+#define TEXT_PLAY L"Start &Test"
+#define TEXT_STOP L"Stop &Test"
 
 CMainFrame::CMainFrame()
 	: m_currentStyle(NULL)
@@ -28,16 +33,23 @@ CMainFrame::CMainFrame()
 
 void CMainFrame::OpenStyle(const CString& file)
 {
+	USES_CONVERSION;
+
 	m_currentStyle = new libmsstyle::VisualStyle();
 
 	try
 	{
-		std::wstring tmp(file.GetString());
-		m_currentStyle->Load(StdWideToUTF8(tmp));
+		m_currentStyle->Load(W2A(file.GetString()));
+
+		MENUITEMINFO info = { 0 };
+		info.cbSize = sizeof(MENUITEMINFO);
+		info.fMask = MIIM_STATE;
+		info.fState = MFS_ENABLED;
+		SetMenuItemInfo(m_fileSubMenu, ID_FILE_SAVE_AS, MF_BYCOMMAND, &info);
 	}
 	catch (std::exception& ex)
 	{
-		MessageBoxA(NULL, ex.what(), "Error loading style!", MB_OK | MB_ICONERROR);
+		MessageBoxA(m_hWnd, ex.what(), "Error loading style!", MB_OK | MB_ICONERROR);
 		delete m_currentStyle;
 		m_currentStyle = nullptr;
 		return;
@@ -52,7 +64,7 @@ void CMainFrame::CloseStyle()
 	{
 		try {
 			m_themeManager.Rollback();
-			//themeMenu->SetLabel(ID_THEME_APPLY, wxT(TEXT_PLAY));
+			SetThemeTestMenuItemText(TEXT_PLAY, false);
 		}
 		catch (...)
 		{
@@ -67,37 +79,41 @@ void CMainFrame::CloseStyle()
 	}
 }
 
-HBITMAP MakeBitMapTransparent(HBITMAP hbmSrc)
+HBITMAP BitmapReplaceBackground(HBITMAP srcBmp, COLORREF dstCol)
 {
-	HDC hdcSrc, hdcDst;
-	HBITMAP hbmOld, hbmNew;
-	BITMAP bm;
-	COLORREF clrTP, clrBK;
+	HDC			hdcSrc, hdcDst;
+	HBITMAP		hbmOld, hbmNew;
+	BITMAP		bm;
+	COLORREF	srcColor;
 
-	if ((hdcSrc = CreateCompatibleDC(NULL)) != NULL) {
-		if ((hdcDst = CreateCompatibleDC(NULL)) != NULL) {
-			int nRow, nCol;
-			GetObject(hbmSrc, sizeof(bm), &bm);
-			hbmOld = (HBITMAP)SelectObject(hdcSrc, hbmSrc);
+	if ((hdcSrc = CreateCompatibleDC(NULL)) != NULL)
+	{
+		if ((hdcDst = CreateCompatibleDC(NULL)) != NULL)
+		{
+			GetObject(srcBmp, sizeof(bm), &bm);
+			hbmOld = (HBITMAP)SelectObject(hdcSrc, srcBmp);
 			hbmNew = CreateBitmap(bm.bmWidth, bm.bmHeight, bm.bmPlanes, bm.bmBitsPixel, NULL);
 			SelectObject(hdcDst, hbmNew);
 
 			BitBlt(hdcDst, 0, 0, bm.bmWidth, bm.bmHeight, hdcSrc, 0, 0, SRCCOPY);
 
-			clrTP = GetPixel(hdcDst, 0, 0);// Get color of first pixel at 0,0
-			clrBK = GetSysColor(COLOR_MENU);// Get the current background color of the menu
+			srcColor = GetPixel(hdcDst, 0, 0); // take a color sample from pixel (0, 0)
 
-			for (nRow = 0; nRow < bm.bmHeight; nRow++)// work our way through all the pixels changing their color
-				for (nCol = 0; nCol < bm.bmWidth; nCol++)// when we hit our set transparency color.
-					if (GetPixel(hdcDst, nCol, nRow) == clrTP)
-						SetPixel(hdcDst, nCol, nRow, clrBK);
-
+			for (int y = 0; y < bm.bmHeight; y++)
+			{
+				for (int x = 0; x < bm.bmWidth; x++)
+				{
+					if (GetPixel(hdcDst, x, y) == srcColor)
+					{
+						SetPixel(hdcDst, x, y, dstCol);
+					}
+				}
+			}
 			DeleteDC(hdcDst);
 		}
 		DeleteDC(hdcSrc);
-
 	}
-	return hbmNew;// return our transformed bitmap.
+	return hbmNew;
 }
 
 LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
@@ -106,42 +122,44 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 	Gdiplus::GdiplusStartupInput gdiplusStartupInput;
 	GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
 
-	// create command bar window
 	HWND hWndCmdBar = m_commandBar.Create(m_hWnd, rcDefault, NULL, ATL_SIMPLE_CMDBAR_PANE_STYLE);
 	m_commandBar.AttachMenu(GetMenu());
 	m_commandBar.LoadImages(IDR_MAINFRAME);
 	SetMenu(NULL);
 
+	CreateSimpleReBar(ATL_SIMPLE_REBAR_NOBORDER_STYLE);
+	AddSimpleReBarBand(hWndCmdBar);
+	CreateSimpleStatusBar();
 
+	m_fileSubMenu = GetSubMenu(m_commandBar.GetMenu(), 0);
 	m_themeSubMenu = GetSubMenu(m_commandBar.GetMenu(), 1);
+
+	// initially disable the "save as" menu item
+	MENUITEMINFO info = { 0 };
+	info.cbSize = sizeof(MENUITEMINFO);
+	info.fMask = MIIM_STATE;
+	info.fState = MFS_DISABLED;
+	SetMenuItemInfo(m_fileSubMenu, ID_FILE_SAVE_AS, MF_BYCOMMAND, &info);
+
+	// set start / stop bitmaps
 	m_bmpStart = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_THEME_START), IMAGE_BITMAP, 16, 16, LR_SHARED);
 	m_bmpStop = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_THEME_STOP), IMAGE_BITMAP, 16, 16, LR_SHARED);
 
-	m_bmpStart = MakeBitMapTransparent(m_bmpStart);
-	m_bmpStop = MakeBitMapTransparent(m_bmpStop);
+	m_bmpStart = BitmapReplaceBackground(m_bmpStart, GetSysColor(COLOR_MENU));
+	m_bmpStop = BitmapReplaceBackground(m_bmpStop, GetSysColor(COLOR_MENU));
 
-	SetMenuItemBitmaps(m_themeSubMenu, 0, MF_BYPOSITION, m_bmpStart, m_bmpStop);
+	SetMenuItemBitmaps(m_themeSubMenu, ID_THEME_TEST, MF_BYCOMMAND, m_bmpStart, m_bmpStop);
 
-
-	//HWND hWndToolBar = CreateSimpleToolBarCtrl(m_hWnd, IDR_MAINFRAME, FALSE, ATL_SIMPLE_TOOLBAR_PANE_STYLE);
-
-	CreateSimpleReBar(ATL_SIMPLE_REBAR_NOBORDER_STYLE);
-	AddSimpleReBarBand(hWndCmdBar);
-	//AddSimpleReBarBand(hWndToolBar, NULL, TRUE);
-
-	CreateSimpleStatusBar();
-
+	// layout
 	m_splitLeft.Create(m_hWnd, rcDefault, NULL, COMMON_WND_STYLE);
 	m_splitRight.Create(m_splitLeft, rcDefault, NULL, COMMON_WND_STYLE);
 	m_hWndClient = m_splitLeft;
-	
 
 	m_treeView.Create(m_splitLeft, rcDefault, NULL, COMMON_WND_STYLE
 		| TVS_HASLINES 
 		| TVS_LINESATROOT 
 		| TVS_HASBUTTONS 
 		| TVS_SHOWSELALWAYS);
-
 
 	m_imageView.Create(m_splitRight, rcDefault, NULL, COMMON_WND_STYLE);
 	m_imageView.SetBitmap(NULL);
@@ -162,11 +180,11 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 	HBITMAP hbmpPropAdd = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_PROP_ADD), IMAGE_BITMAP, 16, 16, LR_SHARED);
 	HBITMAP hbmpPropRem = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_PROP_REMOVE), IMAGE_BITMAP, 16, 16, LR_SHARED);
 	
-	hbmpPropAdd = MakeBitMapTransparent(hbmpPropAdd);
-	hbmpPropRem = MakeBitMapTransparent(hbmpPropRem);
+	hbmpPropAdd = BitmapReplaceBackground(hbmpPropAdd, GetSysColor(COLOR_MENU));
+	hbmpPropRem = BitmapReplaceBackground(hbmpPropRem, GetSysColor(COLOR_MENU));
 
-	SetMenuItemBitmaps(m_propListMenu, 0, MF_BYPOSITION, hbmpPropAdd, hbmpPropAdd);
-	SetMenuItemBitmaps(m_propListMenu, 1, MF_BYPOSITION, hbmpPropRem, hbmpPropRem);
+	SetMenuItemBitmaps(m_propListMenu, ID_PROPVIEW_ADD, MF_BYCOMMAND, hbmpPropAdd, hbmpPropAdd);
+	SetMenuItemBitmaps(m_propListMenu, ID_PROPVIEW_REMOVE, MF_BYCOMMAND, hbmpPropRem, hbmpPropRem);
 
 	m_splitLeft.SetSplitterPanes(m_treeView, m_splitRight);
 	m_splitRight.SetSplitterPanes(m_imageView, m_propList);
@@ -176,8 +194,9 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 	UISetCheck(ID_VIEW_TOOLBAR, 1);
 	UISetCheck(ID_VIEW_STATUS_BAR, 1);
 
-	// Resource editor has some unicode quirks?
 	SetThemeTestMenuItemText(TEXT_PLAY, false);
+
+	RegisterDragDrop(m_hWnd, this);
 
 	// register object for message filtering and idle updates
 	CMessageLoop* pLoop = _Module.GetMessageLoop();
@@ -259,10 +278,32 @@ LRESULT CMainFrame::OnContextMenu(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL&
 		LRESULT res = ::SendMessage(m_propList, LB_ITEMFROMPOINT, 0, MAKELPARAM(pt.x, pt.y));
 
 		int index = LOWORD(res);
-		if (HIWORD(res) == 0)
+		if (HIWORD(res) == 0 && index != 0xFFFF)
 		{
 			m_propList.SetFocus();
 			m_propList.SetCurSel(index);
+
+			HPROPERTY prop = m_propList.GetProperty(index);
+			ItemData* itemData = (ItemData*)m_propList.GetItemData(prop);
+
+			if (itemData->type == ITEM_STATE)
+			{
+				// disallow remove
+				MENUITEMINFO info = { 0 };
+				info.cbSize = sizeof(MENUITEMINFO);
+				info.fMask = MIIM_STATE;
+				info.fState = MFS_DISABLED;
+				SetMenuItemInfo(m_propListMenu, 1, MF_BYPOSITION, &info);
+			}
+			else if (itemData->type == ITEM_PROPERTY)
+			{
+				// allow remove
+				MENUITEMINFO info = { 0 };
+				info.cbSize = sizeof(MENUITEMINFO);
+				info.fMask = MIIM_STATE;
+				info.fState = MFS_ENABLED;
+				SetMenuItemInfo(m_propListMenu, 1, MF_BYPOSITION, &info);
+			}
 
 			HWND source = reinterpret_cast<HWND>(wParam);
 			BOOL res = TrackPopupMenu(m_propListMenu, TPM_RETURNCMD
@@ -272,12 +313,18 @@ LRESULT CMainFrame::OnContextMenu(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL&
 				, source
 				, NULL);
 
-			switch (res)
+			if (res == ID_PROP_ADD)
 			{
-			case ID_PROP_ADD:
-				break;
-			case ID_PROP_REMOVE:
-				break;
+				if (itemData->type == ITEM_STATE)
+					OnAddProperty(reinterpret_cast<libmsstyle::StyleState*>(itemData->object)->stateID);
+				else if (itemData->type == ITEM_PROPERTY)
+					OnAddProperty(reinterpret_cast<libmsstyle::StyleProperty*>(itemData->object)->header.stateID);
+			}
+			else if (res == ID_PROP_REMOVE)
+			{
+				if (itemData->type == ITEM_PROPERTY)
+					OnRemoveProperty(reinterpret_cast<libmsstyle::StyleProperty*>(itemData->object));
+				else MessageBoxW(L"Cannot remove full states yet!", L"Remove Property", MB_OK | MB_ICONWARNING);
 			}
 		}
 	}
@@ -306,16 +353,11 @@ HTREEITEM CMainFrame::DoFindNext(const SearchProperties* search, HTREEITEM node)
 	HTREEITEM originalNode = node;
 	while (node != NULL)
 	{
-		//CTreeItem aaa(node, &m_treeView);
-		//CString strrr;
-		//aaa.GetText(strrr);
-		//MessageBox(strrr.GetString());
-
 		// see whether the node contains "search.value" somewhere.
 		// skip the first node to not get stuck.
 		if (node != originalNode)
 		{
-			TreeItemData* data = reinterpret_cast<TreeItemData*>(m_treeView.GetItemData(node));
+			ItemData* data = reinterpret_cast<ItemData*>(m_treeView.GetItemData(node));
 			switch (search->mode)
 			{
 			case SearchProperties::MODE_NAME:
@@ -393,7 +435,7 @@ LRESULT CMainFrame::OnFindNext(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, 
 	{
 		WCHAR textbuffer[128];
 		wsprintf(textbuffer, L"No further match for \"%s\" !\nSearch will begin from top again.", props->text);
-		MessageBox(textbuffer, L"Search - End reached", MB_OK | MB_ICONINFORMATION);
+		MessageBoxW(textbuffer, L"Search - End reached", MB_OK | MB_ICONINFORMATION);
 		endReached = true;
 	}
 
@@ -412,15 +454,15 @@ LRESULT CMainFrame::OnTreeViewSelectionChanged(int idCtrl, LPNMHDR pnmh, BOOL& b
 	m_imageView.SetBitmap(NULL);
 	SetStatusText(L"");
 
-	TreeItemData* data = reinterpret_cast<TreeItemData*>(evt->itemNew.lParam);
+	ItemData* data = reinterpret_cast<ItemData*>(evt->itemNew.lParam);
 	if (data == nullptr)
 		return 0;
 
 	HTREEITEM parentItem = m_treeView.GetParentItem(evt->itemNew.hItem);
-	TreeItemData* parentData = reinterpret_cast<TreeItemData*>(m_treeView.GetItemData(parentItem));
+	ItemData* parentData = reinterpret_cast<ItemData*>(m_treeView.GetItemData(parentItem));
 
 	HTREEITEM grandparentItem = m_treeView.GetParentItem(parentItem);
-	TreeItemData* grandparentData = reinterpret_cast<TreeItemData*>(m_treeView.GetItemData(grandparentItem));
+	ItemData* grandparentData = reinterpret_cast<ItemData*>(m_treeView.GetItemData(grandparentItem));
 
 	// Class Node
 	if (data->type == ITEM_CLASS)
@@ -511,13 +553,84 @@ LRESULT CMainFrame::OnTreeViewSelectionChanged(int idCtrl, LPNMHDR pnmh, BOOL& b
 	return 0;
 }
 
+LRESULT CMainFrame::OnAddProperty(int32_t stateId)
+{
+	if (selection.ClassId < 0 ||
+		selection.PartId < 0)
+	{
+		MessageBoxW(L"Internal error. Lost track of state.", L"msstyleEditor", MB_OK | MB_ICONERROR);
+		return 0;
+	}
+
+	libmsstyle::StyleProperty* prop = new libmsstyle::StyleProperty();
+	prop->header.classID = selection.ClassId;
+	prop->header.partID = selection.PartId;
+	prop->header.stateID = stateId;
+
+	CAddPropDlg addDlg;
+	if (addDlg.DoModal(prop) == IDOK)
+	{
+		libmsstyle::StylePart* part = m_currentStyle
+			->FindClass(selection.ClassId)						
+			->FindPart(selection.PartId);
+
+		part->FindState(prop->header.stateID)->AddProperty(prop);
+		ClearPropView();
+		FillPropView(*part);
+	}
+	else delete prop;
+
+	return 0;
+}
+
+LRESULT CMainFrame::OnRemoveProperty(libmsstyle::StyleProperty* selectedProp)
+{
+	USES_CONVERSION;
+
+	if (selection.ClassId < 0 ||
+		selection.PartId < 0)
+	{
+		MessageBox(L"Internal error. Lost track of selection.", L"Remove Property", MB_OK | MB_ICONERROR);
+		return 0;
+	}
+
+	libmsstyle::StyleProperty* prop = selectedProp;
+	if (prop->GetTypeID() == libmsstyle::IDENTIFIER::FILENAME ||
+		prop->GetTypeID() == libmsstyle::IDENTIFIER::FILENAME_LITE ||
+		prop->GetTypeID() == libmsstyle::IDENTIFIER::DISKSTREAM)
+	{
+		MessageBoxW(L"Cannot remove image properties yet!", L"Remove Property", MB_OK | MB_ICONINFORMATION);
+		return 0;
+	}
+
+	WCHAR msgText[120];
+	wsprintf(msgText, L"Remove property \"%s\" with value: \"%s\"?", A2W(prop->LookupName()), A2W(prop->GetValueAsString().c_str()));
+	if (MessageBoxW(msgText, L"Remove Property", MB_YESNO) == IDYES)
+	{
+		libmsstyle::StylePart* part = m_currentStyle
+			->FindClass(selection.ClassId)
+			->FindPart(selection.PartId);
+
+		// todo: cannot just remove any prop. image props are still used in the classview..
+		part->FindState(prop->header.stateID)->RemoveProperty(prop);
+		ClearPropView();
+		FillPropView(*part);
+	}
+
+	return 0;
+}
 
 LRESULT CMainFrame::OnPropGridItemChanging(int idCtrl, LPNMHDR pnmh, BOOL& bHandled)
 {
 	LPNMPROPERTYITEM evt = (LPNMPROPERTYITEM)pnmh;
 	
 	IProperty* gridProp = evt->prop;
-	libmsstyle::StyleProperty* styleProp = (libmsstyle::StyleProperty*)gridProp->GetItemData();
+	ItemData* itemData = (ItemData*)gridProp->GetItemData();
+
+	if (itemData->type != ITEM_PROPERTY)
+		return CHANGE_OK;
+
+	libmsstyle::StyleProperty* styleProp = (libmsstyle::StyleProperty*)itemData->object;
 
 	if (!styleProp)
 		return CHANGE_VETO;
@@ -600,7 +713,7 @@ LRESULT CMainFrame::OnPropGridItemChanging(int idCtrl, LPNMHDR pnmh, BOOL& bHand
 
 LPARAM CMainFrame::RegUserData(void* data, int type)
 {
-	TreeItemData* userData = new TreeItemData(data, type);
+	ItemData* userData = new ItemData(data, type);
 	m_treeItemData.push_back(userData);
 
 	return reinterpret_cast<LPARAM>(userData);
@@ -608,24 +721,23 @@ LPARAM CMainFrame::RegUserData(void* data, int type)
 
 void CMainFrame::FillTreeView()
 {
+	USES_CONVERSION;
+
 	m_treeView.SetRedraw(0);
 
 	ClearTreeView();
 
 	HTREEITEM rootNode = TVI_ROOT;
-	
 
 	// Add classes
 	for (auto& cls : *m_currentStyle)
 	{
-		std::wstring tmp = StdUTF8ToWide(cls.second.className);
-		CTreeItem classNode = m_treeView.InsertItem(TVIF_TEXT | TVIF_PARAM, tmp.c_str(), 0, 0, 0, 0, RegUserData(&cls.second, ITEM_CLASS), rootNode, TVI_LAST);
+		CTreeItem classNode = m_treeView.InsertItem(TVIF_TEXT | TVIF_PARAM, A2T(cls.second.className.c_str()), 0, 0, 0, 0, RegUserData(&cls.second, ITEM_CLASS), rootNode, TVI_LAST);
 
 		// Add parts
 		for (auto& part : cls.second)
 		{
-			tmp = StdUTF8ToWide(part.second.partName);
-			CTreeItem partNode = m_treeView.InsertItem(TVIF_TEXT | TVIF_PARAM, tmp.c_str(), 0, 0, 0, 0, RegUserData(&part.second, ITEM_PART), classNode, TVI_LAST);
+			CTreeItem partNode = m_treeView.InsertItem(TVIF_TEXT | TVIF_PARAM, A2T(part.second.partName.c_str()), 0, 0, 0, 0, RegUserData(&part.second, ITEM_PART), classNode, TVI_LAST);
 
 			// Add images
 			for (auto& state : part.second)
@@ -638,8 +750,7 @@ void CMainFrame::FillTreeView()
 						prop->header.typeID == libmsstyle::IDENTIFIER::FILENAME_LITE ||
 						prop->header.typeID == libmsstyle::IDENTIFIER::DISKSTREAM)
 					{
-						tmp = StdUTF8ToWide(prop->LookupName()); // propnames have to be looked up, but thats fast
-						m_treeView.InsertItem(TVIF_TEXT | TVIF_PARAM, tmp.c_str(), 0, 0, 0, 0, RegUserData(prop, ITEM_PROPERTY), partNode, TVI_LAST);
+						m_treeView.InsertItem(TVIF_TEXT | TVIF_PARAM, A2T(prop->LookupName()), 0, 0, 0, 0, RegUserData(prop, ITEM_PROPERTY), partNode, TVI_LAST);
 					}
 				}
 			}
@@ -660,15 +771,19 @@ void CMainFrame::ClearTreeView()
 	{
 		delete *it;
 	}
+	m_treeItemData.clear();
 }
 
 void CMainFrame::FillPropView(libmsstyle::StylePart& part)
 {
+	USES_CONVERSION;
+
 	for (auto& state : part)
 	{
-		std::wstring tmp = StdUTF8ToWide(state.second.stateName);
-		CCategoryProperty* category = new CCategoryProperty(tmp.c_str(), (LPARAM)&state);
+		ItemData* itemData = new ItemData(&state, ITEM_STATE);
+		CCategoryProperty* category = new CCategoryProperty(A2T(state.second.stateName.c_str()), (LPARAM)itemData);
 		m_propList.AddItem(category);
+
 		for (auto& prop : state.second)
 		{
 			HPROPERTY p = GetPropertyItemFromStyleProperty(*prop);
@@ -691,6 +806,8 @@ void CMainFrame::ClearPropView()
 	int max = m_propListBase.GetCount();
 	for (int i = max-1; i >= 0; --i)
 	{
+		HPROPERTY prop = m_propList.GetProperty(i);
+		delete (ItemData*)m_propList.GetItemData(prop);
 		m_propListBase.DeleteString(i);
 	}
 }
@@ -708,10 +825,24 @@ void CMainFrame::ShowImageFromResource(libmsstyle::StyleProperty& prop)
 	{
 		m_selectedImage = res;
 		
-		IStream* stream = SHCreateMemStream(reinterpret_cast<const BYTE*>(res.GetData()), res.GetSize());
-		Gdiplus::Image* img = new Gdiplus::Image(stream);
-		m_imageView.SetBitmap(img);
-		stream->Release();
+		HGLOBAL memHandle = GlobalAlloc((GMEM_MOVEABLE | GMEM_DISCARDABLE), res.GetSize());
+		if (memHandle != NULL)
+		{
+			BYTE* mem = (BYTE*)GlobalLock(memHandle);
+			if (mem != NULL)
+			{
+				memcpy(mem, res.GetData(), res.GetSize());
+				GlobalUnlock(memHandle);
+
+				IStream* memStream;
+				if (CreateStreamOnHGlobal(memHandle, TRUE, &memStream) == S_OK)
+				{
+					Gdiplus::Image* img = new Gdiplus::Image(memStream);
+					m_imageView.SetBitmap(img);
+					memStream->Release();
+				}
+			}
+		}
 	}
 }
 
@@ -764,7 +895,7 @@ LRESULT CMainFrame::OnFileOpen(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCt
 
 	CShellFileOpenDialog openDialog(NULL
 		, FOS_FORCEFILESYSTEM | FOS_FILEMUSTEXIST | FOS_PATHMUSTEXIST
-		, _T("txt")
+		, _T("msstyles")
 		, filter
 		, _countof(filter));
 
@@ -783,6 +914,8 @@ LRESULT CMainFrame::OnFileOpen(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCt
 
 LRESULT CMainFrame::OnFileSave(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
 {
+	USES_CONVERSION;
+
 	COMDLG_FILTERSPEC filter[] =
 	{
 		{ _T("Visual Style(*.msstyles)"), _T("*.msstyles") }
@@ -790,7 +923,7 @@ LRESULT CMainFrame::OnFileSave(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCt
 
 	CShellFileSaveDialog saveDialog(NULL
 		, FOS_FORCEFILESYSTEM | FOS_FILEMUSTEXIST | FOS_PATHMUSTEXIST
-		, _T("txt")
+		, _T("msstyles")
 		, filter
 		, _countof(filter));
 
@@ -801,8 +934,7 @@ LRESULT CMainFrame::OnFileSave(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCt
 
 		try
 		{
-			std::wstring tmp(filePath.GetString());
-			m_currentStyle->Save(StdWideToUTF8(tmp));
+			m_currentStyle->Save(W2A(filePath));
 
 			SetStatusText(L"Style saved successfully!");
 		}
@@ -817,6 +949,38 @@ LRESULT CMainFrame::OnFileSave(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCt
 
 LRESULT CMainFrame::OnFileExportStyleInfo(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
 {
+	USES_CONVERSION;
+
+	if (m_currentStyle == nullptr)
+		return 0;
+
+	COMDLG_FILTERSPEC filter[] =
+	{
+		{ _T("Style Info(*.txt)"), _T("*.txt") }
+	};
+
+	CShellFileSaveDialog saveDialog(NULL
+		, FOS_FORCEFILESYSTEM | FOS_FILEMUSTEXIST | FOS_PATHMUSTEXIST
+		, _T("txt")
+		, filter
+		, _countof(filter));
+
+	if (saveDialog.DoModal() == IDOK)
+	{
+		try
+		{
+			CString filePath;
+			saveDialog.GetFilePath(filePath);
+
+			std::string path = W2A(filePath);
+			Exporter::ExportLogicalStructure(path, *m_currentStyle);
+		}
+		catch (std::runtime_error ex)
+		{
+			MessageBoxA(m_hWnd, ex.what(), "Error exporting", MB_OK | MB_ICONERROR);
+		}
+	}
+
 	return 0;
 }
 
@@ -832,14 +996,13 @@ LRESULT CMainFrame::OnThemeTest(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndC
 	if (m_currentStyle == nullptr)
 		return 0;
 
-
 	if (m_themeManager.IsThemeInUse())
 	{
 		try
 		{
 			m_themeManager.Rollback();
 			SetThemeTestMenuItemText(TEXT_PLAY, false);
-			Sleep(300); // prevent doubleclicks
+			Sleep(300); // avoid accidental doubleclicks
 			return 0;
 		}
 		catch (...)
@@ -848,8 +1011,7 @@ LRESULT CMainFrame::OnThemeTest(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndC
 	}
 
 	bool needConfirmation = false;
-	OSVERSIONINFO version;
-	ZeroMemory(&version, sizeof(OSVERSIONINFO));
+	OSVERSIONINFO version = { 0 };
 	version.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 
 #pragma warning( disable : 4996 )
@@ -891,7 +1053,7 @@ LRESULT CMainFrame::OnThemeTest(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndC
 	{
 		m_themeManager.ApplyTheme(*m_currentStyle);
 		SetThemeTestMenuItemText(TEXT_STOP, true);
-		Sleep(300); // prevent doubleclicks
+		Sleep(300); // avoid accidental doubleclicks
 	}
 	catch (std::runtime_error& err)
 	{
@@ -971,6 +1133,8 @@ LRESULT CMainFrame::OnImageExport(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWn
 
 LRESULT CMainFrame::OnImageReplace(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
 {
+	USES_CONVERSION;
+
 	if (m_selectedProperty == nullptr)
 	{
 		MessageBoxW(L"Select an image resource first!", L"Replace Image", MB_OK | MB_ICONERROR);
@@ -1007,8 +1171,7 @@ LRESULT CMainFrame::OnImageReplace(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hW
 		CString filePath;
 		openDialog.GetFilePath(filePath);
 
-		std::wstring tmp(filePath.GetString());
-		m_currentStyle->QueueResourceUpdate(m_selectedProperty->GetResourceID(), tp, StdWideToUTF8(tmp));
+		m_currentStyle->QueueResourceUpdate(m_selectedProperty->GetResourceID(), tp, W2A(filePath));
 	}
 
 	return 0;
@@ -1050,11 +1213,11 @@ LRESULT CMainFrame::OnViewThemeFolder(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /
 	{
 		wsprintf(path, L"%s\\Resources\\Themes\\", windowsFolder);
 		CoTaskMemFree(windowsFolder);
-		ShellExecute(NULL, L"explore", path, NULL, NULL, SW_SHOWDEFAULT);
+		ShellExecuteW(NULL, L"explore", path, NULL, NULL, SW_SHOWDEFAULT);
 	}
 	else
 	{
-		ShellExecute(NULL, L"explore", L"C:\\Windows\\Resources\\Themes\\", NULL, NULL, SW_SHOWDEFAULT);
+		ShellExecuteW(NULL, L"explore", L"C:\\Windows\\Resources\\Themes\\", NULL, NULL, SW_SHOWDEFAULT);
 	}
 	return 0;
 }
@@ -1068,17 +1231,115 @@ LRESULT CMainFrame::OnViewStatusBar(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*h
 	return 0;
 }
 
-
-LRESULT CMainFrame::OnAppLicense(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
-{
-	return 0;
-}
-
 LRESULT CMainFrame::OnAppAbout(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
 {
 	CAboutDlg dlg;
 	dlg.DoModal();
 	return 0;
+}
+
+#pragma endregion
+
+#pragma region Drag & Drop Handling
+
+ULONG m_refCount = 0;
+DWORD m_effect = 0;
+
+HRESULT STDMETHODCALLTYPE CMainFrame::QueryInterface(REFIID refiid, void FAR* FAR* ppvObject)
+{
+	*ppvObject = (refiid == IID_IUnknown || refiid == IID_IDropTarget) ? this : NULL;
+
+	if (*ppvObject != NULL)
+		((LPUNKNOWN)*ppvObject)->AddRef();
+
+	return *ppvObject == NULL ? E_NOINTERFACE : S_OK;
+}
+
+ULONG STDMETHODCALLTYPE CMainFrame::AddRef(void)
+{
+	return InterlockedIncrement(&m_refCount);
+}
+
+ULONG STDMETHODCALLTYPE CMainFrame::Release(void)
+{
+	ULONG refCount = InterlockedDecrement(&m_refCount);
+	if(refCount == 0)
+		delete this;
+	return refCount;
+}
+
+HRESULT GetFirstFilename(IDataObject *pDataObj, WCHAR* pDst, DWORD dwLen)
+{
+	FORMATETC format = { 0 };
+	format.cfFormat = CF_HDROP;
+	format.dwAspect = DVASPECT_CONTENT;
+	format.lindex = -1;
+	format.tymed = TYMED_HGLOBAL;
+
+	STGMEDIUM medium = { 0 };
+	HRESULT result = S_OK;
+	if ((result = pDataObj->GetData(&format, &medium)) == S_OK)
+	{
+		DROPFILES* droppedFiles = static_cast<DROPFILES*>(medium.hGlobal);
+
+		// apparently this is how to access the data (see MSDN "Shell Clipboard Formats", CF_HDROP)
+		DWORD offset = *(DWORD*)(droppedFiles->pFiles);
+		WCHAR* files = (WCHAR*)(droppedFiles->pFiles + offset);
+
+		wcsncpy(pDst, files, dwLen);
+		ReleaseStgMedium(&medium);
+	}
+
+	return result;
+}
+
+HRESULT STDMETHODCALLTYPE CMainFrame::DragEnter(IDataObject *pDataObj, DWORD grfKeyState, POINTL pt, DWORD *pdwEffect)
+{
+	if (pdwEffect == NULL || pDataObj == NULL)
+		return E_INVALIDARG;
+
+	WCHAR filename[255];
+	if (GetFirstFilename(pDataObj, filename, 255) == S_OK)
+	{
+		wcslwr(filename);
+		if (wcsstr(filename, L".msstyles"))
+			*pdwEffect = DROPEFFECT_COPY;
+		else *pdwEffect = DROPEFFECT_NONE;
+	}
+	else
+	{
+		*pdwEffect = DROPEFFECT_NONE;
+	}
+
+	m_effect = *pdwEffect;
+	return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE CMainFrame::DragOver(DWORD grfKeyState, POINTL pt, DWORD *pdwEffect)
+{
+	// all controls are a valid drop location, so reuse the result of our initial check in "DragEnter"
+	*pdwEffect = m_effect;
+	return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE CMainFrame::DragLeave(void)
+{
+	return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE CMainFrame::Drop(IDataObject *pDataObj, DWORD grfKeyState, POINTL pt, DWORD *pdwEffect)
+{
+	if (pdwEffect == NULL || pDataObj == NULL)
+		return E_INVALIDARG;
+
+	WCHAR filename[255];
+	if (GetFirstFilename(pDataObj, filename, 255) == S_OK)
+	{
+		CloseStyle();
+		OpenStyle(filename);
+	}
+
+	return S_OK;
 }
 
 #pragma endregion

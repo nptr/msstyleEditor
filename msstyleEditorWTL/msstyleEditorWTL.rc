@@ -65,7 +65,7 @@ BEGIN
     END
     POPUP "&Theme"
     BEGIN
-        MENUITEM "&Test ?",                     ID_THEME_TEST, CHECKED
+        MENUITEM "Start &Test",                 ID_THEME_TEST
     END
     POPUP "&Image"
     BEGIN
@@ -84,7 +84,6 @@ BEGIN
     POPUP "&Help"
     BEGIN
         MENUITEM "&About",                      ID_APP_ABOUT
-        MENUITEM "&License",                    ID_HELP_LICENSE
     END
 END
 
@@ -149,6 +148,20 @@ BEGIN
     PUSHBUTTON      "",IDC_SEARCH_GO,110,24,20,16,BS_ICON | BS_FLAT
 END
 
+IDD_ADDPROPDIALOG DIALOGEX 0, 0, 267, 177
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Add Property"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,138,156,58,14
+    PUSHBUTTON      "Abbrechen",IDCANCEL,203,156,56,14
+    COMBOBOX        IDC_TYPE,31,9,99,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LISTBOX         IDC_PROP,7,27,123,124,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Type:",IDC_STATIC,7,11,20,8
+    GROUPBOX        "Description",IDC_STATIC,138,7,120,145
+    LTEXT           "",IDC_DESCRIPTION,144,18,108,129
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -172,6 +185,14 @@ BEGIN
         RIGHTMARGIN, 130
         TOPMARGIN, 7
         BOTTOMMARGIN, 40
+    END
+
+    IDD_ADDPROPDIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 260
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 170
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -288,7 +309,7 @@ END
 STRINGTABLE
 BEGIN
     ID_APP_ABOUT            "Display program information, version number and copyright\nAbout"
-    ID_APP_EXIT             "Quit the application; prompts to save documents\nExit"
+    ID_APP_EXIT             "Quit the application\nExit"
 END
 
 STRINGTABLE
@@ -336,7 +357,7 @@ BEGIN
     ATL_IDS_SCMAXIMIZE      "Enlarge the window to full size"
     ATL_IDS_SCNEXTWINDOW    "Switch to the next document window"
     ATL_IDS_SCPREVWINDOW    "Switch to the previous document window"
-    ATL_IDS_SCCLOSE         "Close the active window and prompts to save the documents"
+    ATL_IDS_SCCLOSE         "Close the active window"
 END
 
 STRINGTABLE
@@ -353,7 +374,20 @@ END
 
 STRINGTABLE
 BEGIN
-    ATL_IDS_MRU_FILE        "Open this document"
+    ATL_IDS_MRU_FILE        "Dumps the themes structure as text"
+END
+
+STRINGTABLE
+BEGIN
+    ID_VIEW_THEMEFOLDER     "Opens the systems theme folder in the explorer\nThemefolder"
+    ID_THEME_TEST           "Temporary applies the open theme to the system\nStart Test"
+    ID_IMAGE_EXPORT         "Exports the currently visible image\nExport"
+    ID_IMAGE_REPLACE        "Replaces the currently visible image\nReplace"
+END
+
+STRINGTABLE
+BEGIN
+    ID_EXPORT_STYLEINFO     "Dumps the themes structure in a readable format"
 END
 
 #endif    // Englisch (USA) resources

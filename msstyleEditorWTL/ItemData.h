@@ -5,14 +5,14 @@
 #define ITEM_STATE			3
 #define ITEM_PROPERTY		4
 
-struct TreeItemData
+struct ItemData
 {
-	TreeItemData(void* pObject, int objectType)
+	ItemData(void* pObject, int objectType)
 		: object(pObject)
 		, type(objectType)
 	{}
 
-	~TreeItemData()
+	ItemData()
 	{
 		int xx = 0;
 	}
