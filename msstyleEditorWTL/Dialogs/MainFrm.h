@@ -114,6 +114,7 @@ public:
 		COMMAND_ID_HANDLER(ID_VIEW_THEMEFOLDER, OnViewThemeFolder)
 		COMMAND_ID_HANDLER(ID_VIEW_STATUS_BAR, OnViewStatusBar)
 		COMMAND_ID_HANDLER(ID_APP_ABOUT, OnAppAbout)
+		COMMAND_ID_HANDLER(ID_HELP_LICENSE, OnAppLicense)
 		COMMAND_ID_HANDLER(ID_FIND, OnFindOpen)
 
 		CHAIN_MSG_MAP(CUpdateUI<CMainFrame>)
@@ -171,6 +172,7 @@ public:
 	LRESULT OnViewStatusBar(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 
 	LRESULT OnAppAbout(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnAppLicense(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 
 private:
 	void FillTreeView();
@@ -185,6 +187,8 @@ private:
 
 	void SetStatusText(LPCWSTR text);
 	void SetThemeTestMenuItemText(LPWSTR text, bool checked);
+
+	void ExpandSiblings(HTREEITEM startItem, UINT nCode);
 
 	HTREEITEM DoFindNext(const SearchProperties* p, HTREEITEM node);
 	LPARAM RegUserData(void* data, int type);

@@ -15,6 +15,8 @@
 #define IDB_THEME_STOP                  235
 #define IDB_THEME_START                 237
 #define IDD_ADDPROPDIALOG               238
+#define IDR_LICENSE                     239
+#define IDD_LICENSEDIALOG               241
 #define IDC_IPADDRESS1                  1000
 #define IDC_SYSLINK1                    1001
 #define IDC_SEARCH_LOCATION             1002
@@ -24,6 +26,7 @@
 #define IDC_TYPE                        1009
 #define IDC_PROP                        1010
 #define IDC_DESCRIPTION                 1011
+#define IDC_EDIT_LICENSE                1012
 #define ID_VIEW_EXPANDALL               32775
 #define ID_VIEW_COLLAPSEALL             32776
 #define ID_VIEW_                        32777
@@ -48,9 +51,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        239
-#define _APS_NEXT_COMMAND_VALUE         32802
-#define _APS_NEXT_CONTROL_VALUE         1012
+#define _APS_NEXT_RESOURCE_VALUE        242
+#define _APS_NEXT_COMMAND_VALUE         32803
+#define _APS_NEXT_CONTROL_VALUE         1013
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

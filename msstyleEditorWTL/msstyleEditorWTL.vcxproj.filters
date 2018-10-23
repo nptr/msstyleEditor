@@ -65,6 +65,9 @@
     <ClInclude Include="Controls\DropTarget.h">
       <Filter>Controls</Filter>
     </ClInclude>
+    <ClInclude Include="Dialogs\LicenseDlg.h">
+      <Filter>Dialogs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="msstyleEditorWTL.rc">
@@ -73,9 +76,6 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\msstyleEditorWTL.ico">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="res\toolicons.bmp">
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="res\Find.ico">
@@ -93,5 +93,13 @@
     <Image Include="res\Stop.bmp">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="res\Toolicons.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="res\License.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>

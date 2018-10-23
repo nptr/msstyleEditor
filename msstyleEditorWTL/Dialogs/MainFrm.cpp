@@ -2,6 +2,7 @@
 #include "AboutDlg.h"
 #include "AddPropDlg.h"
 #include "SearchDlg.h"
+#include "LicenseDlg.h"
 
 #include "..\SearchLogic.h"
 #include "..\Exporter.h"
@@ -1177,16 +1178,27 @@ LRESULT CMainFrame::OnImageReplace(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hW
 	return 0;
 }
 
+void CMainFrame::ExpandSiblings(HTREEITEM startItem, UINT nCode)
+{
+	HTREEITEM item = startItem;
+	while (item != NULL)
+	{
+		HTREEITEM child = m_treeView.GetChildItem(item);
+		if (child != NULL)
+		{
+			ExpandSiblings(child, nCode);
+		}
+
+		m_treeView.Expand(item, nCode);
+		item = m_treeView.GetNextSiblingItem(item);
+	}
+}
 
 LRESULT CMainFrame::OnViewExpand(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
 {
 	m_treeView.SetRedraw(0);
 	HTREEITEM item = m_treeView.GetRootItem();
-	while (item != NULL)
-	{
-		m_treeView.Expand(item, TVE_EXPAND);
-		item = m_treeView.GetNextSiblingItem(item);
-	}
+	ExpandSiblings(item, TVE_EXPAND);
 	m_treeView.SetRedraw(1);
 	return 0;
 }
@@ -1195,11 +1207,7 @@ LRESULT CMainFrame::OnViewCollapse(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hW
 {
 	m_treeView.SetRedraw(0);
 	HTREEITEM item = m_treeView.GetRootItem();
-	while (item != NULL)
-	{
-		m_treeView.Expand(item, TVE_COLLAPSE);
-		item = m_treeView.GetNextSiblingItem(item);
-	}
+	ExpandSiblings(item, TVE_COLLAPSE);
 	m_treeView.SetRedraw(1);
 	return 0;
 }
@@ -1234,6 +1242,13 @@ LRESULT CMainFrame::OnViewStatusBar(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*h
 LRESULT CMainFrame::OnAppAbout(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
 {
 	CAboutDlg dlg;
+	dlg.DoModal();
+	return 0;
+}
+
+LRESULT CMainFrame::OnAppLicense(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+{
+	CLicenseDlg dlg;
 	dlg.DoModal();
 	return 0;
 }

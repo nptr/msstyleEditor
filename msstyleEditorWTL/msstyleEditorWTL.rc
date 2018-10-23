@@ -84,6 +84,7 @@ BEGIN
     POPUP "&Help"
     BEGIN
         MENUITEM "&About",                      ID_APP_ABOUT
+        MENUITEM "&License",                    ID_HELP_LICENSE
     END
 END
 
@@ -162,6 +163,14 @@ BEGIN
     LTEXT           "",IDC_DESCRIPTION,144,18,108,129
 END
 
+IDD_LICENSEDIALOG DIALOGEX 0, 0, 341, 197
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "License"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    EDITTEXT        IDC_EDIT_LICENSE,7,7,327,183,ES_MULTILINE | ES_AUTOVSCROLL | ES_READONLY
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -193,6 +202,14 @@ BEGIN
         RIGHTMARGIN, 260
         TOPMARGIN, 7
         BOTTOMMARGIN, 170
+    END
+
+    IDD_LICENSEDIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 334
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 190
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -281,11 +298,18 @@ END
 // Bitmap
 //
 
-IDR_MAINFRAME           BITMAP                  "res\\toolicons.bmp"
+IDR_MAINFRAME           BITMAP                  "res\\Toolicons.bmp"
 IDB_PROP_ADD            BITMAP                  "res\\Add.bmp"
 IDB_PROP_REMOVE         BITMAP                  "res\\Remove.bmp"
 IDB_THEME_START         BITMAP                  "res\\Start.bmp"
 IDB_THEME_STOP          BITMAP                  "res\\Stop.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// HTML
+//
+
+IDR_LICENSE             HTML                    "res\\License.txt"
 
 /////////////////////////////////////////////////////////////////////////////
 //

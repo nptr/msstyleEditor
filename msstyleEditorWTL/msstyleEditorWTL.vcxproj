@@ -243,6 +243,7 @@
     <ClInclude Include="Controls\PropertyList.h" />
     <ClInclude Include="Dialogs\AboutDlg.h" />
     <ClInclude Include="Dialogs\AddPropDlg.h" />
+    <ClInclude Include="Dialogs\LicenseDlg.h" />
     <ClInclude Include="Dialogs\MainFrm.h" />
     <ClInclude Include="Dialogs\SearchDlg.h" />
     <ClInclude Include="Exporter.h" />
@@ -264,7 +265,10 @@
     <Image Include="res\Remove.bmp" />
     <Image Include="res\Start.bmp" />
     <Image Include="res\Stop.bmp" />
-    <Image Include="res\toolicons.bmp" />
+    <Image Include="res\Toolicons.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="res\License.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
