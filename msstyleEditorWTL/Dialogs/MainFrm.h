@@ -23,6 +23,7 @@ struct ItemData;
 struct SearchProperties;
 
 class CSearchDlg;
+class CTestDlg;
 
 class CMainFrame :
 	public CFrameWindowImpl<CMainFrame>,
@@ -41,6 +42,7 @@ private:
 	CImageCtrl			m_imageView;
 
 	CSearchDlg*			m_searchDialog;
+	CTestDlg*			m_testDialog;
 
 	libmsstyle::VisualStyle*	m_currentStyle;
 	libmsstyle::StyleProperty*	m_selectedProperty;
@@ -112,6 +114,7 @@ public:
 		COMMAND_ID_HANDLER(ID_VIEW_EXPANDALL, OnViewExpand)
 		COMMAND_ID_HANDLER(ID_VIEW_COLLAPSEALL, OnViewCollapse)
 		COMMAND_ID_HANDLER(ID_VIEW_THEMEFOLDER, OnViewThemeFolder)
+		COMMAND_ID_HANDLER(ID_VIEW_TESTDIALOG, OnViewTestDialog)
 		COMMAND_ID_HANDLER(ID_VIEW_STATUS_BAR, OnViewStatusBar)
 		COMMAND_ID_HANDLER(ID_APP_ABOUT, OnAppAbout)
 		COMMAND_ID_HANDLER(ID_HELP_LICENSE, OnAppLicense)
@@ -169,6 +172,7 @@ public:
 	LRESULT OnViewExpand(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnViewCollapse(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnViewThemeFolder(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnViewTestDialog(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnViewStatusBar(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 
 	LRESULT OnAppAbout(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
@@ -186,6 +190,7 @@ private:
 	void ClearImageView();
 
 	void SetStatusText(LPCWSTR text);
+	void SetWindowCaption(LPCWSTR text);
 	void SetThemeTestMenuItemText(LPWSTR text, bool checked);
 
 	void ExpandSiblings(HTREEITEM startItem, UINT nCode);

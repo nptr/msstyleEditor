@@ -114,12 +114,16 @@ namespace libmsstyle
 			if (m_moduleHandle != 0)
 			{
 				Resource cmap = GetResource(m_moduleHandle, "CMAP", "CMAP");
-				LoadClassmap(cmap);
+				if (cmap.size != 0)
+					LoadClassmap(cmap);
+				else throw std::runtime_error("Style contains no class map!");
 
 				m_stylePlatform = DeterminePlatform();
 
 				Resource pmap = GetResource(m_moduleHandle, "NORMAL", "VARIANT");
-				LoadProperties(pmap);
+				if (pmap.size != 0)
+					LoadProperties(pmap);
+				else throw std::runtime_error("Style contains no properties!");
 			}
 			else throw std::runtime_error("Could not open file as PE resource!");
 		}

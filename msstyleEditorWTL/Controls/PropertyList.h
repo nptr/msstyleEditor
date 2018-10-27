@@ -52,13 +52,14 @@
 #define PLS_EX_SINGLECLICKEDIT 0x00000010
 #define PLS_EX_NOCOLUMNRESIZE  0x00000020
 
+#define CHANGE_OK			0
+#define CHANGE_VETO			1
 
 // Include property base class
 #include "PropertyItem.h"
 
 // Include property implementations
 #include "PropertyItemEditors.h"
-#include "PropertyItemEditorsCustom.h"
 #include "PropertyItemImpl.h"
 
 
@@ -181,16 +182,6 @@ public:
       if( iIndex < 0 || iIndex >= m_arrItems.GetSize() ) return NULL;
       return m_arrItems[iIndex];
    }
-
-   virtual HWND CreateInplaceControl(HWND hWnd, const RECT& rc)
-   {
- 	   CPropertyCategoryEditor* win = new CPropertyCategoryEditor();
-	   ATLASSERT(win);
-	   RECT rcWin = rc;
-	   HWND tmp = win->Create(hWnd, rcWin, L"", WS_VISIBLE | WS_CHILD | ES_LEFT | ES_AUTOHSCROLL);
-	   win->Invalidate();
-	   return tmp;
-   }
 };
 
 inline HPROPERTY PropCreateCategory(LPCTSTR pstrName, LPARAM lParam=0)
@@ -204,7 +195,7 @@ inline HPROPERTY PropCreateCategory(LPCTSTR pstrName, LPARAM lParam=0)
 
 template< class T, class TBase = CListBox, class TWinTraits = CWinTraitsOR<LBS_OWNERDRAWVARIABLE|LBS_NOTIFY> >
 class ATL_NO_VTABLE CPropertyListImpl : 
-   public CWindowImpl< T, TBase, TWinTraits >,
+   public CDoubleBufferWindowImpl< T, TBase, TWinTraits >,
    public COwnerDraw< T >
 {
 public:
@@ -224,6 +215,8 @@ public:
    int m_iMiddle;
    bool m_bColumnFixed;
 
+   WNDPROC g_wpTabCtr;
+
    CPropertyListImpl() : 
       m_hwndInplace(NULL), 
       m_iInplaceIndex(-1), 
@@ -241,6 +234,9 @@ public:
    {
       ATLASSERT(m_hWnd==NULL);
       ATLASSERT(::IsWindow(hWnd));
+
+	  //g_wpTabCtr = (WNDPROC)GetWindowLong(-4);
+
       BOOL bRet = CWindowImpl< T, TBase, TWinTraits >::SubclassWindow(hWnd);
       if( bRet ) _Init();
       return bRet;
@@ -902,7 +898,7 @@ public:
 
       // Ask owner about change
       NMPROPERTYITEM nmh = { m_hWnd, GetDlgCtrlID(), PIN_ITEMCHANGING, prop };
-      if( ::SendMessage(GetParent(), WM_NOTIFY, nmh.hdr.idFrom, (LPARAM) &nmh) == 0 ) {
+	  if (::SendMessage(GetParent(), WM_NOTIFY, nmh.hdr.idFrom, (LPARAM)&nmh) == CHANGE_OK) {
          // Let owner know
          nmh.hdr.code = PIN_ITEMCHANGED;
          ::SendMessage(GetParent(), WM_NOTIFY, nmh.hdr.idFrom, (LPARAM) &nmh);
@@ -954,7 +950,7 @@ public:
 
 	  // Ask owner about change
       NMPROPERTYITEM nmh = { m_hWnd, GetDlgCtrlID(), PIN_ITEMCHANGING, prop };
-      if( ::SendMessage(GetParent(), WM_NOTIFY, nmh.hdr.idFrom, (LPARAM) &nmh) == 0 ) {
+      if( ::SendMessage(GetParent(), WM_NOTIFY, nmh.hdr.idFrom, (LPARAM) &nmh) == CHANGE_OK) {
          // Let owner know
          nmh.hdr.code = PIN_ITEMCHANGED;
          ::SendMessage(GetParent(), WM_NOTIFY, nmh.hdr.idFrom, (LPARAM) &nmh);
@@ -1120,6 +1116,8 @@ public:
       dc.SelectPen(hOldPen);
 
       dc.SelectFont(hOldFont);
+
+
    }
 };
 

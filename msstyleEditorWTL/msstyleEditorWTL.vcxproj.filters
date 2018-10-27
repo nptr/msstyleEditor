@@ -22,6 +22,9 @@
     <ClCompile Include="precompiled.cpp" />
     <ClCompile Include="SearchLogic.cpp" />
     <ClCompile Include="Exporter.cpp" />
+    <ClCompile Include="Controls\propertyGrid.c">
+      <Filter>Controls</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
@@ -54,9 +57,6 @@
     </ClInclude>
     <ClInclude Include="precompiled.h" />
     <ClInclude Include="SearchLogic.h" />
-    <ClInclude Include="Controls\PropertyItemEditorsCustom.h">
-      <Filter>Controls</Filter>
-    </ClInclude>
     <ClInclude Include="Dialogs\AddPropDlg.h">
       <Filter>Dialogs</Filter>
     </ClInclude>
@@ -67,6 +67,12 @@
     </ClInclude>
     <ClInclude Include="Dialogs\LicenseDlg.h">
       <Filter>Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="Dialogs\TestDlg.h">
+      <Filter>Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="Controls\propertyGrid.h">
+      <Filter>Controls</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

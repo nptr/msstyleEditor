@@ -76,6 +76,9 @@ public:
 		CEdit searchBox(GetDlgItem(IDC_SEARCH_TEXT));
 		searchBox.SetCueBannerText(L"Search", TRUE);
 
+		m_searchProperties.mode = SearchProperties::MODE_NAME;
+		m_searchProperties.type = libmsstyle::IDENTIFIER::COLOR;
+
 		return TRUE;
 	}
 

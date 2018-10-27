@@ -49,7 +49,7 @@ HPROPERTY GetEnumPropertyItem(libmsstyle::StyleProperty& prop)
 	}
 	list[i] = NULL;
 
-	HPROPERTY p = new CPropertyListItem(A2W(prop.LookupName()), list, 0, MkItemData(&prop));
+	HPROPERTY p = new CPropertyListItem(A2W(prop.LookupName()), list, prop.data.enumtype.enumvalue, MkItemData(&prop));
 
 	delete[] list;
 	return p;

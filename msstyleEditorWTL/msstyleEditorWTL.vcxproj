@@ -97,7 +97,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(OutputPath)\libmsstyle.lib;Shlwapi.lib;Gdiplus.lib;Comdlg32.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(OutputPath)\libmsstyle.lib;Gdiplus.lib;Comdlg32.lib</AdditionalDependencies>
     </Link>
     <ResourceCompile>
       <Culture>0x0409</Culture>
@@ -132,7 +132,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(OutputPath)\libmsstyle.lib;Shlwapi.lib;Gdiplus.lib;Comdlg32.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(OutputPath)\libmsstyle.lib;Gdiplus.lib;Comdlg32.lib</AdditionalDependencies>
     </Link>
     <ResourceCompile>
       <Culture>0x0409</Culture>
@@ -165,7 +165,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>$(OutputPath)\libmsstyle.lib;Shlwapi.lib;Gdiplus.lib;Comdlg32.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(OutputPath)\libmsstyle.lib;Gdiplus.lib;Comdlg32.lib</AdditionalDependencies>
     </Link>
     <ResourceCompile>
       <Culture>0x0409</Culture>
@@ -220,6 +220,14 @@
     </Midl>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Controls\propertyGrid.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </PrecompiledHeaderFile>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </ForcedIncludeFiles>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</CompileAs>
+    </ClCompile>
     <ClCompile Include="Dialogs\MainFrm.cpp" />
     <ClCompile Include="Exporter.cpp" />
     <ClCompile Include="Helper.cpp" />
@@ -236,9 +244,9 @@
   <ItemGroup>
     <ClInclude Include="Controls\DropTarget.h" />
     <ClInclude Include="Controls\ImageCtrl.h" />
+    <ClInclude Include="Controls\propertyGrid.h" />
     <ClInclude Include="Controls\PropertyItem.h" />
     <ClInclude Include="Controls\PropertyItemEditors.h" />
-    <ClInclude Include="Controls\PropertyItemEditorsCustom.h" />
     <ClInclude Include="Controls\PropertyItemImpl.h" />
     <ClInclude Include="Controls\PropertyList.h" />
     <ClInclude Include="Dialogs\AboutDlg.h" />
@@ -246,6 +254,7 @@
     <ClInclude Include="Dialogs\LicenseDlg.h" />
     <ClInclude Include="Dialogs\MainFrm.h" />
     <ClInclude Include="Dialogs\SearchDlg.h" />
+    <ClInclude Include="Dialogs\TestDlg.h" />
     <ClInclude Include="Exporter.h" />
     <ClInclude Include="Helper.h" />
     <ClInclude Include="resource.h" />

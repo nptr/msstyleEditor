@@ -3,6 +3,9 @@
 #include "AddPropDlg.h"
 #include "SearchDlg.h"
 #include "LicenseDlg.h"
+#include "TestDlg.h"
+
+#include "msstyleEditorWTL\Controls\propertyGrid.h"
 
 #include "..\SearchLogic.h"
 #include "..\Exporter.h"
@@ -18,9 +21,6 @@
 #define COMMON_WND_STYLE	(WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN)
 #define NOT_A_MENU			1
 
-#define CHANGE_OK			0
-#define CHANGE_VETO			1
-
 #define TEXT_PLAY L"Start &Test"
 #define TEXT_STOP L"Stop &Test"
 
@@ -29,6 +29,7 @@ CMainFrame::CMainFrame()
 	, m_selectedProperty(NULL)
 	, m_imageViewMenu(NULL)
 	, m_searchDialog(NULL)
+	, m_testDialog(NULL)
 {
 }
 
@@ -47,6 +48,8 @@ void CMainFrame::OpenStyle(const CString& file)
 		info.fMask = MIIM_STATE;
 		info.fState = MFS_ENABLED;
 		SetMenuItemInfo(m_fileSubMenu, ID_FILE_SAVE_AS, MF_BYCOMMAND, &info);
+		
+		SetWindowCaption(T2CW(file.GetString()));
 	}
 	catch (std::exception& ex)
 	{
@@ -77,6 +80,8 @@ void CMainFrame::CloseStyle()
 
 		delete m_currentStyle;
 		m_currentStyle = nullptr;
+
+		SetWindowCaption(NULL);
 	}
 }
 
@@ -122,6 +127,9 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 	ULONG_PTR gdiplusToken;
 	Gdiplus::GdiplusStartupInput gdiplusStartupInput;
 	GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+
+	// Use WS_EX_COMPOSITED on parent + WS_EX_TRANSPARENT on child to obtain double buffering
+	ModifyStyleEx(NULL, WS_EX_COMPOSITED);
 
 	HWND hWndCmdBar = m_commandBar.Create(m_hWnd, rcDefault, NULL, ATL_SIMPLE_CMDBAR_PANE_STYLE);
 	m_commandBar.AttachMenu(GetMenu());
@@ -177,6 +185,8 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 	m_propList.SubclassWindow(m_propListBase);
 	m_propList.SetExtendedListStyle(PLS_EX_CATEGORIZED | LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
 	m_propListMenu = GetSubMenu(LoadMenu(NULL, MAKEINTRESOURCE(IDR_PROPVIEW)), 0);
+
+	HWND propgrid = New_PropertyGrid(m_hWnd, 0);
 
 	HBITMAP hbmpPropAdd = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_PROP_ADD), IMAGE_BITMAP, 16, 16, LR_SHARED);
 	HBITMAP hbmpPropRem = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_PROP_REMOVE), IMAGE_BITMAP, 16, 16, LR_SHARED);
@@ -858,6 +868,20 @@ void CMainFrame::SetStatusText(LPCWSTR text)
 	bar.SetText(0, text);
 }
 
+void CMainFrame::SetWindowCaption(LPCWSTR text)
+{
+	WCHAR caption[300] = { 0 };
+	wcscat(caption, L"msstyleEditor");
+	
+	if (text != NULL)
+	{
+		wcscat(caption, L" - ");
+		wcscat(caption, text);
+	}
+
+	SetWindowTextW(caption);
+}
+
 void CMainFrame::SetThemeTestMenuItemText(LPWSTR text, bool checked)
 {
 	WCHAR menuItemText[48];
@@ -1011,7 +1035,7 @@ LRESULT CMainFrame::OnThemeTest(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndC
 		}
 	}
 
-	bool needConfirmation = false;
+	bool needConfirmation = true;
 	OSVERSIONINFO version = { 0 };
 	version.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 
@@ -1022,24 +1046,24 @@ LRESULT CMainFrame::OnThemeTest(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndC
 
 	if (version.dwMajorVersion == 6 &&
 		version.dwMinorVersion == 1 &&
-		styleplatform != libmsstyle::Platform::WIN7)
+		styleplatform == libmsstyle::Platform::WIN7)
 	{
-		needConfirmation = true;
+		needConfirmation = false;
 	}
 
 	if (version.dwMajorVersion == 6 &&
 		version.dwMinorVersion >= 2 &&
-		styleplatform != libmsstyle::Platform::WIN8 &&
-		styleplatform != libmsstyle::Platform::WIN81)
+		(styleplatform == libmsstyle::Platform::WIN8 ||
+		styleplatform == libmsstyle::Platform::WIN81))
 	{
-		needConfirmation = true;
+		needConfirmation = false;
 	}
 
 	if (version.dwMajorVersion == 10 &&
 		version.dwMinorVersion >= 0 &&
-		styleplatform != libmsstyle::Platform::WIN10)
+		styleplatform == libmsstyle::Platform::WIN10)
 	{
-		needConfirmation = true;
+		needConfirmation = false;
 	}
 
 	if (needConfirmation)
@@ -1230,6 +1254,21 @@ LRESULT CMainFrame::OnViewThemeFolder(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /
 	return 0;
 }
 
+LRESULT CMainFrame::OnViewTestDialog(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+{
+	if (!m_testDialog)
+	{
+		m_testDialog = new CTestDlg();
+		m_testDialog->Create(m_hWnd);
+	}
+
+	if (!m_testDialog->IsWindowVisible())
+	{
+		m_testDialog->ShowWindow(SW_SHOWNORMAL);
+	}
+	return 0;
+}
+
 LRESULT CMainFrame::OnViewStatusBar(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
 {
 	BOOL bVisible = !::IsWindowVisible(m_hWndStatusBar);
@@ -1262,12 +1301,17 @@ DWORD m_effect = 0;
 
 HRESULT STDMETHODCALLTYPE CMainFrame::QueryInterface(REFIID refiid, void FAR* FAR* ppvObject)
 {
-	*ppvObject = (refiid == IID_IUnknown || refiid == IID_IDropTarget) ? this : NULL;
-
-	if (*ppvObject != NULL)
-		((LPUNKNOWN)*ppvObject)->AddRef();
-
-	return *ppvObject == NULL ? E_NOINTERFACE : S_OK;
+	if (refiid == IID_IUnknown || refiid == IID_IDropTarget)
+	{
+		*ppvObject = this;
+		this->AddRef();
+		return S_OK;
+	}
+	else
+	{
+		*ppvObject = NULL;
+		return E_NOINTERFACE;
+	}
 }
 
 ULONG STDMETHODCALLTYPE CMainFrame::AddRef(void)

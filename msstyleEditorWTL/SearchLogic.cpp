@@ -4,6 +4,25 @@
 #include "libmsstyle\VisualStyle.h"
 #include "Dialogs\SearchDlg.h"
 
+const char* stristr(const char* str, const char* substr)
+{
+	char* strLow = (char*)alloca(256);
+	char* strLowPtr = strLow;
+
+	char* subStrLow = (char*)alloca(256);
+	char* subStrLowPtr = subStrLow;
+
+	while (*str)
+		*strLowPtr++ = tolower(*str++);
+	*strLowPtr = '\0';
+
+	while (*substr)
+		*subStrLowPtr++ = tolower(*substr++);
+	*subStrLowPtr = '\0';
+
+	return strstr(strLow, subStrLow);
+}
+
 bool ContainsProperty(const SearchProperties& search, ItemData* treeItemData)
 {
 	USES_CONVERSION;
@@ -14,7 +33,7 @@ bool ContainsProperty(const SearchProperties& search, ItemData* treeItemData)
 	// If its a part node, check its properties
 	if (treeItemData->type != ITEM_PART)
 		return false;
-
+	
 	libmsstyle::StylePart* part = reinterpret_cast<libmsstyle::StylePart*>(treeItemData->object);
 
 	for (auto& state : *part)
@@ -35,7 +54,7 @@ bool ContainsProperty(const SearchProperties& search, ItemData* treeItemData)
 					prop->data.positiontype.x,
 					prop->data.positiontype.y);
 
-				if (stricmp(propPos, W2A(search.text)) == 0)
+				if (stristr(propPos, W2A(search.text)) != 0)
 					return true;
 
 			} break;
@@ -47,7 +66,7 @@ bool ContainsProperty(const SearchProperties& search, ItemData* treeItemData)
 					prop->data.colortype.g,
 					prop->data.colortype.b);
 
-				if (stricmp(propColor, W2A(search.text)) == 0)
+				if (stristr(propColor, W2A(search.text)) != 0)
 					return true;
 			} break;
 			case libmsstyle::IDENTIFIER::MARGINS:
@@ -59,7 +78,7 @@ bool ContainsProperty(const SearchProperties& search, ItemData* treeItemData)
 					prop->data.margintype.right,
 					prop->data.margintype.bottom);
 
-				if (stricmp(propMargin, W2A(search.text)) == 0)
+				if (stristr(propMargin, W2A(search.text)) != 0)
 					return true;
 			} break;
 			case libmsstyle::IDENTIFIER::RECTTYPE:
@@ -71,7 +90,7 @@ bool ContainsProperty(const SearchProperties& search, ItemData* treeItemData)
 					prop->data.recttype.right,
 					prop->data.recttype.bottom);
 
-				if (stricmp(propRect, W2A(search.text)) == 0)
+				if (stristr(propRect, W2A(search.text)) != 0)
 					return true;
 			} break;
 			case libmsstyle::IDENTIFIER::SIZE:
@@ -101,22 +120,22 @@ bool ContainsName(LPCWSTR str, ItemData* treeItemData)
 	// Class Node
 	if (treeItemData->type == ITEM_CLASS)
 	{
-		libmsstyle::StyleClass* cls = reinterpret_cast<libmsstyle::StyleClass*>(treeItemData);
-		return stricmp(cls->className.c_str(), W2A(str)) == 0;
+		libmsstyle::StyleClass* cls = reinterpret_cast<libmsstyle::StyleClass*>(treeItemData->object);
+		return stristr(cls->className.c_str(), W2A(str)) != 0;
 	}
 
 	// Part Node
 	if (treeItemData->type == ITEM_PART)
 	{
-		libmsstyle::StylePart* part = reinterpret_cast<libmsstyle::StylePart*>(treeItemData);
-		return stricmp(part->partName.c_str(), W2A(str)) == 0;
+		libmsstyle::StylePart* part = reinterpret_cast<libmsstyle::StylePart*>(treeItemData->object);
+		return stristr(part->partName.c_str(), W2A(str)) != 0;
 	}
 
 	// Image Node
 	if (treeItemData->type == ITEM_PROPERTY)
 	{
-		libmsstyle::StyleProperty* prop = reinterpret_cast<libmsstyle::StyleProperty*>(treeItemData);
-		return stricmp(prop->LookupName(), W2A(str)) == 0;
+		libmsstyle::StyleProperty* prop = reinterpret_cast<libmsstyle::StyleProperty*>(treeItemData->object);
+		return stristr(prop->LookupName(), W2A(str)) != 0;
 	}
 
 	return false;
