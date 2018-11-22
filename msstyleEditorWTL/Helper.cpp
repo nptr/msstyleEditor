@@ -2,9 +2,6 @@
 
 #include <atlctrls.h>
 
-#include "Controls\PropertyItemEditors.h"
-#include "Controls\PropertyItemImpl.h"
-
 #include "ItemData.h"
 
 #include "libmsstyle\Lookup.h"
@@ -14,79 +11,74 @@
 
 using namespace libmsstyle;
 
-LPARAM MkItemData(StyleProperty* prop)
+LPVOID MkItemData(StyleProperty* prop)
 {
-	return reinterpret_cast<LPARAM>(new ItemData(prop, ITEM_PROPERTY));
+	return new ItemData(prop, ITEM_PROPERTY);
 }
 
-HPROPERTY GetPropertyItemSpecialCases(StyleProperty& prop)
+
+TCHAR* BuildFontList(TCHAR* dst, libmsstyle::StyleProperty& prop)
 {
 	USES_CONVERSION;
 
-	if (prop.GetNameID() == IDENTIFIER::COLORIZATIONCOLOR)
+	TCHAR* dstPtr = dst;
+	auto it = libmsstyle::FONT_MAP.begin();
+	for (int i = 0; it != libmsstyle::FONT_MAP.end(); ++it, ++i)
 	{
-		HPROPERTY p = new CPropertyColorItem(A2W(prop.LookupName()), prop.data.inttype.value, MkItemData(&prop));
-		return p;
+		TCHAR* str = A2T(it->second);
+		while (*str)
+			*dstPtr++ = *str++;
+		*dstPtr++ = NULL;
 	}
-	else return nullptr;
+	*dstPtr = NULL;
+
+	return dst;
 }
 
-HPROPERTY GetEnumPropertyItem(libmsstyle::StyleProperty& prop)
+TCHAR* BuildEnumList(TCHAR* dst, libmsstyle::StyleProperty& prop)
 {
 	USES_CONVERSION;
 
 	libmsstyle::lookup::EnumList result = libmsstyle::lookup::FindEnums(prop.header.nameID);
 	if (result.enums == nullptr || result.numEnums == 0)
-		return nullptr;
+		return NULL;
 
-	LPCWSTR* list = new LPCWSTR[result.numEnums + 1];
-
-	int i = 0;
-	for ( ; i < result.numEnums; ++i)
+	TCHAR* dstPtr = dst;
+	for(int i = 0; i < result.numEnums; ++i)
 	{
-		
-		list[i] = A2W(result.enums[i].value);
+		TCHAR* str = A2T(result.enums[i].value);
+		while (*str)
+			*dstPtr++ = *str++;
+		*dstPtr++ = NULL;
 	}
-	list[i] = NULL;
+	*dstPtr = NULL;
 
-	HPROPERTY p = new CPropertyListItem(A2W(prop.LookupName()), list, prop.data.enumtype.enumvalue, MkItemData(&prop));
-
-	delete[] list;
-	return p;
+	return dst;
 }
 
-HPROPERTY GetFontsPropertyItem(libmsstyle::StyleProperty& prop)
+bool InitPropgridItemSpecial(PROPGRIDITEM& item, StyleProperty& prop)
+{
+	if (prop.GetNameID() == IDENTIFIER::COLORIZATIONCOLOR)
+	{
+		item.iItemType = PIT_COLOR;
+		item.lpCurValue = (LPARAM)RGB(prop.data.colortype.r, prop.data.colortype.g, prop.data.colortype.b);
+		return true;
+	}
+
+	return false;
+}
+
+void SetInitPropgridItem(HWND grid, PROPGRIDITEM& item, StyleProperty& prop, int index)
 {
 	USES_CONVERSION;
 
-	LPCWSTR* list = new LPCWSTR[libmsstyle::FONT_MAP.size() + 1];
+	wchar_t str[512];
 
-	int i = 0;
-	auto it = libmsstyle::FONT_MAP.begin();
+	wchar_t* propName = A2W(prop.LookupName());
+	item.lpszPropName = propName;
 
-	for ( ; it != libmsstyle::FONT_MAP.end(); ++it, ++i)
-	{
-		list[i] = A2W(it->second);
-	}
-	list[i] = NULL;
-
-	HPROPERTY p = new CPropertyListItem(A2W(prop.LookupName()), list, 0, MkItemData(&prop));
-
-	delete[] list;
-	return p;
-}
-
-HPROPERTY GetPropertyItemFromStyleProperty(StyleProperty& prop)
-{
-	USES_CONVERSION;
-
-	wchar_t str[64];
-
-	const wchar_t* propName = A2W(prop.LookupName());
-
-	HPROPERTY special = GetPropertyItemSpecialCases(prop);
-	if (special != nullptr)
-		return special;
+	if (InitPropgridItemSpecial(item, prop))
+		return;
 
 	switch (prop.header.typeID)
 	{
@@ -94,71 +86,83 @@ HPROPERTY GetPropertyItemFromStyleProperty(StyleProperty& prop)
 	case IDENTIFIER::FILENAME_LITE:
 	case IDENTIFIER::DISKSTREAM:
 	{
-		HPROPERTY p = new CPropertyEditItem(propName, CComVariant(prop.GetResourceID()), MkItemData(&prop));
-		return p;
-	}
+		item.iItemType = PIT_EDIT;
+		item.lpCurValue = (LPARAM)_itot(prop.GetResourceID(), str, 10);
+	} break;
 	case IDENTIFIER::ENUM:
 	case IDENTIFIER::HIGHCONTRASTCOLORTYPE:
 	{
-		HPROPERTY p = GetEnumPropertyItem(prop);
-		if (p == nullptr)
+		TCHAR* enumList = BuildEnumList(str, prop);
+		if (enumList)
 		{
-			p = new CPropertyEditItem(propName, CComVariant(prop.data.enumtype.enumvalue), MkItemData(&prop));
+			item.iItemType = PIT_COMBO;
+			item.lpCurValue = (LPARAM)A2T(libmsstyle::lookup::GetEnumAsString(prop.header.nameID, prop.data.enumtype.enumvalue));
+			item.lpszzCmbItems = enumList;
 		}
-		return p;
-	}
+		else
+		{
+			item.iItemType = PIT_EDIT;
+			item.lpCurValue = (LPARAM)_itot(prop.data.enumtype.enumvalue, str, 10);
+		}
+	} break;
 	case IDENTIFIER::SIZE:
 	{
-		HPROPERTY p = new CPropertyEditItem(propName, CComVariant(prop.data.sizetype.size), MkItemData(&prop));
-		return p;
-	}
+		item.iItemType = PIT_EDIT;
+		item.lpCurValue = (LPARAM)_itot(prop.data.sizetype.size, str, 10);
+	} break;
 	case IDENTIFIER::COLOR:
 	{
-		HPROPERTY p = new CPropertyColorItem(propName, RGB(prop.data.colortype.r, prop.data.colortype.g, prop.data.colortype.b), MkItemData(&prop));
-		return p;
-	}
+		item.iItemType = PIT_COLOR;
+		item.lpCurValue = (LPARAM)RGB(prop.data.colortype.r, prop.data.colortype.g, prop.data.colortype.b);
+	} break;
 	case IDENTIFIER::INT:
 	{
-		HPROPERTY p = new CPropertyEditItem(propName, CComVariant(prop.data.inttype.value), MkItemData(&prop));
-		return p;
-	}
+		item.iItemType = PIT_EDIT;
+		item.lpCurValue = (LPARAM)_itot(prop.data.inttype.value, str, 10);
+	} break;
 	case IDENTIFIER::BOOLTYPE:
 	{
-		HPROPERTY p = new CPropertyEditItem(propName, CComVariant(prop.data.booltype.boolvalue), MkItemData(&prop));
-		return p;
-	}
+		item.iItemType = PIT_CHECK;
+		item.lpCurValue = (LPARAM)prop.data.booltype.boolvalue;
+	} break;
 	case IDENTIFIER::MARGINS:
 	{
 		wsprintf(str, L"%d, %d, %d, %d", prop.data.margintype.left, prop.data.margintype.top, prop.data.margintype.right, prop.data.margintype.bottom);
-		HPROPERTY p = new CPropertyEditItem(propName, CComVariant(str), MkItemData(&prop));
-		return p;
-	}
+		item.iItemType = PIT_EDIT;
+		item.lpCurValue = (LPARAM)str;
+	} break;
 	case IDENTIFIER::RECTTYPE:
 	{
 		wsprintf(str, L"%d, %d, %d, %d", prop.data.recttype.left, prop.data.recttype.top, prop.data.recttype.right, prop.data.recttype.bottom);
-		HPROPERTY p = new CPropertyEditItem(propName, CComVariant(str), MkItemData(&prop));
-		return p;
-	}
+		item.iItemType = PIT_EDIT;
+		item.lpCurValue = (LPARAM)str;
+	} break;
 	case IDENTIFIER::POSITION:
 	{
 		wsprintf(str, L"%d, %d", prop.data.positiontype.x, prop.data.positiontype.y);
-		HPROPERTY p = new CPropertyEditItem(propName, CComVariant(str), MkItemData(&prop));
-		return p;
-	}
+		item.iItemType = PIT_EDIT;
+		item.lpCurValue = (LPARAM)str;
+	} break;
 	case IDENTIFIER::FONT:
 	{
-		HPROPERTY p = GetFontsPropertyItem(prop);
-		if (p == nullptr)
+		TCHAR* fontList = BuildFontList(str, prop);
+		if (fontList)
 		{
-			p = new CPropertyEditItem(propName, CComVariant(prop.GetResourceID()), MkItemData(&prop));
+			item.iItemType = PIT_COMBO;
+			item.lpCurValue = (LPARAM)A2T(libmsstyle::lookup::FindFontName(prop.GetResourceID()).c_str());
+			item.lpszzCmbItems = fontList;
 		}
-		return p;
-	}
+		else
+		{
+			item.iItemType = PIT_EDIT;
+			item.lpCurValue = (LPARAM)_itot(prop.GetResourceID(), str, 10);
+		}
+	} break;
 	case IDENTIFIER::STRING:
 	{
-		HPROPERTY p = new CPropertyEditItem(propName, CComVariant(&prop.data.texttype.firstChar), MkItemData(&prop));
-		return p;
-	}
+		item.iItemType = PIT_EDIT;
+		item.lpCurValue = (LPARAM)W2T(&prop.data.texttype.firstChar);
+	} break;
 	case IDENTIFIER::INTLIST:
 	{
 		if (prop.data.intlist.numInts >= 3)
@@ -169,11 +173,22 @@ HPROPERTY GetPropertyItemFromStyleProperty(StyleProperty& prop)
 				, *(&prop.data.intlist.firstInt + 2));
 		}
 		else wsprintf(str, L"Len: %d, Values omitted", prop.data.intlist.numInts);
-		HPROPERTY p = new CPropertyEditItem(propName, CComVariant(str), MkItemData(&prop));
-		return p;
-	}
+		item.iItemType = PIT_EDIT;
+		item.lpCurValue = (LPARAM)str;
+	} break;
 	default:
-		HPROPERTY p = new CPropertyEditItem(propName, CComVariant(L"VALUE"), MkItemData(&prop));
-		return p;
+	{
+		item.iItemType = PIT_EDIT;
+		item.lpCurValue = (LPARAM)_T("UNKNOWN");
+	} break;
+	}
+
+	if (index < 0)
+	{
+		PropGrid_AddItem(grid, &item);
+	}
+	else
+	{
+		PropGrid_SetItemData(grid, index, &item);
 	}
 }

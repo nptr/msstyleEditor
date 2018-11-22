@@ -28,6 +28,7 @@
 //DWM 1.7: Version 1.7 changes labelled thus.
 //DWM 1.8: Version 1.8 changes labelled thus.
 //DWM 1.9: Version 1.9 changes labelled thus.
+//DWM 2.0: Version 2.0 changes labelled thus.
 
 //DWM 1.9: Suppress POCC Warning "Argument x to 'sscanf' does not match the format string; 
 //          expected 'unsigned char *' but found 'unsigned long'"
@@ -37,6 +38,11 @@
 
 #ifndef _WIN32_WINNT // Necessary for WM_MOUSEWHEEL support
 #define _WIN32_WINNT 0x0500
+#endif
+
+// MSVC++ Support
+#ifndef _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
 #endif
 
 #define WIN32_LEAN_AND_MEAN
@@ -52,6 +58,32 @@
 #include <tchar.h>
 #include <uxtheme.h>
 #include "propertyGrid.h"
+
+// Begin MSVC++ Support
+
+#ifdef _stprintf
+#undef _stprintf
+#endif
+
+#ifdef _UNICODE
+#define _tmemcpy  wmemcpy
+#define _tmemmove  wmemmove
+#define _tmemset  wmemset
+#define _stprintf  swprintf
+#else
+#define _tmemcpy  memcpy
+#define _tmemmove  memmove
+#define _tmemset  memset
+#define _stprintf  snprintf
+#endif
+
+#define ToolTip_AddTool(hwnd,lpti)  (BOOL)SNDMSG((hwnd),TTM_ADDTOOL,0,(LPARAM)(LPTOOLINFO)(lpti))
+#define ToolTip_EnumTools(hwnd,iTool,lpti)  (BOOL)SNDMSG((hwnd),TTM_ENUMTOOLS,(WPARAM)(UINT)(iTool),(LPARAM)(LPTOOLINFO)(lpti))
+#define ToolTip_UpdateTipText(hwnd,lpti)  (void)SNDMSG((hwnd),TTM_UPDATETIPTEXT,0,(LPARAM)(LPTOOLINFO)(lpti))
+#define ToolTip_NewToolRect(hwnd,lpti)  (void)SNDMSG((hwnd),TTM_NEWTOOLRECT,0,(LPARAM)(LPTOOLINFO)(lpti))
+
+
+// End MSVC++ Support
 
 #define ID_LISTBOX 2000   ///<An Id for the Listbox
 #define ID_LISTMAP 2001   ///<An Id for the Listmap
@@ -105,17 +137,6 @@
 /// @param rect A RECT struct.
 #define WIDTH(rect) ((LONG)(rect.right - rect.left))
 
-/// @def MAKE_PRECT(left, top, right, bottom)
-///
-/// @brief Declare an inline rect.
-///
-/// @param left The left coordinate.
-/// @param top The top coordinate.
-/// @param right The right coordinate.
-/// @param bottom The bottom coordinate.
-#define MAKE_PRECT(left, top, right, bottom) \
-    (&(RECT) { (left), (top), (right), (bottom) })
-
 /// @def ListBox_ItemFromPoint(hwndCtl, xPos, yPos)
 ///
 /// @brief Gets the zero-based index of the item nearest the specified point
@@ -152,34 +173,6 @@
 
 /// @}
 
-#ifndef _tmemmove
-	#ifdef _UNICODE
-		#define _tmemmove wmemmove
-	#else
-		#define _tmemmove memmove
-	#endif
-#endif
-
-#ifndef _tmemset
-	#ifdef _UNICODE
-		#define _tmemset wmemset
-	#else
-		#define _tmemset memset
-	#endif
-#endif
-
-// not sure if "snprintf" is the pendant to "swprintf"
-#ifdef _UNICODE
-	#define _stprintf swprintf
-#else
-	#define _stprintf snprintf
-#endif
-
-#define ToolTip_AddTool(hwnd, pti) SendMessage(hwnd, TTM_ADDTOOL, 0, (LPARAM)pti)
-#define ToolTip_EnumTools(hwnd, index, pti) SendMessage(hwnd, TTM_ENUMTOOLS, index, (LPARAM)pti)
-#define ToolTip_UpdateTipText(hwnd, pti) SendMessage(hwnd, TTM_UPDATETIPTEXT, 0, (LPARAM)pti)
-#define ToolTip_NewToolRect(hwnd, pti) SendMessage(hwnd, TTM_NEWTOOLRECT, 0, (LPARAM)pti)
-
 LPCTSTR g_szClassName = _T("PropGridCtl"); ///< The classname.
 
 /// @brief A nice assortment of custom colors.
@@ -210,6 +203,23 @@ static LRESULT DefProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     return CallWindowProc((WNDPROC)GetProp(hwnd, WPRC), hwnd, msg, wParam, lParam);
 }
 
+/// @brief Declare an inline rect.
+///
+/// @param left The left coordinate.
+/// @param top The top coordinate.
+/// @param right The right coordinate.
+/// @param bottom The bottom coordinate.
+static inline PRECT MAKE_PRECT(LONG left, LONG top, LONG right, LONG bottom)
+{
+    static RECT rc;
+    memset(&rc, 0, sizeof(rc));
+    rc.left = left;
+    rc.top = top;
+    rc.right = right;
+    rc.bottom = bottom;
+    return &rc;
+}
+
 /// @brief Determine if this is running on XP or lower.
 ///
 /// @returns TRUE if OS is XP or earlier.
@@ -238,6 +248,7 @@ typedef struct tagLISTBOXITEM {
     LPTSTR lpszMisc;    ///< Item specific data string
     LPTSTR lpszPropDesc;///< Property (item) description
     LPTSTR lpszCurValue;///< Property (item) value
+    LPVOID lpUserData;  ///< Additional user data
     INT iItemType;      ///< Property (item) type identifier
     BOOL fCollapsed;    ///< Catalog (group) collapsed flag
 } LISTBOXITEM , *LPLISTBOXITEM;
@@ -355,7 +366,6 @@ static LPTSTR NewString(LPTSTR str)
     {
         return (LPTSTR)calloc(1, sizeof(TCHAR)); 
     }
-
     return _tmemmove(tmp, str, _tcslen(str));
 }
 
@@ -393,7 +403,7 @@ static LPTSTR NewStringArray(LPTSTR szzStr)
 /// @param iItemType The item type designation.
 ///
 /// @returns a Pointer to the allocated list box item.
-static LPLISTBOXITEM NewItem(LPTSTR szCatalog, LPTSTR szPropName, LPTSTR szCurValue, LPTSTR szMisc, LPTSTR szPropDesc, INT iItemType)
+static LPLISTBOXITEM NewItem(LPTSTR szCatalog, LPTSTR szPropName, LPTSTR szCurValue, LPTSTR szMisc, LPTSTR szPropDesc, INT iItemType, LPVOID lpUserData = NULL)
 {
     LPLISTBOXITEM lpItem = (LPLISTBOXITEM)calloc(1, sizeof(LISTBOXITEM));
 
@@ -408,6 +418,7 @@ static LPLISTBOXITEM NewItem(LPTSTR szCatalog, LPTSTR szPropName, LPTSTR szCurVa
         lpItem->lpszMisc = NewString(szMisc);
 
     lpItem->lpszPropDesc = NewString(szPropDesc);
+    lpItem->lpUserData = lpUserData; // user managed memory
 
     return lpItem;
 }
@@ -584,7 +595,7 @@ static VOID DrawBorder(HDC hdc, LPRECT lprc, DWORD dwBorder, COLORREF clr)
     LOGPEN oLogPen;
 
     HPEN hOld;
-    GetObject(hOld = SelectObject(hdc, GetStockObject(BLACK_PEN)), sizeof(oLogPen), &oLogPen);
+    GetObject(hOld = (HPEN) SelectObject(hdc, GetStockObject(BLACK_PEN)), sizeof(oLogPen), &oLogPen);
     oLogPen.lopnColor = clr;
 
     SelectObject(hdc, CreatePenIndirect(&oLogPen));
@@ -882,7 +893,6 @@ static LRESULT CALLBACK Edit_Proc(HWND hEdit, UINT msg, WPARAM wParam, LPARAM lP
     }
     else if (WM_KILLFOCUS == msg)
     {
-        FORWARD_WM_CHAR(hEdit, VK_RETURN, 0, SNDMSG);//DWM 1.6: force update of grid data
         Editor_OnKillFocus(hEdit, (HWND)wParam);
     }
     else if (WM_PAINT == msg)   // Obliterate border
@@ -910,12 +920,9 @@ static LRESULT CALLBACK Edit_Proc(HWND hEdit, UINT msg, WPARAM wParam, LPARAM lP
     {
         switch (wParam)
         {
-            case VK_TAB:
-                if (GetKeyState(VK_SHIFT) & 0x8000)
-                {
-                    FORWARD_WM_CHAR(hEdit, VK_RETURN, 0, SNDMSG);
-                }
-                else //DWM 1.3: Added Focus to grid parent
+            case VK_TAB://DWM 2.0: Rewrote to change trigger Notification 
+				FORWARD_WM_CHAR(hEdit, VK_RETURN, 0, SNDMSG);
+                if (!(GetKeyState(VK_SHIFT) & 0x8000))
                 {
                     SetFocusToParent();
                 }
@@ -1025,7 +1032,7 @@ static LRESULT CALLBACK IpEdit_Proc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
         if (NULL != g_lpInst->lpCurrent)
         {
 			//DWM 1.9: Updated this code to use DWORD and IPADDRESS macroes instead of 4 byte array and cast.
-            DWORD ip;
+			DWORD ip;
             TCHAR buf[MAX_PATH];
             if (4 == SNDMSG(hIpEdit, IPM_GETADDRESS, 0, (LPARAM) &ip))
             {
@@ -1056,7 +1063,9 @@ static LRESULT CALLBACK IpEdit_Proc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
                 hNext = GetWindow(hwnd, GW_HWNDNEXT);
                 if (NULL == hNext) //DWM 1.3: Added Focus to Listbox
                 {
-                    SetFocus(g_lpInst->hwndListBox);
+					//DWM 2.0: Changed to FORWARD_WM_CHAR to set focus to Listbox and 
+					// trigger WM_NOTIFY
+					FORWARD_WM_CHAR(hIpEdit, VK_RETURN, 0, SNDMSG);
                     return TRUE;
                 }
             }
@@ -1065,8 +1074,10 @@ static LRESULT CALLBACK IpEdit_Proc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM l
                 hNext = GetWindow(hwnd, GW_HWNDPREV);
                 if (NULL == hNext) //DWM 1.3: Added Focus to grid parent
                 {
-                    SetFocusToParent();
+					//DWM 2.0: Changed to FORWARD_WM_CHAR to trigger WM_NOTIFY
+					FORWARD_WM_CHAR(hIpEdit, VK_RETURN, 0, SNDMSG);
                     Editor_OnKillFocus(hIpEdit, NULL);
+					SetFocusToParent();
                     return TRUE;
                 }
             }
@@ -1338,7 +1349,6 @@ static LRESULT CALLBACK DatePicker_Proc(HWND hDate, UINT msg, WPARAM wParam, LPA
             DrawBorder(hdc, &rect, BF_TOPLEFT, GetSysColor(COLOR_WINDOW));
             rect.top += 1;
             rect.left += 1;
-
 			//DWM 1.9: Added
 #ifdef __POCC__
             rect.bottom -= 2;
@@ -1564,7 +1574,6 @@ static LRESULT CALLBACK ComboBox_Proc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM
         HWND hFocus = (HWND) wParam;
         if(hwnd != GetParent(hFocus))// not a combobox editor or a combobox
         {
-            FORWARD_WM_CHAR(hwnd, VK_RETURN, 0, SNDMSG);//DWM 1.6: force update of grid data
             Editor_OnKillFocus(hwnd, (HWND) wParam);
         }
     }
@@ -1637,8 +1646,10 @@ static LRESULT CALLBACK ComboBox_Proc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM
         else //DWM 1.3: Added Focus to grid parent
         {
             ShowWindow(fEdit ? GetParent(hwnd) : hwnd, SW_HIDE);
-            SetFocusToParent();
+			//DWM 2.0: Changed to FORWARD_WM_CHAR to trigger WM_NOTIFY
+			FORWARD_WM_CHAR(hwnd, VK_RETURN, 0, SNDMSG);
             Editor_OnKillFocus(hwnd, NULL);
+			SetFocusToParent();
         }
         return TRUE;
     }
@@ -1668,7 +1679,8 @@ static HWND CreateCombo(HINSTANCE hInstance, HWND hwndParent, INT id, BOOL fEdit
     DWORD dwStyle, dwExStyle;
     HWND hwnd;
 
-    dwStyle = WS_CHILD | CBS_NOINTEGRALHEIGHT | (fEditable ? CBS_DROPDOWN : CBS_DROPDOWNLIST);
+	//DWM 2.0: Added WS_VSCROLL per user suggestion
+    dwStyle = WS_CHILD | WS_VSCROLL | CBS_NOINTEGRALHEIGHT | (fEditable ? CBS_DROPDOWN : CBS_DROPDOWNLIST);
 
     dwExStyle = WS_EX_LEFT;
 
@@ -1715,23 +1727,23 @@ static VOID LogFontItem_FromString(LPPROPGRIDFONTITEM lpLogFontItem, LPTSTR lpsz
     LPLOGFONT lpLf = (LPLOGFONT)lpLogFontItem;
     _stscanf(lpszFont,
 #ifdef _UNICODE
-		_T( "Height: %d " \
-			L"Width: %d " \
-			L"Escapement: %d " \
-			L"Orientation:  %d " \
-			L"Weight: %d " \
-			L"Italic: %hhd " \
-			L"Underline: %hhd " \
-			L"StrikeOut: %hhd " \
-			L"CharSet: %hhd " \
-			L"OutPrecision: %hhd " \
-			L"ClipPrecision: %hhd " \
-			L"Quality: %hhd " \
-			L"PitchAndFamily: %hhd " \
-			L"FaceName: %32l[^\r\n] " \
-            L"Color: %d"),
+            L"Height: %d " \
+            L"Width: %d " \
+            L"Escapement: %d " \
+            L"Orientation:  %d " \
+            L"Weight: %d " \
+            L"Italic: %hhd " \
+            L"Underline: %hhd " \
+            L"StrikeOut: %hhd " \
+            L"CharSet: %hhd " \
+            L"OutPrecision: %hhd " \
+            L"ClipPrecision: %hhd " \
+            L"Quality: %hhd " \
+            L"PitchAndFamily: %hhd " \
+            L"FaceName: %32l[^\r\n] " \
+            L"Color: %d",
 #else
-        _T( "Height: %d " \
+            "Height: %d " \
             "Width: %d " \
             "Escapement: %d " \
             "Orientation:  %d " \
@@ -1745,7 +1757,7 @@ static VOID LogFontItem_FromString(LPPROPGRIDFONTITEM lpLogFontItem, LPTSTR lpsz
             "Quality: %hhd " \
             "PitchAndFamily: %hhd " \
             "FaceName: %32[^\r\n] " \
-            "Color: %d"),
+            "Color: %d",
 #endif
         &lpLf->lfHeight,
         &lpLf->lfWidth,
@@ -1777,37 +1789,37 @@ static LPTSTR LogFontItem_ToString(LPPROPGRIDFONTITEM lpLogFontItem)
     LPLOGFONT lpLf = (LPLOGFONT)lpLogFontItem;
     _stprintf(buf, MAX_PATH,
 #ifdef _UNICODE
-		L"Height: %d\r\n" \
-		L"Width: %d\r\n" \
-		L"Escapement: %d\r\n" \
-		L"Orientation:  %d\r\n" \
-		L"Weight: %d\r\n" \
-		L"Italic: %d\r\n" \
-		L"Underline: %d\r\n" \
-		L"StrikeOut: %d\r\n" \
-		L"CharSet: %d\r\n" \
-		L"OutPrecision: %d\r\n" \
-		L"ClipPrecision: %d\r\n" \
-		L"Quality: %d\r\n" \
-		L"PitchAndFamily: %d\r\n" \
-		L"FaceName: %ls\r\n" \
-		L"Color: %d",
+            L"Height: %d\r\n" \
+            L"Width: %d\r\n" \
+            L"Escapement: %d\r\n" \
+            L"Orientation:  %d\r\n" \
+            L"Weight: %d\r\n" \
+            L"Italic: %d\r\n" \
+            L"Underline: %d\r\n" \
+            L"StrikeOut: %d\r\n" \
+            L"CharSet: %d\r\n" \
+            L"OutPrecision: %d\r\n" \
+            L"ClipPrecision: %d\r\n" \
+            L"Quality: %d\r\n" \
+            L"PitchAndFamily: %d\r\n" \
+            L"FaceName: %ls\r\n" \
+            L"Color: %d",
 #else
-        "Height: %d\r\n" \
-		"Width: %d\r\n" \
-		"Escapement: %d\r\n" \
-		"Orientation:  %d\r\n" \
-		"Weight: %d\r\n" \
-		"Italic: %d\r\n" \
-		"Underline: %d\r\n" \
-		"StrikeOut: %d\r\n" \
-		"CharSet: %d\r\n" \
-		"OutPrecision: %d\r\n" \
-		"ClipPrecision: %d\r\n" \
-		"Quality: %d\r\n" \
-		"PitchAndFamily: %d\r\n" \
-		"FaceName: %s\r\n" \
-		"Color: %d",
+            "Height: %d\r\n" \
+            "Width: %d\r\n" \
+            "Escapement: %d\r\n" \
+            "Orientation:  %d\r\n" \
+            "Weight: %d\r\n" \
+            "Italic: %d\r\n" \
+            "Underline: %d\r\n" \
+            "StrikeOut: %d\r\n" \
+            "CharSet: %d\r\n" \
+            "OutPrecision: %d\r\n" \
+            "ClipPrecision: %d\r\n" \
+            "Quality: %d\r\n" \
+            "PitchAndFamily: %d\r\n" \
+            "FaceName: %s\r\n" \
+            "Color: %d",
 #endif
         lpLf->lfHeight,
         lpLf->lfWidth,
@@ -1845,15 +1857,15 @@ static VOID FileDialogItem_FromString(LPPROPGRIDFDITEM lpPgFdItem, LPTSTR lpszFd
 
     _stscanf(lpszFdItem,
 #ifdef _UNICODE
-		L"Title: %256l[^\r\n] " \
-		L"Path: %256l[^\r\n] " \
-		L"Filter: %256l[^\r\n] " \
-		L"Default Extension: %3ls",
+            L"Title: %256l[^\r\n] " \
+            L"Path: %256l[^\r\n] " \
+            L"Filter: %256l[^\r\n] " \
+            L"Default Extension: %3ls",
 #else
-		"Title: %256[^\r\n] " \
-		"Path: %256[^\r\n] " \
-		"Filter: %256[^\r\n] " \
-		"Default Extension: %3s",
+            "Title: %256[^\r\n] " \
+            "Path: %256[^\r\n] " \
+            "Filter: %256[^\r\n] " \
+            "Default Extension: %3s",
 #endif
         (LPTSTR)&PgFdItem[0], (LPTSTR)&PgFdItem[1], (LPTSTR)&PgFdItem[2], (LPTSTR)&PgFdItem[3]);
 
@@ -1902,15 +1914,15 @@ static LPTSTR FileDialogItem_ToString(LPPROPGRIDFDITEM lpPgFdItem)
 
     _stprintf(szBuf, NELEMS(szBuf),
 #ifdef _UNICODE
-		L"Title: %ls\r\n" \
-		L"Path: %ls\r\n" \
-		L"Filter: %ls\r\n" \
-		L"Default Extension: %3ls",
+            L"Title: %ls\r\n" \
+            L"Path: %ls\r\n" \
+            L"Filter: %ls\r\n" \
+            L"Default Extension: %3ls",
 #else
-		"Title: %s\r\n" \
-		"Path: %s\r\n" \
-		"Filter: %s\r\n" \
-		"Default Extension: %3s",
+            "Title: %s\r\n" \
+            "Path: %s\r\n" \
+            "Filter: %s\r\n" \
+            "Default Extension: %3s",
 #endif
         0 < _tcslen(lpPgFdItem->lpszDlgTitle) ? lpPgFdItem->lpszDlgTitle : _T("?"), //DWM 1.2: Added default "?"
         0 < _tcslen(lpPgFdItem->lpszFilePath) ? lpPgFdItem->lpszFilePath : _T("?"), //DWM 1.2: Added default "?"
@@ -1962,9 +1974,8 @@ static LPITEMIDLIST ConvertPathToLpItemIdList(LPTSTR pszPath)
 
     if (SUCCEEDED(SHGetDesktopFolder(&pDesktopFolder)))
     {
-        pDesktopFolder->lpVtbl->ParseDisplayName(pDesktopFolder,
-         NULL, NULL, pwzPath, &chEaten, &pidl, &dwAttributes);
-        pDesktopFolder->lpVtbl->Release(pDesktopFolder);
+        pDesktopFolder->ParseDisplayName(NULL, NULL, pwzPath, &chEaten, &pidl, &dwAttributes);
+        pDesktopFolder->Release();
     }
     return pidl;
 }
@@ -2037,8 +2048,8 @@ static LPTSTR BrowseFolder(HWND hwnd, LPTSTR curPath, LPTSTR title, LPTSTR rootP
             _tmemset(szDir, (TCHAR)0, MAX_PATH);
 
         // free memory used
-        pMalloc->lpVtbl->Free(pMalloc, pidl);
-        pMalloc->lpVtbl->Release(pMalloc);
+        pMalloc->Free(pidl);
+        pMalloc->Release();
     }
     return szDir;
 }
@@ -2766,6 +2777,18 @@ static VOID ListBox_OnKeyDown(HWND hwnd, UINT vk, BOOL fDown, INT cRepeat, UINT 
                 ToggleCatalog(g_lpInst->lpCurrent);
                 fHandled = TRUE;
             }
+			//DWM 2.0: Added Keith S. Robertson suggestion begin.
+		    else if ((VK_ADD == vk || VK_OEM_PLUS == vk) && g_lpInst->lpCurrent->fCollapsed || (VK_SUBTRACT == vk || VK_OEM_MINUS == vk) && !g_lpInst->lpCurrent->fCollapsed)
+		    {
+		        ToggleCatalog(g_lpInst->lpCurrent);
+		        fHandled = TRUE;
+		    }
+		    else if (VK_SPACE == vk)
+		    {
+		        ToggleCatalog(g_lpInst->lpCurrent);
+		        fHandled = TRUE;
+		    }
+			//DWM 2.0: Added end.
         }
         if (PIT_CHECK == g_lpInst->lpCurrent->iItemType && (VK_SPACE == vk || VK_RETURN == vk))
         {
@@ -2918,15 +2941,15 @@ static VOID ListBox_OnCommand(HWND hwnd, INT id, HWND hwndCtl, UINT codeNotify)
 
                 _stscanf(g_lpInst->lpCurrent->lpszMisc,
 #ifdef _UNICODE
-					L"Title: %32l[^\r\n] " \
-					L"Path: %256l[^\r\n] " \
-					L"Filter: %256l[^\r\n] " \
-					L"Default Extension: %3l[^\r\n] ",
+                        L"Title: %32l[^\r\n] " \
+                        L"Path: %256l[^\r\n] " \
+                        L"Filter: %256l[^\r\n] " \
+                        L"Default Extension: %3l[^\r\n] ",
 #else
-					"Title: %32[^\r\n] " \
-					"Path: %256[^\r\n] " \
-					"Filter: %256[^\r\n] " \
-					"Default Extension: %3[^\r\n]",
+                        "Title: %32[^\r\n] " \
+                        "Path: %256[^\r\n] " \
+                        "Filter: %256[^\r\n] " \
+                        "Default Extension: %3[^\r\n]",
 #endif
                     (LPTSTR)&title, (LPTSTR)&path, (LPTSTR)&filter, (LPTSTR)&ext);
 
@@ -3047,6 +3070,11 @@ static VOID ListBox_OnCommand(HWND hwnd, INT id, HWND hwndCtl, UINT codeNotify)
 /// @returns VOID.
 static VOID Grid_OnSize(HWND hwnd, UINT state, INT cx, INT cy)
 {
+    if (NULL == g_lpInst)
+    {
+        return;
+    }
+
     g_lpInst->iVDivider = cy - g_lpInst->iDescHeight;
 
     if (NULL != g_lpInst->hwndPropDesc)
@@ -3139,7 +3167,7 @@ static VOID Grid_OnLButtonDown(HWND hwnd, BOOL fDoubleClick, INT x, INT y, UINT 
         g_lpInst->nOldDivY = y;
 
         HDC hdc = GetDC(hwnd);
-        HPEN hOld = SelectObject(hdc, CreatePen(PS_SOLID, 3, 0));
+        HPEN hOld = (HPEN)SelectObject(hdc, CreatePen(PS_SOLID, 3, 0));
 
         InvertLine(hdc, g_lpInst->nDivLft, g_lpInst->nOldDivY,
             g_lpInst->nDivRht, g_lpInst->nOldDivY);
@@ -3175,7 +3203,7 @@ static VOID Grid_OnLButtonUp(HWND hwnd, INT x, INT y, UINT keyFlags)
         g_lpInst->nOldDivY = y;
 
         HDC hdc = GetDC(hwnd);
-        HPEN hOld = SelectObject(hdc, CreatePen(PS_SOLID, 3, 0));
+        HPEN hOld = (HPEN)SelectObject(hdc, CreatePen(PS_SOLID, 3, 0));
 
         InvertLine(hdc, g_lpInst->nDivLft, g_lpInst->nOldDivY,
             g_lpInst->nDivRht, g_lpInst->nOldDivY);
@@ -3210,7 +3238,7 @@ static VOID Grid_OnMouseMove(HWND hwnd, INT x, INT y, UINT keyFlags)
         //Move divider line to the mouse pos. if columns are
         // currently being resized
         HDC hdc = GetDC(hwnd);
-        HPEN hOld = SelectObject(hdc, CreatePen(PS_SOLID, 3, 0));
+        HPEN hOld = (HPEN)SelectObject(hdc, CreatePen(PS_SOLID, 3, 0));
 
         //Remove old divider line
         InvertLine(hdc, g_lpInst->nDivLft, g_lpInst->nOldDivY,
@@ -3461,7 +3489,7 @@ static VOID Grid_OnDrawItem(HWND hwnd, const DRAWITEMSTRUCT *lpDIS)
     //
     //First part of item
     //
-    FillRect(lpDIS->hDC, &rectPart0, GetStockObject(HOLLOW_BRUSH));
+    FillRect(lpDIS->hDC, &rectPart0, (HBRUSH) GetStockObject(HOLLOW_BRUSH));
 
     if (PIT_CATALOG == pItem->iItemType) //Draw expand / collapse box
     {
@@ -3472,7 +3500,7 @@ static VOID Grid_OnDrawItem(HWND hwnd, const DRAWITEMSTRUCT *lpDIS)
         rect2.bottom = rect2.top + 9;
 
         FillRect(lpDIS->hDC, &rect2, GetSysColorBrush(COLOR_WINDOW));
-        FrameRect(lpDIS->hDC, &rect2, GetStockObject(BLACK_BRUSH));
+        FrameRect(lpDIS->hDC, &rect2, (HBRUSH) GetStockObject(BLACK_BRUSH));
 
         POINT ptCtr;
         ptCtr.x = (LONG) (rect2.left + (WIDTH(rect2) * 0.5));
@@ -3492,7 +3520,7 @@ static VOID Grid_OnDrawItem(HWND hwnd, const DRAWITEMSTRUCT *lpDIS)
     HFONT oldFont;
     if (PIT_CATALOG == pItem->iItemType)
     {
-        FillRect(lpDIS->hDC, &rectCatPart1, GetStockObject(HOLLOW_BRUSH));
+        FillRect(lpDIS->hDC, &rectCatPart1, (HBRUSH) GetStockObject(HOLLOW_BRUSH));
 
         if (nIndex == (UINT)ListBox_GetCurSel(lpDIS->hwndItem) && g_lpInst->fGotFocus)
         {
@@ -3502,7 +3530,7 @@ static VOID Grid_OnDrawItem(HWND hwnd, const DRAWITEMSTRUCT *lpDIS)
         }
 
         //Write the property name (bold font, Visual Studio style)
-        oldFont = SelectObject(lpDIS->hDC, Font_SetBold(lpDIS->hwndItem, TRUE));
+        oldFont = (HFONT) SelectObject(lpDIS->hDC, Font_SetBold(lpDIS->hwndItem, TRUE));
         SetTextColor(lpDIS->hDC, GetSysColor(COLOR_BTNTEXT));
         DrawText(lpDIS->hDC, pItem->lpszCatalog, _tcslen(pItem->lpszCatalog),
             MAKE_PRECT(rectCatPart1.left + 6, rectCatPart1.top + 3,
@@ -3518,7 +3546,7 @@ static VOID Grid_OnDrawItem(HWND hwnd, const DRAWITEMSTRUCT *lpDIS)
             (g_lpInst->fGotFocus ? COLOR_HIGHLIGHT : COLOR_BTNFACE) : COLOR_WINDOW));
 
         //Write the property name
-        oldFont = SelectObject(lpDIS->hDC, Font_SetBold(lpDIS->hwndItem, FALSE));
+        oldFont = (HFONT) SelectObject(lpDIS->hDC, Font_SetBold(lpDIS->hwndItem, FALSE));
         SetTextColor(lpDIS->hDC,
             GetSysColor(nIndex == (UINT)ListBox_GetCurSel(lpDIS->hwndItem) ?
             (g_lpInst->fGotFocus ? COLOR_HIGHLIGHTTEXT : COLOR_BTNTEXT) : COLOR_WINDOWTEXT));
@@ -3547,7 +3575,7 @@ static VOID Grid_OnDrawItem(HWND hwnd, const DRAWITEMSTRUCT *lpDIS)
         if (PIT_COLOR == pItem->iItemType)
         {
             FillSolidRect(lpDIS->hDC, &rect3, GetColor(pItem->lpszCurValue));
-            FrameRect(lpDIS->hDC, &rect3, GetStockObject(BLACK_BRUSH));
+            FrameRect(lpDIS->hDC, &rect3, (HBRUSH) GetStockObject(BLACK_BRUSH));
         }
         else if (PIT_CHECK == pItem->iItemType)
         {
@@ -3601,7 +3629,7 @@ static VOID Grid_OnDrawItem(HWND hwnd, const DRAWITEMSTRUCT *lpDIS)
                     pgfi.logFont.lfHeight = tm.tmHeight + 2; //So displayed text is not oversized
 
                 hf = CreateFontIndirect(&pgfi.logFont);
-                hfOld = SelectObject(lpDIS->hDC, hf);
+                hfOld = (HFONT) SelectObject(lpDIS->hDC, hf);
 
                 SetTextColor(lpDIS->hDC, pgfi.crFont);
 #ifdef _UNICODE
@@ -3733,7 +3761,7 @@ static INT Grid_OnAddString(LPPROPGRIDITEM pgi)
             break;
     }
     lpi = NewItem(pgi->lpszCatalog, pgi->lpszPropName,
-            lpszCurValue, pgi->lpszzCmbItems, pgi->lpszPropDesc, pgi->iItemType);
+            lpszCurValue, pgi->lpszzCmbItems, pgi->lpszPropDesc, pgi->iItemType, pgi->lpUserData);
 
     return ListBox_AddItemData(g_lpInst->hwndListMap, lpi);
 }
@@ -3801,6 +3829,7 @@ static LRESULT Grid_OnGetItemData(INT iItem)
             pgi.lpszzCmbItems = pItem->lpszMisc;
             pgi.lpszPropDesc = pItem->lpszPropDesc;
             pgi.iItemType = pItem->iItemType;
+            pgi.lpUserData = pItem->lpUserData;
 
             switch (pgi.iItemType)
             {
@@ -3909,7 +3938,16 @@ static BOOL Grid_OnGetSel(INT iItem)
 /// @returns VOID.
 static VOID Grid_OnResetContent(VOID)
 {
-    ListBox_ResetContent(g_lpInst->hwndListMap);
+	LPLISTBOXITEM pItem;
+
+	//DWM 2.0: Collapse all open catalogs to avoid freeing memory twice.
+	Grid_CollapseCatalog(NULL);
+
+	ListBox_ResetContent(g_lpInst->hwndListBox); //free catalog entries.
+
+    ListBox_ResetContent(g_lpInst->hwndListMap); //free all other entries.
+
+    g_lpInst->lpCurrent = NULL;
 
     if (NULL != g_lpInst->hwndCtl1)
     {
@@ -3921,7 +3959,7 @@ static VOID Grid_OnResetContent(VOID)
         DestroyWindow(g_lpInst->hwndCtl2);
         g_lpInst->hwndCtl2 = NULL;
     }
-    ListBox_ResetContent(g_lpInst->hwndListBox);
+
     Static_SetText(g_lpInst->hwndPropDesc,_T("")); //DWM 1.2: Clear the property pane
 }
 
@@ -4041,7 +4079,7 @@ static LRESULT Grid_OnSetItemData(INT iItem, LPPROPGRIDITEM pgi)
         //Do not allow the catalog to change; to do so would necessitate moving
         // the item to a different index throwing off the indexing for items.
         lpiNew = NewItem(lpiCurrent->lpszCatalog, pgi->lpszPropName,
-            lpszCurValue, pgi->lpszzCmbItems, pgi->lpszPropDesc, pgi->iItemType);
+            lpszCurValue, pgi->lpszzCmbItems, pgi->lpszPropDesc, pgi->iItemType, pgi->lpUserData);
 
         //Set new data
         lrtn = ListBox_SetItemData(g_lpInst->hwndListMap, iItem, lpiNew);
@@ -4116,7 +4154,8 @@ static VOID Grid_OnDestroy(HWND hwnd)
 {
     if (NULL != g_lpInst)
     {
-        ListBox_ResetContent(g_lpInst->hwndListMap); //Delete all Items
+		//DWM 2.0: Changed following line from ListBox_ResetContent to PropGrid_ResetContent()
+        PropGrid_ResetContent(hwnd); //Delete all Items
         DestroyWindow(g_lpInst->hwndListMap);
         DestroyWindow(g_lpInst->hwndListBox);
 
@@ -4141,7 +4180,7 @@ static VOID Grid_OnDestroy(HWND hwnd)
 ///
 /// @returns ATOM If the function succeeds, the atom that uniquely identifies
 ///                the class being registered, otherwise 0.
-PROPGRID_LINKAGE ATOM InitPropertyGrid(HINSTANCE hInstance)
+ATOM InitPropertyGrid(HINSTANCE hInstance)
 {
     WNDCLASSEX wcex;
 
@@ -4165,7 +4204,7 @@ PROPGRID_LINKAGE ATOM InitPropertyGrid(HINSTANCE hInstance)
 /// @param dwID The ID for this control.
 ///
 /// @returns HWND If the function succeeds, the grid handle, otherwise NULL.
-PROPGRID_LINKAGE HWND New_PropertyGrid(HWND hParent, DWORD dwID)
+HWND New_PropertyGrid(HWND hParent, DWORD dwID)
 {
     static ATOM aPropertyGrid = 0;
     static HWND hPropertyGrid;
@@ -4176,8 +4215,9 @@ PROPGRID_LINKAGE HWND New_PropertyGrid(HWND hParent, DWORD dwID)
     if (!aPropertyGrid)
         aPropertyGrid = InitPropertyGrid(hinst);
 
+	//DWM 2.0: Added WS_VISIBLE per user suggestion
     hPropertyGrid = CreateWindowEx(0, g_szClassName, _T(""),
-         WS_CHILD | WS_TABSTOP, 0, 0, 0, 0, hParent, (HMENU)dwID, hinst, NULL);
+         WS_CHILD | WS_TABSTOP | WS_VISIBLE, 0, 0, 0, 0, hParent, (HMENU)dwID, hinst, NULL);
 
     return hPropertyGrid;
 }

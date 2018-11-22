@@ -22,24 +22,12 @@
     <ClCompile Include="precompiled.cpp" />
     <ClCompile Include="SearchLogic.cpp" />
     <ClCompile Include="Exporter.cpp" />
-    <ClCompile Include="Controls\propertyGrid.c">
+    <ClCompile Include="Controls\propertyGrid.cpp">
       <Filter>Controls</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
-    <ClInclude Include="Controls\PropertyItem.h">
-      <Filter>Controls</Filter>
-    </ClInclude>
-    <ClInclude Include="Controls\PropertyItemEditors.h">
-      <Filter>Controls</Filter>
-    </ClInclude>
-    <ClInclude Include="Controls\PropertyItemImpl.h">
-      <Filter>Controls</Filter>
-    </ClInclude>
-    <ClInclude Include="Controls\PropertyList.h">
-      <Filter>Controls</Filter>
-    </ClInclude>
     <ClInclude Include="Helper.h" />
     <ClInclude Include="Controls\ImageCtrl.h">
       <Filter>Controls</Filter>

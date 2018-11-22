@@ -10,7 +10,6 @@
 #include <atldlgs.h>
 
 #include "..\ThemeManager.h"
-#include "..\Controls\PropertyList.h"
 #include "..\Controls\ImageCtrl.h"
 #include "..\Controls\DropTarget.h"
 #include "..\resource.h"
@@ -37,8 +36,7 @@ private:
 	CSplitterWindow		m_splitLeft;
 	CSplitterWindow		m_splitRight;
 	CTreeViewCtrlEx		m_treeView;
-	CListBox			m_propListBase;
-	CPropertyListCtrl	m_propList;
+	CListBox			m_propList;
 	CImageCtrl			m_imageView;
 
 	CSearchDlg*			m_searchDialog;
@@ -101,7 +99,7 @@ public:
 		MESSAGE_HANDLER(WM_USER + 44, OnFindNext)
 
 		NOTIFY_CODE_HANDLER(TVN_SELCHANGED, OnTreeViewSelectionChanged)
-		NOTIFY_CODE_HANDLER(PIN_ITEMCHANGING, OnPropGridItemChanging)
+		NOTIFY_CODE_HANDLER(WM_USER + 42, OnPropGridItemChanged);
 
 		COMMAND_ID_HANDLER(ID_APP_EXIT, OnFileExit)
 		COMMAND_ID_HANDLER(ID_FILE_NEW, OnFileNew)
@@ -147,6 +145,7 @@ public:
 
 	LRESULT OnTreeViewSelectionChanged(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/);
 	LRESULT OnPropGridItemChanging(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/);
+	LRESULT OnPropGridItemChanged(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/);
 
 	LRESULT OnContextMenu(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 	LRESULT OnFindOpen(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);

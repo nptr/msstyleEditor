@@ -129,7 +129,7 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 	GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
 
 	// Use WS_EX_COMPOSITED on parent + WS_EX_TRANSPARENT on child to obtain double buffering
-	ModifyStyleEx(NULL, WS_EX_COMPOSITED);
+	//ModifyStyleEx(NULL, WS_EX_COMPOSITED);
 
 	HWND hWndCmdBar = m_commandBar.Create(m_hWnd, rcDefault, NULL, ATL_SIMPLE_CMDBAR_PANE_STYLE);
 	m_commandBar.AttachMenu(GetMenu());
@@ -174,19 +174,10 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 	m_imageView.SetBitmap(NULL);
 	m_imageViewMenu = GetSubMenu(LoadMenu(NULL, MAKEINTRESOURCE(IDR_IMAGEVIEW)), 0);
 
-	m_propListBase.Create(m_splitRight, rcDefault, NULL, COMMON_WND_STYLE
-		| WS_VSCROLL
-		| LBS_NOTIFY
-		| LBS_OWNERDRAWVARIABLE 
-		| LBS_NOINTEGRALHEIGHT
-		, WS_EX_RIGHTSCROLLBAR
-		, NOT_A_MENU // Important! Required for REFLECT_NOTIFICATION()
-		, NULL);
-	m_propList.SubclassWindow(m_propListBase);
-	m_propList.SetExtendedListStyle(PLS_EX_CATEGORIZED | LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
+	m_propList = New_PropertyGrid(m_splitRight, 4242);
 	m_propListMenu = GetSubMenu(LoadMenu(NULL, MAKEINTRESOURCE(IDR_PROPVIEW)), 0);
-
-	HWND propgrid = New_PropertyGrid(m_hWnd, 0);
+	//PropGrid_ShowToolTips(m_propList, TRUE);
+	//PropGrid_ShowPropertyDescriptions(m_propList, TRUE);
 
 	HBITMAP hbmpPropAdd = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_PROP_ADD), IMAGE_BITMAP, 16, 16, LR_SHARED);
 	HBITMAP hbmpPropRem = (HBITMAP)LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_PROP_REMOVE), IMAGE_BITMAP, 16, 16, LR_SHARED);
@@ -284,7 +275,7 @@ LRESULT CMainFrame::OnContextMenu(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL&
 		POINT pt = { 0 };
 		pt.x = GET_X_LPARAM(lParam);
 		pt.y = GET_Y_LPARAM(lParam);
-		m_propListBase.ScreenToClient(&pt);
+		m_propList.ScreenToClient(&pt);
 
 		LRESULT res = ::SendMessage(m_propList, LB_ITEMFROMPOINT, 0, MAKELPARAM(pt.x, pt.y));
 
@@ -294,8 +285,8 @@ LRESULT CMainFrame::OnContextMenu(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL&
 			m_propList.SetFocus();
 			m_propList.SetCurSel(index);
 
-			HPROPERTY prop = m_propList.GetProperty(index);
-			ItemData* itemData = (ItemData*)m_propList.GetItemData(prop);
+			LPPROPGRIDITEM item = (LPPROPGRIDITEM)PropGrid_GetItemData(m_propList, index);
+			ItemData* itemData = (ItemData*)item->lpUserData;
 
 			if (itemData->type == ITEM_STATE)
 			{
@@ -631,63 +622,104 @@ LRESULT CMainFrame::OnRemoveProperty(libmsstyle::StyleProperty* selectedProp)
 	return 0;
 }
 
-LRESULT CMainFrame::OnPropGridItemChanging(int idCtrl, LPNMHDR pnmh, BOOL& bHandled)
+bool ToInt(const wchar_t* str, int& dst)
 {
-	LPNMPROPERTYITEM evt = (LPNMPROPERTYITEM)pnmh;
-	
-	IProperty* gridProp = evt->prop;
-	ItemData* itemData = (ItemData*)gridProp->GetItemData();
+	wchar_t* end = NULL;
+	long result = wcstol(str, &end, 10);
+	if (end == str || *end != '\0')
+	{
+		return false;
+	}
+	else
+	{
+		dst = result;
+		return true;
+	}
+}
 
-	if (itemData->type != ITEM_PROPERTY)
-		return CHANGE_OK;
+LRESULT CMainFrame::OnPropGridItemChanged(int idCtrl, LPNMHDR pnmh, BOOL& bHandled)
+{
+	LPNMPROPGRID grid = (LPNMPROPGRID)pnmh;
+	LPPROPGRIDITEM item = PropGrid_GetItemData(m_propList, grid->iIndex);
+
+	ItemData* itemData = (ItemData*)item->lpUserData;
+
+	if (!itemData || itemData->type != ITEM_PROPERTY)
+		return 0;
 
 	libmsstyle::StyleProperty* styleProp = (libmsstyle::StyleProperty*)itemData->object;
+	
+	bool success = false;
 
-	if (!styleProp)
-		return CHANGE_VETO;
-
-	CComVariant propValue;;
-	gridProp->GetValue(&propValue);
-
-	// COLORIZATIONCOLOR is internally an integer...
 	if (styleProp->GetNameID() == libmsstyle::IDENTIFIER::COLORIZATIONCOLOR)
 	{
-		int colorARGB = 
-			GetRValue(propValue.uintVal) << 16 |
-			GetGValue(propValue.uintVal) << 8 |
-			GetBValue(propValue.uintVal) << 0;
+		success = true;
+
+		// propGrid gives us a COLORREF
+		int colorARGB =
+			GetRValue(item->lpCurValue) << 16 |
+			GetGValue(item->lpCurValue) << 8 |
+			GetBValue(item->lpCurValue) << 0;
+
+		// COLORIZATIONCOLOR is internally an integer...
 		styleProp->UpdateIntegerUnchecked(colorARGB);
-		return CHANGE_OK;
+		return 1;
 	}
 
 	switch (styleProp->header.typeID)
 	{
 	case libmsstyle::IDENTIFIER::FILENAME:
-		styleProp->UpdateImageLink(propValue.uintVal); break;
+	{
+		int resourceId = 0;
+		if ((success = ToInt((LPTSTR)item->lpCurValue, resourceId)))
+		{
+			styleProp->UpdateImageLink(resourceId);
+		}
+	} break;
 	case libmsstyle::IDENTIFIER::INT:
-		styleProp->UpdateInteger(propValue.intVal); break;
+	{
+		int intValue = 0;
+		if ((success = ToInt((LPTSTR)item->lpCurValue, intValue)))
+		{
+			styleProp->UpdateInteger(intValue);
+		}
+	} break;
 	case libmsstyle::IDENTIFIER::SIZE:
-		styleProp->UpdateSize(propValue.intVal); break;
+	{
+		int sizeValue = 0;
+		if ((success = ToInt((LPTSTR)item->lpCurValue, sizeValue)))
+		{
+			styleProp->UpdateSize(sizeValue);
+		}
+	} break;
 	case libmsstyle::IDENTIFIER::HIGHCONTRASTCOLORTYPE:
 	case libmsstyle::IDENTIFIER::ENUM:
-		styleProp->UpdateEnum(propValue.uintVal); break;
+	{
+		success = true;
+		//styleProp->UpdateEnum(item->iSelIndex); // index and enum value match
+	} break;
 	case libmsstyle::IDENTIFIER::BOOLTYPE:
-		styleProp->UpdateBoolean((propValue.uintVal > 0)); break;
+	{
+		success = true;
+		styleProp->UpdateBoolean((item->lpCurValue > 0));
+	} break;
 	case libmsstyle::IDENTIFIER::COLOR:
 	{
-		styleProp->UpdateColor(GetRValue(propValue.uintVal), GetGValue(propValue.uintVal), GetBValue(propValue.uintVal));
+		success = true;
+		COLORREF colorValue = (COLORREF)item->lpCurValue;
+		styleProp->UpdateColor(GetRValue(colorValue), GetGValue(colorValue), GetBValue(colorValue));
 	} break;
 	case libmsstyle::IDENTIFIER::RECTTYPE:
 	case libmsstyle::IDENTIFIER::MARGINS:
 	{
 		int l, t, r, b;
-		if (swscanf(propValue.bstrVal, L"%d, %d, %d, %d", &l, &t, &r, &b) != 4)
+		if (swscanf((const wchar_t*)item->lpCurValue, L"%d, %d, %d, %d", &l, &t, &r, &b) != 4)
 		{
 			MessageBoxW(L"Invalid format! expected: a, b, c, d", L"format error", MB_OK | MB_ICONERROR);
-			return CHANGE_VETO;
 		}
 		else
 		{
+			success = true;
 			if (styleProp->header.typeID == libmsstyle::IDENTIFIER::RECTTYPE)
 				styleProp->UpdateRectangle(l, t, r, b);
 			if (styleProp->header.typeID == libmsstyle::IDENTIFIER::MARGINS)
@@ -697,29 +729,50 @@ LRESULT CMainFrame::OnPropGridItemChanging(int idCtrl, LPNMHDR pnmh, BOOL& bHand
 	case libmsstyle::IDENTIFIER::POSITION:
 	{
 		int x, y;
-		if (swscanf(propValue.bstrVal, L"%d, %d", &x, &y) != 2)
+		if (swscanf((const wchar_t*)item->lpCurValue, L"%d, %d", &x, &y) != 2)
 		{
 			MessageBoxW(L"Invalid format! expected: a, b", L"format error", MB_OK | MB_ICONERROR);
-			return CHANGE_VETO;
 		}
 		else
 		{
+			success = true;
 			styleProp->UpdatePosition(x, y);
 		}
 	} break;
 	case libmsstyle::IDENTIFIER::FONT:
-		styleProp->UpdateFont(propValue.uintVal); break;
+	{
+		//if (item->iSelIndex < libmsstyle::FONT_MAP.size())
+		//{
+		//	auto& it = libmsstyle::FONT_MAP.begin();
+		//	std::advance(it, item->iSelIndex);
+
+		//	success = true;
+		//	styleProp->UpdateFont(it->first);
+		//}
+	} break;
 	default:
 	{
+		USES_CONVERSION;
+
 		WCHAR msg[100];
-		wsprintf(msg, L"Changing properties of type '%s' is not supported yet!", libmsstyle::lookup::FindTypeName(styleProp->GetTypeID()));
+		wsprintf(msg, L"Changing properties of type '%s' is not supported yet!", A2W(libmsstyle::lookup::FindTypeName(styleProp->GetTypeID())));
 		MessageBoxW(msg, L"Unsupported", MB_OK | MB_ICONINFORMATION);
-		
-		return CHANGE_VETO;
 	} break;
 	}
 
-	return CHANGE_OK;
+	if (success)
+	{
+		return 1;
+	}
+	else
+	{
+		// its not OK but its the standard beep i was looking for!
+		MessageBeep(MB_OK);
+
+		// TODO: fix selection issue
+		SetInitPropgridItem(m_propList, *item, *styleProp, grid->iIndex);
+		return 0;
+	}
 }
 
 LPARAM CMainFrame::RegUserData(void* data, int type)
@@ -791,36 +844,30 @@ void CMainFrame::FillPropView(libmsstyle::StylePart& part)
 
 	for (auto& state : part)
 	{
-		ItemData* itemData = new ItemData(&state, ITEM_STATE);
-		CCategoryProperty* category = new CCategoryProperty(A2T(state.second.stateName.c_str()), (LPARAM)itemData);
-		m_propList.AddItem(category);
-
 		for (auto& prop : state.second)
 		{
-			HPROPERTY p = GetPropertyItemFromStyleProperty(*prop);
-			if (p != nullptr)
+			PROPGRIDITEM item;
+			PropGrid_ItemInit(item);
+
+			item.lpUserData = new ItemData(prop, ITEM_PROPERTY); // TODO: not free'd yet!!
+			item.lpszCatalog = A2W(state.second.stateName.c_str());
+
+			auto res = libmsstyle::PROPERTY_INFO_MAP.find(prop->header.nameID);
+			if (res != libmsstyle::PROPERTY_INFO_MAP.end())
 			{
-				m_propList.AddItem(p);
+				item.lpszPropDesc = A2W(res->second.description);
 			}
-			else
-			{
-				throw new std::runtime_error("unknown prop");
-			}
+
+			SetInitPropgridItem(m_propList, item, *prop, -1);
 		}
 	}
+
+	PropGrid_ExpandAllCatalogs(m_propList);
 }
 
 void CMainFrame::ClearPropView()
 {
-	// use baseclass since the subclass doesn't
-	// allow calling DeleteString() for some reason
-	int max = m_propListBase.GetCount();
-	for (int i = max-1; i >= 0; --i)
-	{
-		HPROPERTY prop = m_propList.GetProperty(i);
-		delete (ItemData*)m_propList.GetItemData(prop);
-		m_propListBase.DeleteString(i);
-	}
+	PropGrid_ResetContent(m_propList);
 }
 
 void CMainFrame::ShowImageFromFile(LPCWSTR path)

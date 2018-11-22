@@ -220,14 +220,7 @@
     </Midl>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Controls\propertyGrid.c">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-      </PrecompiledHeaderFile>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-      </ForcedIncludeFiles>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</CompileAs>
-    </ClCompile>
+    <ClCompile Include="Controls\propertyGrid.cpp" />
     <ClCompile Include="Dialogs\MainFrm.cpp" />
     <ClCompile Include="Exporter.cpp" />
     <ClCompile Include="Helper.cpp" />
@@ -245,10 +238,6 @@
     <ClInclude Include="Controls\DropTarget.h" />
     <ClInclude Include="Controls\ImageCtrl.h" />
     <ClInclude Include="Controls\propertyGrid.h" />
-    <ClInclude Include="Controls\PropertyItem.h" />
-    <ClInclude Include="Controls\PropertyItemEditors.h" />
-    <ClInclude Include="Controls\PropertyItemImpl.h" />
-    <ClInclude Include="Controls\PropertyList.h" />
     <ClInclude Include="Dialogs\AboutDlg.h" />
     <ClInclude Include="Dialogs\AddPropDlg.h" />
     <ClInclude Include="Dialogs\LicenseDlg.h" />

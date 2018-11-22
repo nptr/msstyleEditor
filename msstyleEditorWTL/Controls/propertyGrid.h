@@ -116,6 +116,7 @@ typedef struct tagPROPGRIDITEM {
     LPTSTR lpszzCmbItems; ///< Double null terminated list of strings
     LPTSTR lpszPropDesc;  ///< Property (item) description
     LPARAM lpCurValue;    ///< Property (item) value
+    LPVOID lpUserData;    ///< Additional user data
     INT    iItemType;     ///< Property (item) type identifier
 } PROPGRIDITEM, *LPPROPGRIDITEM;
 
@@ -386,13 +387,7 @@ typedef struct tagNMPROPGRID {
 /****************************************************************************/
 // Exported function prototypes
 
-#ifdef __cplusplus
-	#define PROPGRID_LINKAGE extern "C" 
-#else
-	#define PROPGRID_LINKAGE
-#endif
-
-PROPGRID_LINKAGE ATOM InitPropertyGrid(HINSTANCE hInstance);
-PROPGRID_LINKAGE HWND New_PropertyGrid(HWND hParent, DWORD dwID);
+ATOM InitPropertyGrid(HINSTANCE hInstance);
+HWND New_PropertyGrid(HWND hParent, DWORD dwID);
 
 #endif //PROPERTYGRID_H
