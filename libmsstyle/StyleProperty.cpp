@@ -282,7 +282,8 @@ namespace libmsstyle
 		} break;
 		case IDENTIFIER::FONT:
 		{
-			return lookup::FindFontName(header.shortFlag);
+            // TODO: need style ref. here to print the actual font name
+            return std::to_string(header.shortFlag);
 		} break;
 		case IDENTIFIER::INTLIST:
 		{

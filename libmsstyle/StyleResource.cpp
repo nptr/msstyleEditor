@@ -30,7 +30,7 @@ namespace libmsstyle
 		impl->m_data = nullptr;
 		impl->m_size = 0;
 		impl->m_name = 0;
-		impl->m_type = StyleResourceType::IMAGE;
+		impl->m_type = StyleResourceType::rtImage;
 	}
 
 	StyleResource::StyleResource(const StyleResource& other)

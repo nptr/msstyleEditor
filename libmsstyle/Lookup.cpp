@@ -496,14 +496,5 @@ namespace libmsstyle
 				return ret->second;
 			else return "UNKNOWN";
 		}
-
-		// TODO: get real data from the XX.msstyles.mui file
-		std::string FindFontName(int fontID)
-		{
-			auto ret = libmsstyle::FONT_MAP.find(fontID);
-			if (ret != libmsstyle::FONT_MAP.end())
-				return format_string("%s (%d)", ret->second, fontID);
-			else return format_string("UNKNOWN (%d)", fontID);
-		}
 	}
 }

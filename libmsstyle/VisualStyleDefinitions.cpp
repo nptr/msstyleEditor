@@ -361,16 +361,4 @@ namespace libmsstyle
 		{ 242, "BITMAPIMAGETYPE" },
 		{ 243, "COMPOSEDIMAGETYPE" },
 	};
-
-
-	const std::unordered_map<int, const char*> FONT_MAP =
-	{
-		{ 501, "Segoe UI, 9, Quality:ClearType" },
-		{ 502, "Segoe UI, 12, Quality:ClearType" },
-		{ 503, "Segoe UI, 9, Bold, Quality:ClearType" },
-		{ 504, "Segoe UI, 9, Underline, Quality:ClearType" },
-		{ 505, "Segoe UI, 12, Underline, Quality:ClearType" },
-		{ 506, "Segoe UI, 10, Quality:ClearType" },
-		{ 507, "Segoe UI, 9, Italic, Quality:ClearType" }
-	};
 }

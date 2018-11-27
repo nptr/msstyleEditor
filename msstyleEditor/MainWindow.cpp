@@ -355,10 +355,10 @@ void MainWindow::OnClassViewTreeSelChanged(wxTreeEvent& event)
 		StyleResourceType type;
 		if (selectedImageProp->GetTypeID() == IDENTIFIER::FILENAME ||
 			selectedImageProp->GetTypeID() == IDENTIFIER::FILENAME_LITE)
-			type = StyleResourceType::IMAGE;
+			type = StyleResourceType::rtImage;
 		else if (selectedImageProp->GetTypeID() == IDENTIFIER::DISKSTREAM)
-			type = StyleResourceType::ATLAS;
-		else type = StyleResourceType::NONE;
+			type = StyleResourceType::rtAtlas;
+		else type = StyleResourceType::rtNone;
 
 		std::string file = currentStyle->GetQueuedResourceUpdate(selectedImageProp->GetResourceID(), type);
 		if (!file.empty())
@@ -575,11 +575,11 @@ void MainWindow::OnImageReplaceClicked(wxCommandEvent& event)
 	{
 	case IDENTIFIER::FILENAME:
 	case IDENTIFIER::FILENAME_LITE:
-		tp = StyleResourceType::IMAGE; break;
+		tp = StyleResourceType::rtImage; break;
 	case IDENTIFIER::DISKSTREAM:
-		tp = StyleResourceType::ATLAS; break;
+		tp = StyleResourceType::rtAtlas; break;
 	default:
-		tp = StyleResourceType::NONE; break;
+		tp = StyleResourceType::rtNone; break;
 	}
 
 	currentStyle->QueueResourceUpdate(selectedImageProp->GetResourceID(), tp, openFileDialog.GetPath().ToStdString());
@@ -1047,7 +1047,7 @@ void MainWindow::FillPropertyView(StylePart& part)
 		category->SetClientData(&state);
 		for (auto& prop : state.second)
 		{
-			category->AppendChild(GetWXPropertyFromMsStyleProperty(*prop));
+			category->AppendChild(GetWXPropertyFromMsStyleProperty(*currentStyle , *prop));
 		}
 		propView->Append(category);
 	}
