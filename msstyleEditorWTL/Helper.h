@@ -1,11 +1,12 @@
 #pragma once
 
+#include "libmsstyle\VisualStyle.h"
 #include "libmsstyle\StyleProperty.h"
 #include "Controls\propertyGrid.h"
 
 #include <string>
 
-void SetInitPropgridItem(HWND grid, PROPGRIDITEM& item, libmsstyle::StyleProperty& prop, int index = -1);
+void SetInitPropgridItem(HWND grid, PROPGRIDITEM& item, libmsstyle::VisualStyle& style, libmsstyle::StyleProperty& prop, int index = -1);
 
 std::string StdWideToUTF8(const std::wstring& str);
 std::wstring StdUTF8ToWide(const std::string& str);

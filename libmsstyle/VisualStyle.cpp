@@ -80,7 +80,7 @@ namespace libmsstyle
 				}
 			}
 
-			CloseModule(m_moduleHandle);
+            detail::CloseModule(m_moduleHandle);
 		}
 
 		void Log(const char* format, ...)
@@ -110,25 +110,25 @@ namespace libmsstyle
 		void Load(const std::string& path)
 		{
 			m_stylePath = path;
-			m_moduleHandle = OpenModule(path);
+            m_moduleHandle = detail::OpenModule(path);
 			if (m_moduleHandle != 0)
 			{
-				Resource cmap = GetResource(m_moduleHandle, "CMAP", "CMAP");
+                detail::Resource cmap = detail::GetResource(m_moduleHandle, "CMAP", "CMAP");
 				if (cmap.size != 0)
 					LoadClassmap(cmap);
 				else throw std::runtime_error("Style contains no class map!");
 
 				m_stylePlatform = DeterminePlatform();
 
-				Resource pmap = GetResource(m_moduleHandle, "NORMAL", "VARIANT");
+                detail::Resource pmap = detail::GetResource(m_moduleHandle, "NORMAL", "VARIANT");
 				if (pmap.size != 0)
 					LoadProperties(pmap);
 				else throw std::runtime_error("Style contains no properties!");
 			}
-			else throw std::runtime_error("Could not open file as PE resource!");
+			else throw std::runtime_error("Couldn't open file as PE resource!");
 		}
 
-		void SaveResources(UpdateHandle updateHandle)
+		void SaveResources(detail::UpdateHandle updateHandle)
 		{
 			for (auto& resource : m_resourceUpdates)
 			{
@@ -150,17 +150,17 @@ namespace libmsstyle
 
 				switch (resource.first.GetType())
 				{
-				case StyleResourceType::IMAGE:
+				case StyleResourceType::rtImage:
 					resName = "IMAGE";
 					break;
-				case StyleResourceType::ATLAS:
+				case StyleResourceType::rtAtlas:
 					resName = "STREAM";
 					break;
 				default:
 					continue;
 				}
 
-				bool success = libmsstyle::UpdateStyleResource(updateHandle, resName,
+				bool success = detail::UpdateStyleResource(updateHandle, resName,
 					resource.first.GetNameID(), imgBuffer,
 					static_cast<unsigned int>(size));
 				if (!success)
@@ -174,7 +174,7 @@ namespace libmsstyle
 			}
 		}
 
-		void SavePropertiesSorted(UpdateHandle updateHandle)
+		void SavePropertiesSorted(detail::UpdateHandle updateHandle)
 		{
 			// assume that twice the size common properties require is enough
 			int estimatedSize = m_propsFound * 48 * 2;
@@ -219,10 +219,10 @@ namespace libmsstyle
 				// the properties, this shouldn't be necessary
 			}
 
-			LanguageId lid = GetFirstLanguageId(m_moduleHandle, "NORMAL", "VARIANT");
+            detail::LanguageId lid = detail::GetFirstLanguageId(m_moduleHandle, "NORMAL", "VARIANT");
 			unsigned int length = static_cast<unsigned int>(dataptr - data);
 
-			if (!UpdateStyleResource(updateHandle, "VARIANT", "NORMAL", lid, data, length))
+            if (!detail::UpdateStyleResource(updateHandle, "VARIANT", "NORMAL", lid, data, length))
 			{
 				throw std::runtime_error("Could not update properties!");
 				return;
@@ -245,7 +245,7 @@ namespace libmsstyle
 				dst << src.rdbuf();
 			}
 
-			UpdateHandle updHandle = libmsstyle::BeginUpdate(path);
+            detail::UpdateHandle updHandle = detail::BeginUpdate(path);
 			if (updHandle == NULL)
 			{
 				throw std::runtime_error("Could not open the file for writing!");
@@ -254,32 +254,13 @@ namespace libmsstyle
 			SaveResources(updHandle);
 			SavePropertiesSorted(updHandle);
 
-			int updateError = libmsstyle::EndUpdate(updHandle);
+            int updateError = detail::EndUpdate(updHandle);
 			if (updateError)
 			{
 				std::string msg = format_string("Could not write the changes to the file! ErrorCode: %d", updateError);
 				throw std::runtime_error(msg);
 				return;
 			}
-		}
-
-		StyleResource GetResourceFromProperty(const StyleProperty& prop)
-		{
-			Resource r;
-
-			if (prop.GetTypeID() == IDENTIFIER::FILENAME ||
-				prop.GetTypeID() == IDENTIFIER::FILENAME_LITE)
-			{
-				r = libmsstyle::GetResource(m_moduleHandle, prop.header.shortFlag, "IMAGE");
-				return StyleResource(r.data, r.size, prop.header.nameID, StyleResourceType::IMAGE);
-			}
-			else if (prop.GetTypeID() == IDENTIFIER::DISKSTREAM)
-			{
-				r = libmsstyle::GetResource(m_moduleHandle, prop.header.shortFlag, "STREAM");
-				return StyleResource(r.data, r.size, prop.header.nameID, StyleResourceType::ATLAS);
-			}
-
-			return StyleResource(nullptr, 0, 0, StyleResourceType::IMAGE);
 		}
 
 
@@ -302,7 +283,48 @@ namespace libmsstyle
 		}
 
 
-		void LoadClassmap(Resource classResource)
+        StyleResource GetResource(int id, StyleResourceType type)
+        {
+            detail::Resource r;
+            switch (type)
+            {
+            case rtImage:
+                r = detail::GetResource(m_moduleHandle, id, "IMAGE");
+                return StyleResource(r.data, r.size, 0, StyleResourceType::rtImage);
+            case rtAtlas:
+                r = detail::GetResource(m_moduleHandle, id, "STREAM");
+                return StyleResource(r.data, r.size, 0, StyleResourceType::rtAtlas);
+            case rtFont:
+                r = detail::FindStringResource(m_moduleHandle, id, MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL));
+                return StyleResource(r.data, r.size * 2, 0, StyleResourceType::rtFont);
+            default:
+                return StyleResource(nullptr, 0, 0, StyleResourceType::rtNone);
+            }
+        }
+
+
+        StyleResource GetResourceFromProperty(const StyleProperty& prop)
+        {
+            detail::Resource r;
+            switch (prop.GetTypeID())
+            {
+            case FILENAME:
+            case FILENAME_LITE:
+                r = detail::GetResource(m_moduleHandle, prop.header.shortFlag, "IMAGE");
+                return StyleResource(r.data, r.size, 0, StyleResourceType::rtImage);
+            case DISKSTREAM:
+                r = detail::GetResource(m_moduleHandle, prop.header.shortFlag, "STREAM");
+                return StyleResource(r.data, r.size, 0, StyleResourceType::rtAtlas);
+            case FONT:
+                r = detail::FindStringResource(m_moduleHandle, prop.header.shortFlag, MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL));
+                return StyleResource(r.data, r.size * 2, 0, StyleResourceType::rtFont);
+            default:
+                return StyleResource(nullptr, 0, 0, StyleResourceType::rtNone);
+            }
+        }
+
+
+		void LoadClassmap(detail::Resource classResource)
 		{
 			int first = 0;
 			int last = 1;
@@ -331,7 +353,7 @@ namespace libmsstyle
 			}
 		}
 
-		void LoadProperties(Resource propResource)
+		void LoadProperties(detail::Resource propResource)
 		{
 			libmsstyle::rw::PropertyReader reader(m_classes.size());
 
@@ -467,7 +489,7 @@ namespace libmsstyle
 
 
 		int m_propsFound;
-		ModuleHandle m_moduleHandle;
+		detail::ModuleHandle m_moduleHandle;
 		Platform m_stylePlatform;
 
 		std::string m_stylePath;
@@ -510,6 +532,11 @@ namespace libmsstyle
 	{
 		return impl->m_propsFound;
 	}
+
+    StyleResource VisualStyle::GetResource(int id, StyleResourceType type)
+    {
+        return impl->GetResource(id, type);
+    }
 
 	StyleResource VisualStyle::GetResourceFromProperty(const StyleProperty& prop)
 	{

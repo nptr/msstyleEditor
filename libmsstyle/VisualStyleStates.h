@@ -4,7 +4,7 @@
 
 namespace libmsstyle
 {
-	typedef struct
+	typedef struct _StateMap
 	{
 		int32_t stateID;
 		const char* stateName;

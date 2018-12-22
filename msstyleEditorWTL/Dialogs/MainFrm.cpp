@@ -524,15 +524,15 @@ LRESULT CMainFrame::OnTreeViewSelectionChanged(int idCtrl, LPNMHDR pnmh, BOOL& b
 		if (m_selectedProperty->GetTypeID() == libmsstyle::IDENTIFIER::FILENAME ||
 			m_selectedProperty->GetTypeID() == libmsstyle::IDENTIFIER::FILENAME_LITE)
 		{
-			type = libmsstyle::StyleResourceType::IMAGE;
+			type = libmsstyle::StyleResourceType::rtImage;
 		}
 		else if (m_selectedProperty->GetTypeID() == libmsstyle::IDENTIFIER::DISKSTREAM)
 		{
-			type = libmsstyle::StyleResourceType::ATLAS;
+			type = libmsstyle::StyleResourceType::rtAtlas;
 		}
 		else
 		{
-			type = libmsstyle::StyleResourceType::NONE;
+			type = libmsstyle::StyleResourceType::rtNone;
 		}
 
 		std::string file = m_currentStyle->GetQueuedResourceUpdate(m_selectedProperty->GetResourceID(), type);
@@ -770,7 +770,7 @@ LRESULT CMainFrame::OnPropGridItemChanged(int idCtrl, LPNMHDR pnmh, BOOL& bHandl
 		MessageBeep(MB_OK);
 
 		// TODO: fix selection issue
-		SetInitPropgridItem(m_propList, *item, *styleProp, grid->iIndex);
+		SetInitPropgridItem(m_propList, *item, *m_currentStyle, *styleProp, grid->iIndex);
 		return 0;
 	}
 }
@@ -858,7 +858,7 @@ void CMainFrame::FillPropView(libmsstyle::StylePart& part)
 				item.lpszPropDesc = A2W(res->second.description);
 			}
 
-			SetInitPropgridItem(m_propList, item, *prop, -1);
+            SetInitPropgridItem(m_propList, item, *m_currentStyle, *prop, -1);
 		}
 	}
 
@@ -1233,11 +1233,11 @@ LRESULT CMainFrame::OnImageReplace(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hW
 		{
 		case libmsstyle::IDENTIFIER::FILENAME:
 		case libmsstyle::IDENTIFIER::FILENAME_LITE:
-			tp = libmsstyle::StyleResourceType::IMAGE; break;
+			tp = libmsstyle::StyleResourceType::rtImage; break;
 		case libmsstyle::IDENTIFIER::DISKSTREAM:
-			tp = libmsstyle::StyleResourceType::ATLAS; break;
+			tp = libmsstyle::StyleResourceType::rtAtlas; break;
 		default:
-			tp = libmsstyle::StyleResourceType::NONE; break;
+			tp = libmsstyle::StyleResourceType::rtNone; break;
 		}
 
 		CString filePath;

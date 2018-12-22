@@ -3,9 +3,9 @@
 #include "libmsstyle\VisualStyle.h"
 #include <cstdarg>
 
-#define NORMAL	(FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE)
-#define OK		(FOREGROUND_GREEN)
-#define ERROR	(FOREGROUND_RED)
+#define FMT_NORMAL	(FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE)
+#define FMT_OK		(FOREGROUND_GREEN)
+#define FMT_ERROR	(FOREGROUND_RED)
 
 void printfc(WORD color, const char* format, ...)
 {
@@ -58,34 +58,34 @@ bool CompareStyles(libmsstyle::VisualStyle& s1, libmsstyle::VisualStyle& s2)
 								else
 								{
 									result = false;
-									printfc(ERROR, "Missing property [N: %d, T: %d] in\r\n", (**prop).header.nameID, (**prop).header.typeID);
-									printfc(ERROR, "State %d: %s\r\n", state->second.stateID, state->second.stateName);
-									printfc(ERROR, "Part %d: %s\r\n", part->second.partID, part->second.partName);
-									printfc(ERROR, "Class %d: %s\r\n", cls->second.classID, cls->second.className);
+									printfc(FMT_ERROR, "Missing property [N: %d, T: %d] in\r\n", (**prop).header.nameID, (**prop).header.typeID);
+                                    printfc(FMT_ERROR, "State %d: %s\r\n", state->second.stateID, state->second.stateName);
+                                    printfc(FMT_ERROR, "Part %d: %s\r\n", part->second.partID, part->second.partName);
+                                    printfc(FMT_ERROR, "Class %d: %s\r\n", cls->second.classID, cls->second.className);
 								}
 							}
 						}
 						else
 						{
 							result = false;
-							printfc(ERROR, "Missing state %d: %s, in\r\n", state->second.stateID, state->second.stateName);
-							printfc(ERROR, "Part %d: %s\r\n", part->second.partID, part->second.partName);
-							printfc(ERROR, "Class %d: %s\r\n", cls->second.classID, cls->second.className);
+                            printfc(FMT_ERROR, "Missing state %d: %s, in\r\n", state->second.stateID, state->second.stateName);
+                            printfc(FMT_ERROR, "Part %d: %s\r\n", part->second.partID, part->second.partName);
+                            printfc(FMT_ERROR, "Class %d: %s\r\n", cls->second.classID, cls->second.className);
 						}
 					}
 				}
 				else
 				{
 					result = false;
-					printfc(ERROR, "Missing part %d: %s, in\r\n", part->second.partID, part->second.partName);
-					printfc(ERROR, "Class %d: %s\r\n", cls->second.classID, cls->second.className);
+                    printfc(FMT_ERROR, "Missing part %d: %s, in\r\n", part->second.partID, part->second.partName);
+                    printfc(FMT_ERROR, "Class %d: %s\r\n", cls->second.classID, cls->second.className);
 				}
 			}
 		}
 		else
 		{
 			result = false;
-			printfc(ERROR, "Missing class %d: %s\r\n", cls->second.classID, cls->second.className);
+            printfc(FMT_ERROR, "Missing class %d: %s\r\n", cls->second.classID, cls->second.className);
 		}
 	}
 
@@ -137,13 +137,13 @@ int _tmain(int argc, _TCHAR* argv[])
 	for (int i = 0; INPUT_DIR[i] != NULL; ++i)
 	{
 		dir = INPUT_DIR[i];
-		printfc(NORMAL, "\r\nDirectory: %s\r\n", dir);
+		printfc(FMT_NORMAL, "\r\nDirectory: %s\r\n", dir);
 
 		sprintf(filter, "%s\\*.msstyles", dir);
 		HANDLE hFirst = FindFirstFileA(filter, &ffd);
 		if (hFirst == INVALID_HANDLE_VALUE)
 		{
-			printfc(NORMAL, "Directory not found %s\r\n", dir);
+            printfc(FMT_NORMAL, "Directory not found %s\r\n", dir);
 			continue;
 		}
 
@@ -153,7 +153,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			{
 				sprintf(fileName, "%s\\%s", dir, ffd.cFileName);
 
-				printfc(NORMAL, "Testing with: %s\r\n", fileName);
+                printfc(FMT_NORMAL, "Testing with: %s\r\n", fileName);
 
 				libmsstyle::VisualStyle currentStyle;
 
@@ -165,20 +165,20 @@ int _tmain(int argc, _TCHAR* argv[])
 					currentStyle.Load(fileName);
 
 					if (SaveReloadCompareTest(currentStyle))
-						printfc(OK, "%s - Save and Reload - OK\r\n", fileName);
-					else printfc(ERROR, "%s - Save and Reload - FAILED\r\n", fileName);
+						printfc(FMT_OK, "%s - Save and Reload - OK\r\n", fileName);
+					else printfc(FMT_ERROR, "%s - Save and Reload - FAILED\r\n", fileName);
 				}
 				catch (std::exception& ex)
 				{
-					printfc(ERROR, "ERROR - %s\r\n", ex.what());
+                    printfc(FMT_ERROR, "ERROR - %s\r\n", ex.what());
 				}
 
 				//
 				// Platform Determination
 				//
 				if (currentStyle.GetCompatiblePlatform() == EXPECTED_PLATFORMS[i])
-					printfc(OK, "%s - DeterminePlatformTest - OK\r\n", fileName);
-				else printfc(ERROR, "%s - DeterminePlatformTest - FAILED\r\n", fileName);
+                    printfc(FMT_OK, "%s - DeterminePlatformTest - OK\r\n", fileName);
+                else printfc(FMT_ERROR, "%s - DeterminePlatformTest - FAILED\r\n", fileName);
 			}
 		}
 		while (FindNextFileA(hFirst, &ffd) != 0);

@@ -16,12 +16,12 @@
 namespace libmsstyle
 {
 
-	struct PropertyInfo
+	typedef struct _PropertyInfo
 	{
 		const char* name;
 		int type;
 		const char* description;
-	};
+    } PropertyInfo;
 
 	/////////////////////////////////////////////////////////////////////////////
 	// The following maps are used for finding the name to an ID
@@ -31,8 +31,6 @@ namespace libmsstyle
 	extern const std::unordered_map<int, PropertyInfo> PROPERTY_INFO_MAP;
 
 	extern const std::unordered_map<int, const char*> DATATYPE_MAP;
-
-	extern const std::unordered_map<int, const char*> FONT_MAP;
 
 	enum IDENTIFIER
 	{

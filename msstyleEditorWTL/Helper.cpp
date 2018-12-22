@@ -4,6 +4,7 @@
 
 #include "ItemData.h"
 
+#include "libmsstyle\VisualStyle.h"
 #include "libmsstyle\Lookup.h"
 
 #include <codecvt>	// codecvt_utf8_utf16
@@ -17,18 +18,33 @@ LPVOID MkItemData(StyleProperty* prop)
 }
 
 
-TCHAR* BuildFontList(TCHAR* dst, libmsstyle::StyleProperty& prop)
+int GetFormattedFontName(TCHAR* dst, int fontId, libmsstyle::VisualStyle& style)
 {
-	USES_CONVERSION;
+    USES_CONVERSION;
 
+    libmsstyle::StyleResource res = style.GetResource(fontId, libmsstyle::StyleResourceType::rtFont);
+    if (res.GetData())
+    {
+        // GetResource(rtFont) returns a counted UTF16 string (no null term.), so
+        // copy carefully and add the terminator afterwards!
+        WCHAR fontName[64] = { 0 };
+        memcpy(fontName, res.GetData(), res.GetSize());
+
+        return _stprintf(dst, L"%d - %s", fontId, W2T(fontName));
+    }
+    else
+    {
+        return _stprintf(dst, _T("%d - Undefined"), fontId);
+    }
+}
+
+TCHAR* BuildFontList(TCHAR* dst, libmsstyle::StyleProperty& prop, libmsstyle::VisualStyle& style)
+{
 	TCHAR* dstPtr = dst;
-	auto it = libmsstyle::FONT_MAP.begin();
-	for (int i = 0; it != libmsstyle::FONT_MAP.end(); ++it, ++i)
+    for (int fontId = 501; fontId < 512; ++fontId)
 	{
-		TCHAR* str = A2T(it->second);
-		while (*str)
-			*dstPtr++ = *str++;
-		*dstPtr++ = NULL;
+        int nc = GetFormattedFontName(dstPtr, fontId, style);
+        dstPtr += (nc + 1); // skip over the null terminator as well
 	}
 	*dstPtr = NULL;
 
@@ -68,7 +84,7 @@ bool InitPropgridItemSpecial(PROPGRIDITEM& item, StyleProperty& prop)
 	return false;
 }
 
-void SetInitPropgridItem(HWND grid, PROPGRIDITEM& item, StyleProperty& prop, int index)
+void SetInitPropgridItem(HWND grid, PROPGRIDITEM& item, VisualStyle& style, StyleProperty& prop, int index)
 {
 	USES_CONVERSION;
 
@@ -145,12 +161,16 @@ void SetInitPropgridItem(HWND grid, PROPGRIDITEM& item, StyleProperty& prop, int
 	} break;
 	case IDENTIFIER::FONT:
 	{
-		TCHAR* fontList = BuildFontList(str, prop);
+        TCHAR* fontList = BuildFontList(str, prop, style);
 		if (fontList)
 		{
 			item.iItemType = PIT_COMBO;
-			item.lpCurValue = (LPARAM)A2T(libmsstyle::lookup::FindFontName(prop.GetResourceID()).c_str());
-			item.lpszzCmbItems = fontList;
+            item.lpszzCmbItems = fontList;
+
+            TCHAR tmpBuffer[64];
+            GetFormattedFontName(tmpBuffer, prop.GetResourceID(), style);
+
+            item.lpCurValue = (LPARAM)tmpBuffer;
 		}
 		else
 		{
