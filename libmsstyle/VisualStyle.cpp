@@ -139,7 +139,9 @@ namespace libmsstyle
 
 				if (size < 0)
 				{
-					throw std::runtime_error("tellg() failed!");
+                    char errorMsg[512];
+                    sprintf(errorMsg, "Replacing resource with id '%d' failed because '%s' is not accessible or missing!", resource.first.GetNameID(), resource.second.c_str());
+                    throw std::runtime_error(errorMsg);
 				}
 
 				char* imgBuffer = new char[size];
@@ -244,6 +246,10 @@ namespace libmsstyle
 				std::ofstream dst(newFile, std::ios::binary);
 				dst << src.rdbuf();
 			}
+            else
+            {
+                throw std::runtime_error("Cannot overwrite the original file!");
+            }
 
             detail::UpdateHandle updHandle = detail::BeginUpdate(path);
 			if (updHandle == NULL)

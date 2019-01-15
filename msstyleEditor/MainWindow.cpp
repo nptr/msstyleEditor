@@ -182,7 +182,6 @@ void MainWindow::OnFileSaveMenuClicked(wxCommandEvent& event)
 	{
 		currentStyle->Save(saveFileDialog.GetPath().ToStdString());
 		statusBar->SetStatusText("Style saved successfully!");
-
 	}
 	catch (std::runtime_error err)
 	{
@@ -1069,9 +1068,15 @@ void MainWindow::ShowImageFromResource(const StyleProperty* prop)
 void MainWindow::ShowImageFromFile(wxString& imgPath)
 {
 	wxFileInputStream stream(imgPath);
-
-	wxImage img(stream, wxBITMAP_TYPE_PNG);
-	imageView->SetImage(img);
+    if (stream.IsOk())
+    {
+        wxImage img(stream, wxBITMAP_TYPE_PNG);
+        imageView->SetImage(img);
+    }
+    else
+    {
+        wxMessageBox("Replacement image '" + imgPath.ToStdString() + "' is not accessible or missing!", "Error loading image!", wxICON_ERROR, this);
+    }
 }
 
 
