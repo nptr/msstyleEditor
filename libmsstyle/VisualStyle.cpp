@@ -107,6 +107,34 @@ namespace libmsstyle
 			return m_classes.size();
 		}
 
+        void BuildStyleTree(std::map<int32_t, StyleClass>& classes, Platform os)
+        {
+            for (auto& cls : classes)
+            {
+                lookup::PartList partList = lookup::FindParts(cls.second.className.c_str(), os);
+                for (int i = 0; i < partList.numParts; ++i)
+                {
+                    PartMap partEntry = partList.parts[i];
+                    
+                    StylePart newPart;
+                    newPart.partID = partEntry.partID;
+                    newPart.partName = partEntry.partName;
+                    StylePart* addedPart = cls.second.AddPart(newPart);
+
+                    for (int j = 0; j < partEntry.numStates; ++j)
+                    {
+                        const StateMap stateEntry = partEntry.states[j];
+
+                        StyleState newState;
+                        newState.stateID = stateEntry.stateID;
+                        newState.stateName = stateEntry.stateName;
+                        addedPart->AddState(newState);
+                    }
+                }
+                
+            }
+        }
+
 		void Load(const std::string& path)
 		{
 			m_stylePath = path;
@@ -119,6 +147,7 @@ namespace libmsstyle
 				else throw std::runtime_error("Style contains no class map!");
 
 				m_stylePlatform = DeterminePlatform();
+                BuildStyleTree(m_classes, m_stylePlatform);
 
                 detail::Resource pmap = detail::GetResource(m_moduleHandle, "NORMAL", "VARIANT");
 				if (pmap.size != 0)
