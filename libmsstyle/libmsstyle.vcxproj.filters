@@ -22,6 +22,7 @@
     <ClInclude Include="PropertyWriter.h" />
     <ClInclude Include="StyleProperty.h" />
     <ClInclude Include="StringUtil.h" />
+    <ClInclude Include="StringTable.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ResourceUtil.cpp" />
@@ -39,5 +40,6 @@
     <ClCompile Include="PropertyWriter.cpp" />
     <ClCompile Include="StyleProperty.cpp" />
     <ClCompile Include="StringUtil.cpp" />
+    <ClCompile Include="StringTable.cpp" />
   </ItemGroup>
 </Project>

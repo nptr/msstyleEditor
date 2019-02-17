@@ -22,15 +22,10 @@ int GetFormattedFontName(TCHAR* dst, int fontId, libmsstyle::VisualStyle& style)
 {
     USES_CONVERSION;
 
-    libmsstyle::StyleResource res = style.GetResource(fontId, libmsstyle::StyleResourceType::rtFont);
-    if (res.GetData())
+    auto it = style.GetStringTable().find(fontId);
+    if (it != style.GetStringTable().end())
     {
-        // GetResource(rtFont) returns a counted UTF16 string (no null term.), so
-        // copy carefully and add the terminator afterwards!
-        WCHAR fontName[64] = { 0 };
-        memcpy(fontName, res.GetData(), res.GetSize());
-
-        return _stprintf(dst, L"%d - %s", fontId, W2T(fontName));
+        return _stprintf(dst, L"%d - %s", fontId, A2T(it->second.c_str()));
     }
     else
     {

@@ -10,6 +10,6 @@ namespace libmsstyle
 class Exporter
 {
 public:
-	static void ExportLogicalStructure(const std::string& path, libmsstyle::VisualStyle& style);
+	static void ExportLogicalStructure(const std::wstring& path, libmsstyle::VisualStyle& style);
 };
 

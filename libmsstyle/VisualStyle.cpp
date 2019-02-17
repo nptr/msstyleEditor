@@ -56,6 +56,7 @@ namespace libmsstyle
 		Impl()
 			: m_propsFound(0)
 			, m_moduleHandle(0)
+            , m_canSaveStringTable(false)
 		{
 		}
 
@@ -153,31 +154,27 @@ namespace libmsstyle
 				if (pmap.size != 0)
 					LoadProperties(pmap);
 				else throw std::runtime_error("Style contains no properties!");
+
+                detail::LoadStringTable(m_moduleHandle, m_stringTable);
 			}
 			else throw std::runtime_error("Couldn't open file as PE resource!");
 		}
 
-		void SaveResources(detail::UpdateHandle updateHandle)
+        bool SaveResources(detail::UpdateHandle updateHandle, std::runtime_error& error)
 		{
 			for (auto& resource : m_resourceUpdates)
 			{
-				std::ifstream newImg(resource.second, std::ios::binary);
-				newImg.seekg(0, std::ios::end);
-				std::streampos size = newImg.tellg();
-				newImg.seekg(0, std::ios::beg);
+                char* buffer;
+                unsigned int length;
+                const char* resName;
 
-				if (size < 0)
+                if (!detail::FileReadAllBytes(resource.second, &buffer, &length))
 				{
                     char errorMsg[512];
                     sprintf(errorMsg, "Replacing resource with id '%d' failed because '%s' is not accessible or missing!", resource.first.GetNameID(), resource.second.c_str());
-                    throw std::runtime_error(errorMsg);
+                    error = std::runtime_error(errorMsg);
+                    return false;
 				}
-
-				char* imgBuffer = new char[size];
-				newImg.read(imgBuffer, size);
-				newImg.close();
-
-				const char* resName;
 
 				switch (resource.first.GetType())
 				{
@@ -191,21 +188,20 @@ namespace libmsstyle
 					continue;
 				}
 
-				bool success = detail::UpdateStyleResource(updateHandle, resName,
-					resource.first.GetNameID(), imgBuffer,
-					static_cast<unsigned int>(size));
+				bool success = detail::UpdateStyleResource(updateHandle, resName, resource.first.GetNameID(), buffer, length);
+                detail::FileFreeBytes(buffer);
+
 				if (!success)
 				{
-					throw std::runtime_error("Could not update IMAGE/STREAM resource!");
-					delete[] imgBuffer;
-					return;
+                    error = std::runtime_error("Could not update IMAGE/STREAM resource!");
+                    return false;
 				}
-
-				delete[] imgBuffer;
 			}
+
+            return true;
 		}
 
-		void SavePropertiesSorted(detail::UpdateHandle updateHandle)
+        bool SavePropertiesSorted(detail::UpdateHandle updateHandle, std::runtime_error& error)
 		{
 			// assume that twice the size common properties require is enough
 			int estimatedSize = m_propsFound * 48 * 2;
@@ -239,8 +235,11 @@ namespace libmsstyle
 						{
 							dataptr = writer.WriteProperty(dataptr, *(*propIt));
 
-							if (dataptr - data > estimatedSize)
-								throw std::runtime_error("I haven't allocated enough memory to save the file..sorry for that!");
+                            if (dataptr - data > estimatedSize)
+                            {
+                                error = std::runtime_error("I haven't allocated enough memory to save the file..sorry for that!");
+                                return false;
+                            }
 						}
 					}
 				}
@@ -255,47 +254,87 @@ namespace libmsstyle
 
             if (!detail::UpdateStyleResource(updateHandle, "VARIANT", "NORMAL", lid, data, length))
 			{
-				throw std::runtime_error("Could not update properties!");
-				return;
+				error = std::runtime_error("Could not update properties!");
+                return false;
 			}
+
+            return true;
 		}
 
 
-		void Save(const std::string& path)
-		{
-			// if source != destination
-			if (path != m_stylePath)
-			{
-				// copy the source file and modify the new one
-				// since we cant create a file from scratch
-				const std::string& originalFile = m_stylePath;
-				std::ifstream src(originalFile, std::ios::binary);
-
-				const std::string& newFile = path;
-				std::ofstream dst(newFile, std::ios::binary);
-				dst << src.rdbuf();
-			}
+        void Save(const std::string& path)
+        {
+            // if source != destination
+            if (path != m_stylePath)
+            {
+                // copy the source file and modify the new one
+                // since we cant create a file from scratch
+                const std::string& originalFile = m_stylePath;
+                const std::string& newFile = path;
+                detail::DuplicateFile(originalFile, newFile);
+            }
             else
             {
                 throw std::runtime_error("Cannot overwrite the original file!");
             }
 
             detail::UpdateHandle updHandle = detail::BeginUpdate(path);
-			if (updHandle == NULL)
-			{
-				throw std::runtime_error("Could not open the file for writing!");
-			}
+            if (updHandle == NULL)
+            {
+                detail::RemoveFile(path);
+                throw std::runtime_error("Could not open the file for writing! (BeginUpdateResource)");
+            }
 
-			SaveResources(updHandle);
-			SavePropertiesSorted(updHandle);
+            std::runtime_error error("");
 
-            int updateError = detail::EndUpdate(updHandle);
+            if (!SaveResources(updHandle, error))
+            {
+                detail::EndUpdate(updHandle, true);
+                detail::RemoveFile(path);
+                throw error;
+            }
+
+            if (!SavePropertiesSorted(updHandle, error))
+            {
+                detail::EndUpdate(updHandle, true);
+                detail::RemoveFile(path);
+                throw error;
+            }
+
+            if (m_canSaveStringTable)
+            {
+                detail::ModuleHandle modHandle = detail::OpenModule(path);
+                if (modHandle == NULL)
+                {
+                    detail::EndUpdate(updHandle, true);
+                    detail::RemoveFile(path);
+                    throw std::runtime_error("Could not open the file for writing! (LoadLibraryEx)");
+                }
+
+                if (!detail::UpdateStringTable(modHandle, updHandle, m_stringTable, error))
+                {
+                    detail::CloseModule(modHandle);
+                    detail::EndUpdate(updHandle, true);
+                    detail::RemoveFile(path);
+                    throw error;
+                }
+                else
+                {
+                    // close the module before calling EndUpdate(). If not
+                    // updating fails because the file is in use.
+                    detail::CloseModule(modHandle);
+                }
+            }
+
+            int updateError = detail::EndUpdate(updHandle, false);
 			if (updateError)
 			{
-				std::string msg = format_string("Could not write the changes to the file! ErrorCode: %d", updateError);
+				std::string msg = format_string("Could not write the changes to the file! Error Code: %d", updateError);
+                detail::RemoveFile(path);
 				throw std::runtime_error(msg);
 				return;
 			}
+
 		}
 
 
@@ -329,9 +368,6 @@ namespace libmsstyle
             case rtAtlas:
                 r = detail::GetResource(m_moduleHandle, id, "STREAM");
                 return StyleResource(r.data, r.size, 0, StyleResourceType::rtAtlas);
-            case rtFont:
-                r = detail::FindStringResource(m_moduleHandle, id, MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL));
-                return StyleResource(r.data, r.size * 2, 0, StyleResourceType::rtFont);
             default:
                 return StyleResource(nullptr, 0, 0, StyleResourceType::rtNone);
             }
@@ -350,9 +386,6 @@ namespace libmsstyle
             case DISKSTREAM:
                 r = detail::GetResource(m_moduleHandle, prop.header.shortFlag, "STREAM");
                 return StyleResource(r.data, r.size, 0, StyleResourceType::rtAtlas);
-            case FONT:
-                r = detail::FindStringResource(m_moduleHandle, prop.header.shortFlag, MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL));
-                return StyleResource(r.data, r.size * 2, 0, StyleResourceType::rtFont);
             default:
                 return StyleResource(nullptr, 0, 0, StyleResourceType::rtNone);
             }
@@ -522,10 +555,11 @@ namespace libmsstyle
 			else return Platform::WIN7;
 		}
 
-
+        bool m_canSaveStringTable;
 		int m_propsFound;
 		detail::ModuleHandle m_moduleHandle;
 		Platform m_stylePlatform;
+        StringTable m_stringTable;
 
 		std::string m_stylePath;
 		std::map<int32_t, StyleClass> m_classes;
@@ -620,4 +654,9 @@ namespace libmsstyle
 			return &(res->second);
 		else return nullptr;
 	}
+
+    StringTable& VisualStyle::GetStringTable()
+    {
+        return impl->m_stringTable;
+    }
 }

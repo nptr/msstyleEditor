@@ -137,6 +137,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="StringTable.h" />
     <ClInclude Include="Lookup.h" />
     <ClInclude Include="PropertyReader.h" />
     <ClInclude Include="PropertyWriter.h" />
@@ -154,6 +155,7 @@
     <ClInclude Include="VisualStyleStates.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="StringTable.cpp" />
     <ClCompile Include="Lookup.cpp" />
     <ClCompile Include="PropertyReader.cpp" />
     <ClCompile Include="PropertyWriter.cpp" />

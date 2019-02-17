@@ -10,7 +10,7 @@ class wxPGProperty;
 class wxPGChoices;
 
 wxPGProperty* GetWXPropertyFromMsStyleProperty(libmsstyle::VisualStyle& style, libmsstyle::StyleProperty& prop);
-wxPGChoices* GetFontsFromMsStyleProperty(libmsstyle::VisualStyle& style, libmsstyle::StyleProperty& prop);
+wxPGChoices* GetChoicesFromStringTable(libmsstyle::VisualStyle& style);
 wxPGChoices* GetEnumsFromMsStyleProperty(libmsstyle::StyleProperty& prop);
 
 std::string WideToUTF8(const std::wstring& str);

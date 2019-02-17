@@ -5,6 +5,7 @@
 #include "StyleState.h"
 #include "StyleProperty.h"
 #include "StyleResource.h"
+#include "StringTable.h"
 
 #include "VisualStyleParts.h"
 #include "VisualStyleEnums.h"
@@ -47,6 +48,8 @@ namespace libmsstyle
 
         StyleResource GetResource(int id, StyleResourceType type);
 		StyleResource GetResourceFromProperty(const StyleProperty& prop);
+
+        StringTable& GetStringTable();
 
 	private:
 		class Impl;

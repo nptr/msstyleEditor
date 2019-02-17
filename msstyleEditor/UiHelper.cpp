@@ -116,11 +116,11 @@ wxPGProperty* GetWXPropertyFromMsStyleProperty(VisualStyle& style, StyleProperty
 	}
 	case IDENTIFIER::FONT:
 	{
-        wxPGChoices* cp = GetFontsFromMsStyleProperty(style, prop);
 		wxPGProperty* p;
 
-		if (cp != nullptr)
+        if (style.GetStringTable().size() > 0)
 		{
+            wxPGChoices* cp = GetChoicesFromStringTable(style);
 			p = new wxEnumProperty(propName, *wxPGProperty::sm_wxPG_LABEL, *cp, prop.GetResourceID());
 			delete cp;
 		}
@@ -175,30 +175,16 @@ wxPGChoices* GetEnumsFromMsStyleProperty(libmsstyle::StyleProperty& prop)
 	return choices;
 }
 
-wxPGChoices* GetFontsFromMsStyleProperty(libmsstyle::VisualStyle& style, libmsstyle::StyleProperty& prop)
+wxPGChoices* GetChoicesFromStringTable(libmsstyle::VisualStyle& style)
 {
-    wchar_t fontname[64];
-    wchar_t textbuffer[64];
+    char textbuffer[128];
 	wxPGChoices* choices = new wxPGChoices();
     
-    for (int fontId = 501; fontId < 512; ++fontId)
+    libmsstyle::StringTable table = style.GetStringTable();
+    for (auto& entry : table)
     {
-        StyleResource res = style.GetResource(fontId, StyleResourceType::rtFont);
-        if (res.GetData())
-        {
-            // it's a counted string so we need to add that null terminator
-            // so it can be used in sprintf()
-            memcpy(fontname, res.GetData(), res.GetSize()); 
-            fontname[res.GetSize() / 2] = 0;
-
-            wsprintf(textbuffer, L"%d - %s", fontId, fontname);
-            choices->Add(wxString(textbuffer), fontId);
-        }
-        else
-        {
-            wsprintf(textbuffer, L"%d - Undefined", fontId);
-            choices->Add(wxString(textbuffer), fontId);
-        }
+        sprintf(textbuffer, "%d - %s", entry.first, entry.second.c_str());
+        choices->Add(wxString::FromUTF8(textbuffer), entry.first);
     }
 
 	return choices;

@@ -36,6 +36,7 @@ private:
 	static const int ID_FIND = 460;
 	static const int ID_PROP_CREATE = 461;
 	static const int ID_PROP_DELETE = 462;
+    static const int ID_STRING_RESOURCES = 463;
 
 	libmsstyle::VisualStyle* currentStyle;
 	libmsstyle::StyleResource selectedImage;
@@ -63,10 +64,11 @@ protected:
 	wxMenu* propContextMenu;
 	wxMenuBar* mainmenu;
 	wxMenu* fileMenu;
+    wxMenu* editMenu;
+    wxMenu* viewMenu;
 	wxMenu* themeMenu;
 	wxMenu* aboutMenu;
-	wxMenu* imageMenu;
-	wxMenu* viewMenu;
+
 	wxStatusBar* statusBar;
 	SearchDialog* searchDlg;
 
@@ -78,6 +80,7 @@ protected:
 	void OnPropertyGridItemCreate(wxCommandEvent& container);
 	void OnImageExportClicked(wxCommandEvent& event);
 	void OnImageReplaceClicked(wxCommandEvent& event);
+    void OnEditStringResources(wxCommandEvent& event);
 	void OnAboutClicked(wxCommandEvent& event);
 	void OnHelpClicked(wxCommandEvent& event);
 	void OnCollapseClicked(wxCommandEvent& event);

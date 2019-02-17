@@ -9,7 +9,6 @@ namespace libmsstyle
 		rtNone,
 		rtImage,	// image
 		rtAtlas,	// image atlas
-        rtFont
 	};
 
 	class StyleResource

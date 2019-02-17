@@ -13,10 +13,10 @@ std::string WStringToUTF8(const std::wstring& str)
 	return myconv.to_bytes(str);
 }
 
-void Exporter::ExportLogicalStructure(const std::string& path, libmsstyle::VisualStyle& style)
+void Exporter::ExportLogicalStructure(const std::wstring& path, libmsstyle::VisualStyle& style)
 {
-	std::ofstream file(path);
-	if (!file.is_open())
+    FILE* file = _wfopen(path.c_str(), L"w");
+    if (!file)
 		throw new std::runtime_error("Can't open or create the file!");
 
 	char buffer[128];
@@ -83,7 +83,7 @@ void Exporter::ExportLogicalStructure(const std::string& path, libmsstyle::Visua
 
 	txt.append("END STRUCTURE");
 
-	file.write(txt.c_str(), txt.length());
-	file.close();
+    fwrite(txt.c_str(), txt.length(), 1, file);
+    fclose(file);
 	return;
 }
