@@ -35,6 +35,7 @@ MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, c
 	: wxFrame(parent, id, title, pos, size, style)
 	, currentStyle(nullptr)
 	, selectedImageProp(nullptr)
+    , searchDlg(nullptr)
 {	
 	this->SetSizeHints(wxSize(900, 600), wxDefaultSize);
 	this->SetBackgroundColour(wxSystemSettings::GetColour(wxSystemColour::wxSYS_COLOUR_LISTBOX));

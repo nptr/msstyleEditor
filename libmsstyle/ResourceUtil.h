@@ -5,7 +5,7 @@
 
 namespace libmsstyle
 {
-    namespace detail
+    namespace priv
     {
         typedef struct
         {

@@ -10,7 +10,7 @@
 
 namespace libmsstyle
 {
-    namespace detail
+    namespace priv
     {
         /**************************************************************************
         * FILE STUFF I SHOULD PUT SOMEWHERE ELSE
@@ -26,7 +26,9 @@ namespace libmsstyle
         {
             std::wstring wsrc = UTF8ToWide(src);
             std::wstring wdst = UTF8ToWide(dst);
-            return CopyFileW(wsrc.c_str(), wdst.c_str(), TRUE) == TRUE;
+
+            // FALSE: don't fail, force overwrite
+            return CopyFileW(wsrc.c_str(), wdst.c_str(), FALSE) == TRUE;
         }
 
         bool FileReadAllBytes(const std::string& src, char** buffer, unsigned int* length)
