@@ -1,8 +1,6 @@
 #include "Exporter.h"
 #include "libmsstyle\VisualStyle.h"
 
-#include <fstream>
-#include <iostream>
 #include <string>
 #include <codecvt>
 

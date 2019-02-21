@@ -10,7 +10,6 @@
 #include "PropertyWriter.h"
 
 #include <string.h>
-#include <fstream>
 #include <algorithm>
 #include <cstdarg>
 

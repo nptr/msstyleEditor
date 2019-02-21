@@ -19,7 +19,6 @@
 #include <wx\wfstream.h>
 #include <wx\wupdlock.h>
 
-#include <fstream>
 #include <algorithm>
 #include <string>
 #include <cctype>	// std::isspace
