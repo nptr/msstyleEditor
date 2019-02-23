@@ -17,6 +17,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libmsstyleTests", "libmssty
 		{223AE9F1-462F-47D5-82C4-3241520D0C8C} = {223AE9F1-462F-47D5-82C4-3241520D0C8C}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "msstyleEditorWTL", "msstyleEditorWTL\msstyleEditorWTL.vcxproj", "{3A8A2FA5-78C2-49EA-9D90-2985E92E2E55}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -49,6 +51,14 @@ Global
 		{48A9C9BC-870B-44AF-B615-60ECA0614B1D}.Release|Win32.Build.0 = Release|Win32
 		{48A9C9BC-870B-44AF-B615-60ECA0614B1D}.Release|x64.ActiveCfg = Release|x64
 		{48A9C9BC-870B-44AF-B615-60ECA0614B1D}.Release|x64.Build.0 = Release|x64
+		{3A8A2FA5-78C2-49EA-9D90-2985E92E2E55}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3A8A2FA5-78C2-49EA-9D90-2985E92E2E55}.Debug|Win32.Build.0 = Debug|Win32
+		{3A8A2FA5-78C2-49EA-9D90-2985E92E2E55}.Debug|x64.ActiveCfg = Debug|x64
+		{3A8A2FA5-78C2-49EA-9D90-2985E92E2E55}.Debug|x64.Build.0 = Debug|x64
+		{3A8A2FA5-78C2-49EA-9D90-2985E92E2E55}.Release|Win32.ActiveCfg = Release|Win32
+		{3A8A2FA5-78C2-49EA-9D90-2985E92E2E55}.Release|Win32.Build.0 = Release|Win32
+		{3A8A2FA5-78C2-49EA-9D90-2985E92E2E55}.Release|x64.ActiveCfg = Release|x64
+		{3A8A2FA5-78C2-49EA-9D90-2985E92E2E55}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

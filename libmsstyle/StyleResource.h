@@ -6,9 +6,9 @@ namespace libmsstyle
 {
 	enum StyleResourceType
 	{
-		NONE,
-		IMAGE,	// image
-		ATLAS	// image atlas
+		rtNone,
+		rtImage,	// image
+		rtAtlas,	// image atlas
 	};
 
 	class StyleResource

@@ -73,13 +73,13 @@ namespace libmsstyle
 			// 40 bytes - padding included
 			case IDENTIFIER::INT:
 			case IDENTIFIER::SIZE:
-			case IDENTIFIER::BOOL:
+			case IDENTIFIER::BOOLTYPE:
 			case IDENTIFIER::COLOR:
 			case IDENTIFIER::ENUM:
 			case IDENTIFIER::POSITION:
 			case IDENTIFIER::HIGHCONTRASTCOLORTYPE:
 			// 48 bytes - padding included
-			case IDENTIFIER::RECT:
+			case IDENTIFIER::RECTTYPE:
 			case IDENTIFIER::MARGINS:
 			{
 				// copy data from known prop

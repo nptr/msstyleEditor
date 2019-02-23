@@ -28,6 +28,5 @@ namespace libmsstyle
 
 		const char* FindPropertyName(int nameID);
 		const char* FindTypeName(int typeID);
-		std::string FindFontName(int fontID);
 	}
 }

@@ -2,6 +2,7 @@
 #include "AboutDialog.h"
 #include "HelpDialog.h"
 #include "AddPropertyDialog.h"
+#include "StringResourceDialog.h"
 
 #include "CustomFileDropTarget.h"
 #include "CustomTreeItemData.h"
@@ -18,7 +19,6 @@
 #include <wx\wfstream.h>
 #include <wx\wupdlock.h>
 
-#include <fstream>
 #include <algorithm>
 #include <string>
 #include <cctype>	// std::isspace
@@ -34,6 +34,7 @@ MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, c
 	: wxFrame(parent, id, title, pos, size, style)
 	, currentStyle(nullptr)
 	, selectedImageProp(nullptr)
+    , searchDlg(nullptr)
 {	
 	this->SetSizeHints(wxSize(900, 600), wxDefaultSize);
 	this->SetBackgroundColour(wxSystemSettings::GetColour(wxSystemColour::wxSYS_COLOUR_LISTBOX));
@@ -66,41 +67,57 @@ MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, c
 	this->Layout();
 
 	mainmenu = new wxMenuBar();
+    fileMenu = new wxMenu();
+    editMenu = new wxMenu();
+    viewMenu = new wxMenu();
+    themeMenu = new wxMenu();
 	aboutMenu = new wxMenu();
-	fileMenu = new wxMenu();
-	themeMenu = new wxMenu();
-	imageMenu = new wxMenu();
-	viewMenu = new wxMenu();
 
 	wxMenu* exportSubMenu = new wxMenu();
 	exportSubMenu->Append(ID_EXPORT_TREE, wxT("Style Info"));
 
-	fileMenu->Append(ID_FOPEN, wxT("&Open"));
-	fileMenu->Append(ID_FSAVE, wxT("&Save"));
-	fileMenu->AppendSubMenu(exportSubMenu, wxT("Export ..."));
+	fileMenu->Append(ID_FOPEN, wxT("&Open\tCtrl+O"));
+	fileMenu->Append(ID_FSAVE, wxT("&Save\tCtrl+S"));
+	fileMenu->AppendSubMenu(exportSubMenu, wxT("&Export ..."));
 	fileMenu->Enable(ID_FSAVE, false);
 
 	themeMenu->Append(ID_THEME_APPLY, wxT(TEXT_PLAY));
 
-	imageMenu->Append(ID_IEXPORT, wxT("&Export"));
-	imageMenu->Append(ID_IREPLACE, wxT("&Replace"));
-	imageMenu->Enable(ID_IEXPORT, false);
-	imageMenu->Enable(ID_IREPLACE, false);
+    editMenu->Append(ID_IEXPORT, wxT("Image &Export"));
+    editMenu->Append(ID_IREPLACE, wxT("Image &Replace"));
+    editMenu->Enable(ID_IEXPORT, false);
+    editMenu->Enable(ID_IREPLACE, false);
+    // Not useful yet because saving string tables doesn't work atm
+    //editMenu->AppendSeparator();
+    //editMenu->Append(ID_STRING_RESOURCES, wxT("&String Resources"));
+    //editMenu->Enable(ID_STRING_RESOURCES, false);
+    editMenu->AppendSeparator();
+    editMenu->Append(ID_FIND, wxT("&Find\tCtrl+F"));
 	
 	aboutMenu->Append(ID_HELP, wxT("&License"));
 	aboutMenu->Append(ID_ABOUT, wxT("&About"));
 
+    //
+    // Image View  & Context Menu
+    //
+    imageViewMenu = new wxMenu();
+    imageViewMenu->AppendRadioItem(ID_BG_WHITE, wxT("White"));
+    imageViewMenu->AppendRadioItem(ID_BG_GREY, wxT("Light Grey"))->Check();
+    imageViewMenu->AppendRadioItem(ID_BG_BLACK, wxT("Black"));
+    imageViewMenu->AppendRadioItem(ID_BG_CHESS, wxT("Chessboard"));
+
 	viewMenu->Append(ID_EXPAND_TREE, wxT("&Expand All"));
 	viewMenu->Append(ID_COLLAPSE_TREE, wxT("&Collapse All"));
+    viewMenu->AppendSubMenu(imageViewMenu, wxT("&Background"));
 	viewMenu->AppendSeparator();
 	viewMenu->Append(ID_THEMEFOLDER, wxT("&Theme Folder"));
 	viewMenu->Enable(ID_RESOURCEDLG, false);
 
 	mainmenu->Append(fileMenu, wxT("&File"));
+    mainmenu->Append(editMenu, wxT("&Edit"));
+    mainmenu->Append(viewMenu, wxT("&View"));
 	mainmenu->Append(themeMenu, wxT("&Theme"));
-	mainmenu->Append(imageMenu, wxT("&Image"));
-	mainmenu->Append(viewMenu, wxT("&View"));
-	mainmenu->Append(aboutMenu, wxT("I&nfo"));
+	mainmenu->Append(aboutMenu, wxT("&Info"));
 	this->SetMenuBar(mainmenu);
 
 	statusBar = this->CreateStatusBar(1);
@@ -113,6 +130,7 @@ MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, c
 
 	Connect(ID_IEXPORT, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnImageExportClicked));
 	Connect(ID_IREPLACE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnImageReplaceClicked));
+    Connect(ID_STRING_RESOURCES, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnEditStringResources));
 	Connect(ID_ABOUT, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnAboutClicked));
 	Connect(ID_HELP, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnHelpClicked));
 	Connect(ID_COLLAPSE_TREE, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnCollapseClicked));
@@ -120,14 +138,6 @@ MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, c
 	Connect(ID_THEMEFOLDER, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnOpenThemeFolder));
 	Connect(ID_FIND, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnOpenSearchDlg));
 
-	//
-	// Image View  & Context Menu
-	//
-	imageViewMenu = new wxMenu();
-	imageViewMenu->AppendRadioItem(ID_BG_WHITE, wxT("White"));
-	imageViewMenu->AppendRadioItem(ID_BG_GREY, wxT("Light Grey"))->Check();
-	imageViewMenu->AppendRadioItem(ID_BG_BLACK, wxT("Black"));
-	imageViewMenu->AppendRadioItem(ID_BG_CHESS, wxT("Chessboard"));
 
 	imageView->Connect(wxEVT_CONTEXT_MENU, wxContextMenuEventHandler(MainWindow::OnImageViewContextMenuTriggered), NULL, this);
 	Connect(ID_BG_WHITE, ID_BG_CHESS, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainWindow::OnImageViewBgSelect));
@@ -150,10 +160,11 @@ MainWindow::MainWindow(wxWindow* parent, wxWindowID id, const wxString& title, c
 
 	this->SetDropTarget(new CustomFileDropTarget(*this));
 
-	wxAcceleratorEntry entries[2];
+	wxAcceleratorEntry entries[3];
 	entries[0].Set(wxAcceleratorEntryFlags::wxACCEL_CTRL, wxKeyCode::WXK_CONTROL_F, ID_FIND);
 	entries[1].Set(wxAcceleratorEntryFlags::wxACCEL_CTRL, wxKeyCode::WXK_CONTROL_S, ID_FSAVE);
-	wxAcceleratorTable table(2, entries);
+    entries[2].Set(wxAcceleratorEntryFlags::wxACCEL_CTRL, wxKeyCode::WXK_CONTROL_O, ID_FOPEN);
+	wxAcceleratorTable table(3, entries);
 	SetAcceleratorTable(table);
 }
 
@@ -180,9 +191,12 @@ void MainWindow::OnFileSaveMenuClicked(wxCommandEvent& event)
 
 	try
 	{
-		currentStyle->Save(saveFileDialog.GetPath().ToStdString());
-		statusBar->SetStatusText("Style saved successfully!");
+        wxString wxpath = saveFileDialog.GetPath();
+        const wxScopedCharBuffer buf = wxpath.ToUTF8();
+        std::string utf8Path(buf.data(), buf.length());
 
+        currentStyle->Save(utf8Path);
+		statusBar->SetStatusText("Style saved successfully!");
 	}
 	catch (std::runtime_error err)
 	{
@@ -201,7 +215,7 @@ void MainWindow::OnExportLogicalStructure(wxCommandEvent& event)
 		if (saveFileDialog.ShowModal() == wxID_CANCEL)
 			return;
 
-		Exporter::ExportLogicalStructure(saveFileDialog.GetPath().ToStdString(), *currentStyle);
+		Exporter::ExportLogicalStructure(saveFileDialog.GetPath().ToStdWstring(), *currentStyle);
 	}
 	catch (std::runtime_error ex)
 	{
@@ -355,16 +369,15 @@ void MainWindow::OnClassViewTreeSelChanged(wxTreeEvent& event)
 		StyleResourceType type;
 		if (selectedImageProp->GetTypeID() == IDENTIFIER::FILENAME ||
 			selectedImageProp->GetTypeID() == IDENTIFIER::FILENAME_LITE)
-			type = StyleResourceType::IMAGE;
+			type = StyleResourceType::rtImage;
 		else if (selectedImageProp->GetTypeID() == IDENTIFIER::DISKSTREAM)
-			type = StyleResourceType::ATLAS;
-		else type = StyleResourceType::NONE;
+			type = StyleResourceType::rtAtlas;
+		else type = StyleResourceType::rtNone;
 
 		std::string file = currentStyle->GetQueuedResourceUpdate(selectedImageProp->GetResourceID(), type);
 		if (!file.empty())
 		{
-			wxString tmpFile(file);
-			ShowImageFromFile(tmpFile);
+			ShowImageFromFile(wxString::FromUTF8(file.c_str()));
 
 			statusBar->SetStatusText(wxString::Format("C: %d, P: %d, Img: %d*", selection.ClassId, selection.PartId, selectedImageProp->GetResourceID()));
 		}
@@ -410,7 +423,7 @@ void MainWindow::OnPropertyGridChanging(wxPropertyGridEvent& event)
 	case IDENTIFIER::HIGHCONTRASTCOLORTYPE:
 	case IDENTIFIER::ENUM:
 		styleProp->UpdateEnum(event.GetValidationInfo().GetValue().GetInteger()); break;
-	case IDENTIFIER::BOOL:
+	case IDENTIFIER::BOOLTYPE:
 		styleProp->UpdateBoolean(event.GetValidationInfo().GetValue().GetBool()); break;
 	case IDENTIFIER::COLOR:
 	{
@@ -418,7 +431,7 @@ void MainWindow::OnPropertyGridChanging(wxPropertyGridEvent& event)
 		wxColor color = value.As<wxColour>();
 		styleProp->UpdateColor(color.Red(), color.Green(), color.Blue());
 	} break;
-	case IDENTIFIER::RECT:
+	case IDENTIFIER::RECTTYPE:
 	case IDENTIFIER::MARGINS:
 	{
 		int l, t, r, b;
@@ -430,7 +443,7 @@ void MainWindow::OnPropertyGridChanging(wxPropertyGridEvent& event)
 		}
 		else
 		{
-			if (styleProp->header.typeID == IDENTIFIER::RECT)
+			if (styleProp->header.typeID == IDENTIFIER::RECTTYPE)
 				styleProp->UpdateRectangle(l, t, r, b);
 			if (styleProp->header.typeID == IDENTIFIER::MARGINS)
 				styleProp->UpdateMargin(l, t, r, b);
@@ -575,14 +588,23 @@ void MainWindow::OnImageReplaceClicked(wxCommandEvent& event)
 	{
 	case IDENTIFIER::FILENAME:
 	case IDENTIFIER::FILENAME_LITE:
-		tp = StyleResourceType::IMAGE; break;
+		tp = StyleResourceType::rtImage; break;
 	case IDENTIFIER::DISKSTREAM:
-		tp = StyleResourceType::ATLAS; break;
+		tp = StyleResourceType::rtAtlas; break;
 	default:
-		tp = StyleResourceType::NONE; break;
+		tp = StyleResourceType::rtNone; break;
 	}
 
-	currentStyle->QueueResourceUpdate(selectedImageProp->GetResourceID(), tp, openFileDialog.GetPath().ToStdString());
+    wxString path = openFileDialog.GetPath();
+    const wxScopedCharBuffer buf = path.ToUTF8();
+    std::string utf8Path(buf.data(), buf.length());
+    currentStyle->QueueResourceUpdate(selectedImageProp->GetResourceID(), tp, utf8Path);
+}
+
+void MainWindow::OnEditStringResources(wxCommandEvent& event)
+{
+    StringResourceDialog dlg(this, currentStyle->GetStringTable());
+    dlg.ShowModal();
 }
 
 void MainWindow::OnImageViewContextMenuTriggered(wxContextMenuEvent& event)
@@ -817,7 +839,7 @@ bool ContainsProperty(const SearchProperties& search, wxTreeItemData* treeItemDa
 					if (ContainsStringInvariant(std::string(propMargin), tmp))
 						return true;
 				} break;
-				case IDENTIFIER::RECT:
+				case IDENTIFIER::RECTTYPE:
 				{
 					char propRect[32];
 					sprintf(propRect, "%d,%d,%d,%d",
@@ -952,11 +974,15 @@ void MainWindow::OpenStyle(const wxString& file)
 
 	try
 	{
-		currentStyle->Load(file.ToStdString());
+        const wxScopedCharBuffer buf = file.ToUTF8();
+        std::string utf8Path(buf.data(), buf.length());
+        currentStyle->Load(utf8Path);
 	}
 	catch (std::exception& ex)
 	{
-		wxMessageBox(ex.what(), "Error loading style!", wxICON_ERROR, this);
+        wxString message("Are you sure this is a Windows Vista, 7, 8 or 10 visual style?\r\n\r\nDetails: ");
+        message += ex.what();
+        wxMessageBox(message, "Error loading style!", wxICON_ERROR, this);
 		delete currentStyle;
 		currentStyle = nullptr;
 		return;
@@ -964,14 +990,15 @@ void MainWindow::OpenStyle(const wxString& file)
 
 	FillClassView();
 
-	imageMenu->Enable(ID_IEXPORT, true);
-	imageMenu->Enable(ID_IREPLACE, true);
+	editMenu->Enable(ID_IEXPORT, true);
+    editMenu->Enable(ID_IREPLACE, true);
+    editMenu->Enable(ID_STRING_RESOURCES, true);
 	fileMenu->Enable(ID_FSAVE, true);
 	themeMenu->Enable(ID_THEME_APPLY, true);
 	viewMenu->Enable(ID_RESOURCEDLG, true);
 
 
-	this->SetTitle(wxString("msstyleEditor - ") + wxString(currentStyle->GetPath()));
+    this->SetTitle(wxString("msstyleEditor - ") + wxString::FromUTF8(currentStyle->GetPath().c_str()));
 }
 
 void MainWindow::CloseStyle()
@@ -1047,7 +1074,7 @@ void MainWindow::FillPropertyView(StylePart& part)
 		category->SetClientData(&state);
 		for (auto& prop : state.second)
 		{
-			category->AppendChild(GetWXPropertyFromMsStyleProperty(*prop));
+			category->AppendChild(GetWXPropertyFromMsStyleProperty(*currentStyle , *prop));
 		}
 		propView->Append(category);
 	}
@@ -1069,9 +1096,15 @@ void MainWindow::ShowImageFromResource(const StyleProperty* prop)
 void MainWindow::ShowImageFromFile(wxString& imgPath)
 {
 	wxFileInputStream stream(imgPath);
-
-	wxImage img(stream, wxBITMAP_TYPE_PNG);
-	imageView->SetImage(img);
+    if (stream.IsOk())
+    {
+        wxImage img(stream, wxBITMAP_TYPE_PNG);
+        imageView->SetImage(img);
+    }
+    else
+    {
+        wxMessageBox("Replacement image '" + imgPath.ToStdString() + "' is not accessible or missing!", "Error loading image!", wxICON_ERROR, this);
+    }
 }
 
 
@@ -1083,6 +1116,4 @@ MainWindow::~MainWindow()
 		delete currentStyle;
 		currentStyle = nullptr;
 	}
-
-	delete imageViewMenu; // not wxWidgets managed!
 }

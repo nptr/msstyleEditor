@@ -1,0 +1,99 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{3b0f6fdc-eebc-46ff-b203-41af2d14bbaf}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;jpg;jpeg;jpe;manifest</Extensions>
+    </Filter>
+    <Filter Include="Controls">
+      <UniqueIdentifier>{3daeeeb4-a4f0-4045-8bbb-b71410d7d5cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dialogs">
+      <UniqueIdentifier>{b2a3e529-68b8-441b-8141-69e4fa872104}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="msstyleEditorWTL.cpp" />
+    <ClCompile Include="Helper.cpp" />
+    <ClCompile Include="ThemeManager.cpp" />
+    <ClCompile Include="Dialogs\MainFrm.cpp">
+      <Filter>Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="precompiled.cpp" />
+    <ClCompile Include="SearchLogic.cpp" />
+    <ClCompile Include="Exporter.cpp" />
+    <ClCompile Include="Controls\propertyGrid.cpp">
+      <Filter>Controls</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="Helper.h" />
+    <ClInclude Include="Controls\ImageCtrl.h">
+      <Filter>Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="ThemeManager.h" />
+    <ClInclude Include="UxthemeUndocumented.h" />
+    <ClInclude Include="Dialogs\AboutDlg.h">
+      <Filter>Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="Dialogs\MainFrm.h">
+      <Filter>Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="Dialogs\SearchDlg.h">
+      <Filter>Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="precompiled.h" />
+    <ClInclude Include="SearchLogic.h" />
+    <ClInclude Include="Dialogs\AddPropDlg.h">
+      <Filter>Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="Exporter.h" />
+    <ClInclude Include="ItemData.h" />
+    <ClInclude Include="Controls\DropTarget.h">
+      <Filter>Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="Dialogs\LicenseDlg.h">
+      <Filter>Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="Dialogs\TestDlg.h">
+      <Filter>Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="Controls\propertyGrid.h">
+      <Filter>Controls</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="msstyleEditorWTL.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\msstyleEditorWTL.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\Find.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\Add.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\Remove.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\Start.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\Stop.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\Toolicons.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="res\License.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+  </ItemGroup>
+</Project>

@@ -76,7 +76,7 @@ namespace libmsstyle
 		}colorlist;
 		struct
 		{
-			wchar_t firstChar;		// first UTF16 character of the string. Not sure if null terminated...
+			wchar_t firstChar;		// first wide character of the string. Not sure if null terminated...
 		}texttype;
 	};
 	#pragma pack(pop)

@@ -4,7 +4,7 @@
 
 namespace libmsstyle
 {
-	typedef struct
+	typedef struct _StateMap
 	{
 		int32_t stateID;
 		const char* stateName;
@@ -25,6 +25,14 @@ namespace libmsstyle
 	extern const StateMap STATES_COMMANDLINK[7];
 
 	extern const StateMap STATES_COMMANDLINKGLYPHS[6];
+
+    extern const StateMap STATES_COMMANDMODULE_SPLITBUTTON[7];
+
+    extern const StateMap STATES_COMMANDMODULE_LIBRARYPANE_GEN[3];
+
+    extern const StateMap STATES_CONTROLPANEL_CONTENTPANE[2];
+
+    extern const StateMap STATES_COPYCLOSEBTN[6];
 
 	extern const StateMap STATES_CB_STYLE[5];
 
@@ -152,7 +160,7 @@ namespace libmsstyle
 
 	extern const StateMap STATES_TOOLTIP_WRENCH[4];
 
-	extern const StateMap STATES_TRACKBAR_GENERAL[6];
+	extern const StateMap STATES_TRACKBAR_GENERAL[2];
 
 	extern const StateMap STATES_TRACKBAR_THUMB_GEN[6];
 

@@ -32,6 +32,9 @@
       <Filter>GUI</Filter>
     </ClCompile>
     <ClCompile Include="ThemeManager.cpp" />
+    <ClCompile Include="StringResourceDialog.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AboutDialog.h">
@@ -65,6 +68,9 @@
       <Filter>GUI</Filter>
     </ClInclude>
     <ClInclude Include="ThemeManager.h" />
+    <ClInclude Include="StringResourceDialog.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="msstyleEditor.rc" />

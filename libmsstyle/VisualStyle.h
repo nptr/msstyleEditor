@@ -5,6 +5,7 @@
 #include "StyleState.h"
 #include "StyleProperty.h"
 #include "StyleResource.h"
+#include "StringTable.h"
 
 #include "VisualStyleParts.h"
 #include "VisualStyleEnums.h"
@@ -41,9 +42,14 @@ namespace libmsstyle
 		Platform GetCompatiblePlatform() const;
 		const std::string& GetPath() const;
 
+
 		std::string GetQueuedResourceUpdate(int nameId, StyleResourceType type);
 		void QueueResourceUpdate(int nameId, StyleResourceType type, const std::string& pathToNew);
+
+        StyleResource GetResource(int id, StyleResourceType type);
 		StyleResource GetResourceFromProperty(const StyleProperty& prop);
+
+        StringTable& GetStringTable();
 
 	private:
 		class Impl;

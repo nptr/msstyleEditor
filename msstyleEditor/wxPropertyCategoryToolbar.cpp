@@ -35,7 +35,7 @@ bool wxCategoryToolbarRenderer::Render(wxDC& dc, const wxRect& rect,
 			featureWidth,
 			featureHeight);
 
-		if (cat->IsExpanded())
+		if (cat->IsExpanded() || cat->GetChildCount() == 0)
 		{
 			if (cat->GetChildCount() > 0)
 			{

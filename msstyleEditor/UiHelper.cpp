@@ -31,7 +31,7 @@ wxPGProperty* GetWXPropertySpecialProps(StyleProperty& prop)
 	else return nullptr;
 }
 
-wxPGProperty* GetWXPropertyFromMsStyleProperty(StyleProperty& prop)
+wxPGProperty* GetWXPropertyFromMsStyleProperty(VisualStyle& style, StyleProperty& prop)
 {
 	char str[64];
 	const char* propName = prop.LookupName();
@@ -87,7 +87,7 @@ wxPGProperty* GetWXPropertyFromMsStyleProperty(StyleProperty& prop)
 		p->SetClientData(&prop);
 		return p;
 	}
-	case IDENTIFIER::BOOL:
+	case IDENTIFIER::BOOLTYPE:
 	{
 		wxIntProperty* p = new wxIntProperty(propName, *wxPGProperty::sm_wxPG_LABEL, prop.data.booltype.boolvalue);
 		p->SetClientData(&prop);
@@ -100,7 +100,7 @@ wxPGProperty* GetWXPropertyFromMsStyleProperty(StyleProperty& prop)
 		p->SetClientData(&prop);
 		return p;
 	}
-	case IDENTIFIER::RECT:
+	case IDENTIFIER::RECTTYPE:
 	{
 		sprintf(str, "%d, %d, %d, %d", prop.data.recttype.left, prop.data.recttype.top, prop.data.recttype.right, prop.data.recttype.bottom);
 		wxStringProperty* p = new wxStringProperty(propName, *wxPGProperty::sm_wxPG_LABEL, str);
@@ -116,11 +116,11 @@ wxPGProperty* GetWXPropertyFromMsStyleProperty(StyleProperty& prop)
 	}
 	case IDENTIFIER::FONT:
 	{
-		wxPGChoices* cp = GetFontsFromMsStyleProperty(prop);
 		wxPGProperty* p;
 
-		if (cp != nullptr)
+        if (style.GetStringTable().size() > 0)
 		{
+            wxPGChoices* cp = GetChoicesFromStringTable(style);
 			p = new wxEnumProperty(propName, *wxPGProperty::sm_wxPG_LABEL, *cp, prop.GetResourceID());
 			delete cp;
 		}
@@ -175,14 +175,17 @@ wxPGChoices* GetEnumsFromMsStyleProperty(libmsstyle::StyleProperty& prop)
 	return choices;
 }
 
-wxPGChoices* GetFontsFromMsStyleProperty(libmsstyle::StyleProperty& prop)
+wxPGChoices* GetChoicesFromStringTable(libmsstyle::VisualStyle& style)
 {
+    char textbuffer[128];
 	wxPGChoices* choices = new wxPGChoices();
-
-	for (auto it = libmsstyle::FONT_MAP.begin(); it != libmsstyle::FONT_MAP.end(); ++it)
-	{
-		choices->Add(it->second, it->first);
-	}
+    
+    libmsstyle::StringTable table = style.GetStringTable();
+    for (auto& entry : table)
+    {
+        sprintf(textbuffer, "%d - %s", entry.first, entry.second.c_str());
+        choices->Add(wxString::FromUTF8(textbuffer), entry.first);
+    }
 
 	return choices;
 }
