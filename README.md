@@ -11,9 +11,8 @@ Note: Versions prior to 1.3.0.0 required the [Microsoft Visual C++ Redistributab
 
 ## Limitations
 + can't create styles from scratch
-+ can't add classes/parts/states
 + can't edit certain property types (e.g. INTLISTs.)
-+ font properties might be labeled incorrectly (hardcoded font names for now..)
++ can't add new fonts
 + can't remove image properties
 + no preview of items in image atlases
 + supports only .png ' s

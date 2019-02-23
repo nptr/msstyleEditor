@@ -48,6 +48,7 @@ SearchDialog::SearchDialog(wxWindow* parent, wxWindowID id, const wxString& titl
 
 	this->SetSizer(bSizer9);
 	this->Layout();
+    bSizer9->Fit(this);
 
 	this->Centre(wxBOTH);
 

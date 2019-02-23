@@ -85,7 +85,8 @@ AddPropertyDialog::AddPropertyDialog(wxWindow* parent, wxWindowID id, const wxSt
 	bSizer13->Add(bSizer14, 0, wxEXPAND, 5);
 
 	descriptionLabel = new wxStaticText(this, wxID_ANY, wxT("Description:"), wxDefaultPosition, wxDefaultSize, wxST_NO_AUTORESIZE);
-	descriptionLabel->Wrap(300);
+    descriptionLabel->SetSizeHints(wxSize(300, 75));
+    descriptionLabel->Wrap(300);
 	bSizer13->Add(descriptionLabel, 1, wxALL | wxEXPAND, 5);
 
 	m_staticLine = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL);
@@ -97,6 +98,8 @@ AddPropertyDialog::AddPropertyDialog(wxWindow* parent, wxWindowID id, const wxSt
 
 	this->SetSizer(bSizer13);
 	this->Layout();
+    bSizer13->Fit(this);
+
 	this->Centre(wxBOTH);
 
 	typeBox->Connect(wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler(AddPropertyDialog::OnTypeSelectionChanged), NULL, this);
