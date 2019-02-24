@@ -38,14 +38,9 @@ namespace libmsstyle
 			// Arbitrary
 			case IDENTIFIER::INTLIST:
 			{
-				// I encountered an INTLIST prop, that had the
-				// short indicator NOT set, but still ended right
-				// after it. That shouldn't be allowed from my understanding.
-				// I'll reject it until i know more, not wanting this to get too hacky.
-				if (IsProbablyValidHeader(cursor))
+                if (prop->header.sizeInBytes == 0)
 				{
-					result = Result::BadProperty;
-					return cursor;
+                    prop->data.intlist.numInts = 0;
 				}
 				else
 				{

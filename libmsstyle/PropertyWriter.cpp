@@ -26,18 +26,21 @@ namespace libmsstyle
 			// arbitrary
 			case IDENTIFIER::INTLIST:
 			{
-				// numInts field
-				memcpy(dest, &prop.data, 4);
-				dest += 4;
+                if (prop.header.sizeInBytes != 0)
+                {
+                    // numInts field
+                    memcpy(dest, &prop.data, 4);
+                    dest += 4;
 
-				for (auto& num : prop.intlist)
-				{
-					// copy data, inc dest
-					*dest++ = (num >> 0) & 0xFF;
-					*dest++ = (num >> 8) & 0xFF;
-					*dest++ = (num >> 16) & 0xFF;
-					*dest++ = (num >> 24) & 0xFF;
-				}
+                    for (auto& num : prop.intlist)
+                    {
+                        // copy data, inc dest
+                        *dest++ = (num >> 0) & 0xFF;
+                        *dest++ = (num >> 8) & 0xFF;
+                        *dest++ = (num >> 16) & 0xFF;
+                        *dest++ = (num >> 24) & 0xFF;
+                    }
+                }
 
 				dest = PadToMultipleOf(source, dest, 8);
 			} break;

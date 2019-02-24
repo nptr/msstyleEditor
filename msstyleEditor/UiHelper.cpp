@@ -142,10 +142,10 @@ wxPGProperty* GetWXPropertyFromMsStyleProperty(VisualStyle& style, StyleProperty
 	{
 		if (prop.data.intlist.numInts >= 3)
 		{
-			sprintf(str, "%d, %d, %d, .. (%d)", prop.data.intlist.numInts
-				, *(&prop.data.intlist.firstInt + 0)
-				, *(&prop.data.intlist.firstInt + 1)
-				, *(&prop.data.intlist.firstInt + 2));
+			sprintf(str, "Len: %d, Values: %d, %d, %d, ...", prop.data.intlist.numInts
+                , prop.intlist[0]
+                , prop.intlist[1]
+                , prop.intlist[2]);
 		}
 		else sprintf(str, "Len: %d, Values omitted", prop.data.intlist.numInts);
 		wxStringProperty* p = new wxStringProperty(propName, *wxPGProperty::sm_wxPG_LABEL, str);
