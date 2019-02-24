@@ -323,13 +323,22 @@ namespace libmsstyle
             return FALSE; // stop, i just need the first result
         }
 
-        LanguageId GetFirstLanguageId(ModuleHandle moduleHandle, const char* name, const char* type)
+        LanguageId GetFirstLanguageId(ModuleHandle moduleHandle, const char* type, const char* name)
         {
             LanguageId langId = 0;
 
             std::wstring wtype = UTF8ToWide(type);
             std::wstring wname = UTF8ToWide(name);
             EnumResourceLanguagesW(static_cast<HMODULE>(moduleHandle), wtype.c_str(), wname.c_str(), (ENUMRESLANGPROCW)&LanguageCallback, (LONG_PTR)&langId);
+            return langId;
+        }
+
+        LanguageId GetFirstLanguageId(ModuleHandle moduleHandle, const char* type, int name)
+        {
+            LanguageId langId = 0;
+
+            std::wstring wtype = UTF8ToWide(type);
+            EnumResourceLanguagesW(static_cast<HMODULE>(moduleHandle), wtype.c_str(), MAKEINTRESOURCEW(name), (ENUMRESLANGPROCW)&LanguageCallback, (LONG_PTR)&langId);
             return langId;
         }
 
@@ -351,17 +360,10 @@ namespace libmsstyle
             return UpdateResourceW(updateHandle, wtype.c_str(), wname.c_str(), (WORD)lid, (LPVOID)data, length) != 0;
         }
 
-        bool UpdateStyleResource(UpdateHandle updateHandle, const char* type, const char* name, const char* data, unsigned int length)
+        bool UpdateStyleResource(UpdateHandle updateHandle, const char* type, int name, LanguageId lid, const char* data, unsigned int length)
         {
             std::wstring wtype = UTF8ToWide(type);
-            std::wstring wname = UTF8ToWide(name);
-            return UpdateResourceW(updateHandle, wtype.c_str(), wname.c_str(), MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL), (LPVOID)data, length) != 0;
-        }
-
-        bool UpdateStyleResource(UpdateHandle updateHandle, const char* type, int nameId, const char* data, unsigned int length)
-        {
-            std::wstring wtype = UTF8ToWide(type);
-            return UpdateResourceW(updateHandle, wtype.c_str(), MAKEINTRESOURCEW(nameId), MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL), (LPVOID)data, length) != 0;
+            return UpdateResourceW(updateHandle, wtype.c_str(), MAKEINTRESOURCEW(name), (WORD)lid, (LPVOID)data, length) != 0;
         }
 
         int EndUpdate(UpdateHandle updateHandle, bool discard)

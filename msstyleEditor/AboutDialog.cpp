@@ -23,7 +23,7 @@ AboutDialog::AboutDialog(wxWindow* parent, wxWindowID id, const wxString& title,
     wxBoxSizer* bSizer21;
     bSizer21 = new wxBoxSizer(wxVERTICAL);
 
-    m_staticText2 = new wxStaticText(staticBoxSizer->GetStaticBox(), wxID_ANY, wxT("msstyleEditor v1.4.0.1"), wxDefaultPosition, wxDefaultSize, 0);
+    m_staticText2 = new wxStaticText(staticBoxSizer->GetStaticBox(), wxID_ANY, wxT("msstyleEditor v1.4.0.2"), wxDefaultPosition, wxDefaultSize, 0);
     m_staticText2->Wrap(-1);
     bSizer21->Add(m_staticText2, 0, wxBOTTOM | wxLEFT, 5);
 

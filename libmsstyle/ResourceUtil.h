@@ -23,7 +23,8 @@ namespace libmsstyle
         Resource GetResource(ModuleHandle moduleHandle, const char* name, const char* type);
         Resource GetResource(ModuleHandle moduleHandle, int nameId, const char* type);
 
-        LanguageId GetFirstLanguageId(ModuleHandle moduleHandle, const char* name, const char* type);
+        LanguageId GetFirstLanguageId(ModuleHandle moduleHandle, const char* type, const char* name);
+        LanguageId GetFirstLanguageId(ModuleHandle moduleHandle, const char* type, int name);
 
         void LoadStringTable(ModuleHandle moduleHandle, StringTable& table);
         bool UpdateStringTable(ModuleHandle moduleHandle, UpdateHandle updateHandle, StringTable& table, std::runtime_error& error);
@@ -31,8 +32,8 @@ namespace libmsstyle
         // TODO: return error code instead of bool
         UpdateHandle BeginUpdate(const std::string& modulePath);
         bool UpdateStyleResource(UpdateHandle, const char* type, const char* name, LanguageId lid, const char* data, unsigned int length);
-        bool UpdateStyleResource(UpdateHandle, const char* type, const char* name, const char* data, unsigned int length);
-        bool UpdateStyleResource(UpdateHandle, const char* type, int nameId, const char* data, unsigned int length);
+        bool UpdateStyleResource(UpdateHandle, const char* type, int name, LanguageId lid, const char* data, unsigned int length);
+
         int EndUpdate(UpdateHandle updateHandle, bool discard);
 
         // TODO: this file is not exactly the right place

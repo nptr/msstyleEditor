@@ -159,7 +159,7 @@ namespace libmsstyle
 			else throw std::runtime_error("Couldn't open file as PE resource!");
 		}
 
-        bool SaveResources(priv::UpdateHandle updateHandle, std::runtime_error& error)
+        bool SaveResources(priv::ModuleHandle moduleHandle, priv::UpdateHandle updateHandle, std::runtime_error& error)
 		{
 			for (auto& resource : m_resourceUpdates)
 			{
@@ -187,7 +187,9 @@ namespace libmsstyle
 					continue;
 				}
 
-				bool success = priv::UpdateStyleResource(updateHandle, resName, resource.first.GetNameID(), buffer, length);
+
+                priv::LanguageId lid = priv::GetFirstLanguageId(moduleHandle, resName, resource.first.GetNameID());
+                bool success = priv::UpdateStyleResource(updateHandle, resName, resource.first.GetNameID(), lid, buffer, length);
                 priv::FileFreeBytes(buffer);
 
 				if (!success)
@@ -200,7 +202,7 @@ namespace libmsstyle
             return true;
 		}
 
-        bool SavePropertiesSorted(priv::UpdateHandle updateHandle, std::runtime_error& error)
+        bool SavePropertiesSorted(priv::ModuleHandle moduleHandle, priv::UpdateHandle updateHandle, std::runtime_error& error)
 		{
 			// assume that twice the size common properties require is enough
 			int estimatedSize = m_propsFound * 48 * 2;
@@ -248,7 +250,7 @@ namespace libmsstyle
 				// the properties, this shouldn't be necessary
 			}
 
-            priv::LanguageId lid = priv::GetFirstLanguageId(m_moduleHandle, "NORMAL", "VARIANT");
+            priv::LanguageId lid = priv::GetFirstLanguageId(moduleHandle, "VARIANT", "NORMAL");
 			unsigned int length = static_cast<unsigned int>(dataptr - data);
 
             if (!priv::UpdateStyleResource(updateHandle, "VARIANT", "NORMAL", lid, data, length))
@@ -287,15 +289,27 @@ namespace libmsstyle
 
             std::runtime_error error("");
 
-            if (!SaveResources(updHandle, error))
+            // we could reuse m_moduleHandle here (from the original file) to query information
+            // but to be safe i am opening the new file and get its module handle instead.
+            priv::ModuleHandle modHandle = priv::OpenModule(path);
+            if (modHandle == NULL)
             {
+                priv::EndUpdate(updHandle, true);
+                priv::RemoveFile(path);
+                throw std::runtime_error("Could not open the file for writing! (LoadLibraryEx)");
+            }
+
+            if (!SaveResources(modHandle, updHandle, error))
+            {
+                priv::CloseModule(modHandle);
                 priv::EndUpdate(updHandle, true);
                 priv::RemoveFile(path);
                 throw error;
             }
 
-            if (!SavePropertiesSorted(updHandle, error))
+            if (!SavePropertiesSorted(modHandle, updHandle, error))
             {
+                priv::CloseModule(modHandle);
                 priv::EndUpdate(updHandle, true);
                 priv::RemoveFile(path);
                 throw error;
@@ -303,14 +317,6 @@ namespace libmsstyle
 
             if (m_canSaveStringTable)
             {
-                priv::ModuleHandle modHandle = priv::OpenModule(path);
-                if (modHandle == NULL)
-                {
-                    priv::EndUpdate(updHandle, true);
-                    priv::RemoveFile(path);
-                    throw std::runtime_error("Could not open the file for writing! (LoadLibraryEx)");
-                }
-
                 if (!priv::UpdateStringTable(modHandle, updHandle, m_stringTable, error))
                 {
                     priv::CloseModule(modHandle);
@@ -318,13 +324,11 @@ namespace libmsstyle
                     priv::RemoveFile(path);
                     throw error;
                 }
-                else
-                {
-                    // close the module before calling EndUpdate(). If not
-                    // updating fails because the file is in use.
-                    priv::CloseModule(modHandle);
-                }
             }
+
+            // close the module before calling EndUpdate(). If not
+            // updating fails because the file is in use.
+            priv::CloseModule(modHandle);
 
             int updateError = priv::EndUpdate(updHandle, false);
 			if (updateError)
