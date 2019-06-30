@@ -23,6 +23,7 @@ const int typeIdArray[] =
 	208
 };
 
+
 class wxPropertyClientData : public wxClientData
 {
 public:
@@ -42,28 +43,25 @@ private:
 
 AddPropertyDialog::AddPropertyDialog(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style) : wxDialog(parent, id, title, pos, size, style)
 {
-	this->SetSizeHints(size, size);
+	this->SetSizeHints(wxDefaultSize, wxDefaultSize);
 
-	wxBoxSizer* bSizer13;
-	bSizer13 = new wxBoxSizer(wxVERTICAL);
+	wxBoxSizer* sizerMain;
+	sizerMain = new wxBoxSizer(wxVERTICAL);
 
-	wxBoxSizer* bSizer16;
-	bSizer16 = new wxBoxSizer(wxHORIZONTAL);
+	wxBoxSizer* sizerHalfHorz;
+	sizerHalfHorz = new wxBoxSizer(wxHORIZONTAL);
+
+	wxBoxSizer* bSizer21;
+	bSizer21 = new wxBoxSizer(wxVERTICAL);
+
+	wxBoxSizer* bSizer20;
+	bSizer20 = new wxBoxSizer(wxHORIZONTAL);
 
 	m_staticText5 = new wxStaticText(this, wxID_ANY, wxT("Type:"), wxDefaultPosition, wxDefaultSize, 0);
 	m_staticText5->Wrap(-1);
 	m_staticText5->SetMaxSize(wxSize(120, -1));
-	bSizer16->Add(m_staticText5, 1, wxTOP | wxRIGHT | wxLEFT, 5);
 
-	m_staticText6 = new wxStaticText(this, wxID_ANY, wxT("Property:"), wxDefaultPosition, wxDefaultSize, 0);
-	m_staticText6->Wrap(-1);
-	bSizer16->Add(m_staticText6, 1, wxTOP | wxRIGHT | wxLEFT, 5);
-
-
-	bSizer13->Add(bSizer16, 0, wxEXPAND, 5);
-
-	wxBoxSizer* bSizer14;
-	bSizer14 = new wxBoxSizer(wxHORIZONTAL);
+	bSizer20->Add(m_staticText5, 0, wxTOP | wxRIGHT | wxLEFT | wxALIGN_CENTER_VERTICAL, 5);
 
 	wxArrayString typeBoxChoices;
 	typeBoxChoices.Add(typeNameArray[0]);
@@ -76,35 +74,62 @@ AddPropertyDialog::AddPropertyDialog(wxWindow* parent, wxWindowID id, const wxSt
 	typeBox->SetSelection(0);
 	typeBox->SetMaxSize(wxSize(120, -1));
 
-	bSizer14->Add(typeBox, 1, wxALL, 5);
+	bSizer20->Add(typeBox, 1, wxALIGN_CENTER_VERTICAL | wxTOP | wxRIGHT | wxLEFT, 5);
 
-	wxArrayString propBoxChoices;
-	propBox = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, propBoxChoices, wxCB_SORT);
-	propBox->SetSelection(0);
-	bSizer14->Add(propBox, 1, wxALL, 5);
-	bSizer13->Add(bSizer14, 0, wxEXPAND, 5);
 
-	descriptionLabel = new wxStaticText(this, wxID_ANY, wxT("Description:"), wxDefaultPosition, wxDefaultSize, wxST_NO_AUTORESIZE);
-    descriptionLabel->SetSizeHints(wxSize(300, 75));
-    descriptionLabel->Wrap(300);
-	bSizer13->Add(descriptionLabel, 1, wxALL | wxEXPAND, 5);
+	bSizer21->Add(bSizer20, 0, wxEXPAND, 5);
+
+	propBox = new wxListBox(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, NULL, wxLB_SINGLE | wxLB_SORT);
+	bSizer21->Add(propBox, 1, wxEXPAND | wxALL, 5);
+
+
+	sizerHalfHorz->Add(bSizer21, 1, wxEXPAND, 5);
+
+	wxStaticBoxSizer* sbSizer2;
+	sbSizer2 = new wxStaticBoxSizer(new wxStaticBox(this, wxID_ANY, wxT("Description")), wxVERTICAL);
+
+	descriptionLabel = new wxStaticText(sbSizer2->GetStaticBox(), wxID_ANY, wxT("-"), wxDefaultPosition, wxDefaultSize, wxST_NO_AUTORESIZE);
+	descriptionLabel->Wrap(300);
+	sbSizer2->Add(descriptionLabel, 1, wxALL | wxEXPAND, 5);
+
+
+	sizerHalfHorz->Add(sbSizer2, 1, wxEXPAND | wxBOTTOM | wxRIGHT, 5);
+
+
+	sizerMain->Add(sizerHalfHorz, 1, wxEXPAND, 5);
+
+	wxBoxSizer* bSizer14;
+	bSizer14 = new wxBoxSizer(wxHORIZONTAL);
+
+
+	sizerMain->Add(bSizer14, 0, wxEXPAND, 5);
 
 	m_staticLine = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL);
-	bSizer13->Add(m_staticLine, 0, wxEXPAND | wxTOP | wxRIGHT | wxLEFT, 5);
+	sizerMain->Add(m_staticLine, 0, wxTOP | wxRIGHT | wxLEFT | wxEXPAND, 5);
+
+	wxBoxSizer* bSizer22;
+	bSizer22 = new wxBoxSizer(wxHORIZONTAL);
 
 	okButton = new wxButton(this, wxID_ANY, wxT("Ok"), wxDefaultPosition, wxDefaultSize, 0);
-	bSizer13->Add(okButton, 0, wxALL | wxALIGN_RIGHT, 5);
+	bSizer22->Add(okButton, 0, wxALL | wxALIGN_RIGHT, 5);
+
+	cancelButton = new wxButton(this, wxID_ANY, wxT("Cancel"), wxDefaultPosition, wxDefaultSize, 0);
+	bSizer22->Add(cancelButton, 0, wxALL, 5);
 
 
-	this->SetSizer(bSizer13);
+	sizerMain->Add(bSizer22, 0, wxALIGN_RIGHT, 5);
+
+
+	this->SetSizer(sizerMain);
 	this->Layout();
-    bSizer13->Fit(this);
 
 	this->Centre(wxBOTH);
 
+	// Connect Events
 	typeBox->Connect(wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler(AddPropertyDialog::OnTypeSelectionChanged), NULL, this);
-	propBox->Connect(wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler(AddPropertyDialog::OnPropertySelectionChanged), NULL, this);
+	propBox->Connect(wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler(AddPropertyDialog::OnPropertySelectionChanged), NULL, this);
 	okButton->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(AddPropertyDialog::OnOkClicked), NULL, this);
+	cancelButton->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(AddPropertyDialog::OnCancelClicked), NULL, this);
 
 	OnTypeSelectionChanged(wxCommandEvent());
 }
@@ -140,12 +165,17 @@ void AddPropertyDialog::OnPropertySelectionChanged(wxCommandEvent& event)
 		return;
 
 	wxPropertyClientData* cd = static_cast<wxPropertyClientData*>(propBox->GetClientObject(selectedIndex));
-	descriptionLabel->SetLabel(wxString("Description: ") + cd->GetPropInfo().description);
+	descriptionLabel->SetLabel(cd->GetPropInfo().description);
 }
 
 void AddPropertyDialog::OnOkClicked(wxCommandEvent& event)
 {
 	EndModal(wxID_OK);
+}
+
+void AddPropertyDialog::OnCancelClicked(wxCommandEvent& event)
+{
+	EndModal(wxID_CANCEL);
 }
 
 int AddPropertyDialog::ShowModal(StyleProperty& prop)
@@ -158,9 +188,9 @@ int AddPropertyDialog::ShowModal(StyleProperty& prop)
 			return wxID_CANCEL;
 
 		wxPropertyClientData* cd = static_cast<wxPropertyClientData*>(propBox->GetClientObject(selectedIndex));
-		
+
 		prop.Initialize((libmsstyle::IDENTIFIER)cd->GetPropInfo().type,
-						(libmsstyle::IDENTIFIER)cd->GetNameID());
+			(libmsstyle::IDENTIFIER)cd->GetNameID());
 	}
 
 	return ret;
@@ -169,6 +199,7 @@ int AddPropertyDialog::ShowModal(StyleProperty& prop)
 AddPropertyDialog::~AddPropertyDialog()
 {
 	typeBox->Disconnect(wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler(AddPropertyDialog::OnTypeSelectionChanged), NULL, this);
-	propBox->Disconnect(wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler(AddPropertyDialog::OnPropertySelectionChanged), NULL, this);
+	propBox->Disconnect(wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler(AddPropertyDialog::OnPropertySelectionChanged), NULL, this);
 	okButton->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(AddPropertyDialog::OnOkClicked), NULL, this);
+	cancelButton->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(AddPropertyDialog::OnCancelClicked), NULL, this);
 }
