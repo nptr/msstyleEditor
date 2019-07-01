@@ -25,16 +25,16 @@ namespace uxtheme
 	typedef HRESULT(WINAPI *SetSystemThemePtr)(LPCWSTR themeFile, LPCWSTR colorName, LPCWSTR sizeName, DWORD unknownFlags);
 	// Ordinal 94 - exported by name as well
 	typedef HRESULT(WINAPI *GetCurrentThemeNamePtr)(LPWSTR themeFile, int maxNameChars,
-													LPWSTR colorName, int maxColorChars,
-													LPWSTR sizeName, int maxSizeChars);
-	
+		LPWSTR colorName, int maxColorChars,
+		LPWSTR sizeName, int maxSizeChars);
+
 	HMODULE hModule = LoadLibraryW(L"uxtheme.dll");
 
 
-	OpenThemeFilePtr OpenThemeFile					= (OpenThemeFilePtr)GetProcAddress(hModule, (PCSTR)(2));
-	CloseThemeFilePtr CloseThemeFile				= (CloseThemeFilePtr)GetProcAddress(hModule, (PCSTR)(3));
-	ApplyThemePtr ApplyTheme						= (ApplyThemePtr)GetProcAddress(hModule, (PCSTR)(4));
-	OpenThemeDataFromFilePtr OpenThemeDataFromFile	= (OpenThemeDataFromFilePtr)GetProcAddress(hModule, (PCSTR)(16));
-	SetSystemThemePtr SetSystemTheme				= (SetSystemThemePtr)GetProcAddress(hModule, (PCSTR)(65));
-	GetCurrentThemeNamePtr GetCurrentThemeName		= (GetCurrentThemeNamePtr)GetProcAddress(hModule, "GetCurrentThemeName");
+	OpenThemeFilePtr OpenThemeFile = (OpenThemeFilePtr)GetProcAddress(hModule, (PCSTR)(2));
+	CloseThemeFilePtr CloseThemeFile = (CloseThemeFilePtr)GetProcAddress(hModule, (PCSTR)(3));
+	ApplyThemePtr ApplyTheme = (ApplyThemePtr)GetProcAddress(hModule, (PCSTR)(4));
+	OpenThemeDataFromFilePtr OpenThemeDataFromFile = (OpenThemeDataFromFilePtr)GetProcAddress(hModule, (PCSTR)(16));
+	SetSystemThemePtr SetSystemTheme = (SetSystemThemePtr)GetProcAddress(hModule, (PCSTR)(65));
+	GetCurrentThemeNamePtr GetCurrentThemeName = (GetCurrentThemeNamePtr)GetProcAddress(hModule, "GetCurrentThemeName");
 }

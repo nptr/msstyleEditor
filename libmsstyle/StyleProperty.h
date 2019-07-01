@@ -5,7 +5,7 @@
 
 namespace libmsstyle
 {
-	#pragma pack(push, 1)
+#pragma pack(push, 1)
 	struct PropertyHeader
 	{
 		int32_t nameID;		// Offset: 0, Size: 4,	ID for the property name, described in MSDN
@@ -17,10 +17,10 @@ namespace libmsstyle
 		int32_t reserved;	// Offset: 24, Size: 4	Seems to be always zero
 		int32_t sizeInBytes;// Offset: 28, Size: 4	The size of the data that follows. Does not include padding
 	};
-	#pragma pack(pop)
+#pragma pack(pop)
 
 
-	#pragma pack(push, 1)
+#pragma pack(push, 1)
 	union PropertyData
 	{
 		struct
@@ -79,7 +79,7 @@ namespace libmsstyle
 			wchar_t firstChar;		// first wide character of the string. Not sure if null terminated...
 		}texttype;
 	};
-	#pragma pack(pop)
+#pragma pack(pop)
 
 
 	class StyleProperty
@@ -102,7 +102,7 @@ namespace libmsstyle
 		bool IsPropertyValid() const;
 		int GetRegularPropertySize() const;
 		bool IsNameMatchingType() const;
-		
+
 		IDENTIFIER GetTypeID() const;
 		IDENTIFIER GetNameID() const;
 		const char* LookupName() const;

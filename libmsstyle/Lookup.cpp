@@ -86,7 +86,7 @@ namespace libmsstyle
 				m.numEnums = MSSTYLE_ARRAY_LENGTH(libmsstyle::ENUM_TRUESIZESCALING);
 			}
 			else if (nameID >= IDENTIFIER::UNKNOWN_5110_HC &&
-					 nameID <= IDENTIFIER::UNKNOWN_5122_HC)
+				nameID <= IDENTIFIER::UNKNOWN_5122_HC)
 			{
 				m.enums = (EnumMap*)&libmsstyle::ENUM_HIGHCONTRASTTYPE;
 				m.numEnums = MSSTYLE_ARRAY_LENGTH(libmsstyle::ENUM_HIGHCONTRASTTYPE);
@@ -108,7 +108,7 @@ namespace libmsstyle
 			//
 
 			PartList m;
-			if (strstr(className, "Toolbar"))	// Toolbar is often inherited, so find it first. It also has to be matched before "Button", 
+			if (strstr(className, "Toolbar"))	// Toolbar is often inherited, so find it first. It also has to be caught before "Button", 
 			{									// because otherwise the SearchButton::Toolbar class would use the Button parts instead of the toolbar ones.
 				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_TOOLBAR);
 				m.parts = PARTS_TOOLBAR;

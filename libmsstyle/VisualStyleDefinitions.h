@@ -21,7 +21,7 @@ namespace libmsstyle
 		const char* name;
 		int type;
 		const char* description;
-    } PropertyInfo;
+	} PropertyInfo;
 
 	/////////////////////////////////////////////////////////////////////////////
 	// The following maps are used for finding the name to an ID

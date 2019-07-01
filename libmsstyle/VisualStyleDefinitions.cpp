@@ -29,7 +29,7 @@ namespace libmsstyle
 		{ 215, { "BITMAPREF", 215, "" } },
 		{ 216, { "FLOAT", 216, "" } },
 		{ 217, { "FLOATLIST", 217, "" } },
-		
+
 		{ 240, { "SIMPLIFIEDIMAGETYPE", 240, "" } },
 		{ 241, { "HIGHCONTRASTCOLORTYPE", 241, "" } }, // integer-like
 		{ 242, { "BITMAPIMAGETYPE", 242, "" } },
@@ -181,8 +181,8 @@ namespace libmsstyle
 		{ 2408, { "GRADIENTRATIO3", 202, "The amount of the third gradient color (TMT_GRADIENTCOLOR3) to use in drawing the part." } },
 		{ 2409, { "GRADIENTRATIO4", 202, "The amount of the fourth gradient color (TMT_GRADIENTCOLOR4) to use in drawing the part." } },
 		{ 2410, { "GRADIENTRATIO5", 202, "The amount of the fifth gradient color (TMT_GRADIENTCOLOR5) to use in drawing the part." } },
-        { 2411, { "PROGRESSCHUNKSIZE", 202, "The size of the progress control \"chunk\" shapes that define how far an operation has progressed." } },
-        { 2412, { "PROGRESSSPACESIZE", 202, "The total size of all of the progress control \"chunks\"." } },
+		{ 2411, { "PROGRESSCHUNKSIZE", 202, "The size of the progress control \"chunk\" shapes that define how far an operation has progressed." } },
+		{ 2412, { "PROGRESSSPACESIZE", 202, "The total size of all of the progress control \"chunks\"." } },
 		{ 2413, { "SATURATION", 202, "The amount of saturation (0-255) to apply to an icon drawn using DrawThemeIcon." } },
 		{ 2414, { "TEXTBORDERSIZE", 202, "The thickness of the border drawn around text characters." } },
 		{ 2415, { "ALPHATHRESHOLD", 202, "The minimum alpha value (0-255) that a pixel must have to be considered opaque." } },

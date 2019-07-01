@@ -95,39 +95,39 @@ namespace libmsstyle
 		{ 5, "DEFAULTED" },
 	};
 
-    const StateMap STATES_COMMANDMODULE_SPLITBUTTON[] =
-    {
-        { 0, "Common" },
-        { 1, "NORMAL" },
-        { 2, "HOT" },
-        { 3, "PRESSED" },
-        { 4, "KEYFOCUSED" },
-        { 5, "NEARHOT" },
-        { 6, "DISABLED" }
-    };
+	const StateMap STATES_COMMANDMODULE_SPLITBUTTON[] =
+	{
+		{ 0, "Common" },
+		{ 1, "NORMAL" },
+		{ 2, "HOT" },
+		{ 3, "PRESSED" },
+		{ 4, "KEYFOCUSED" },
+		{ 5, "NEARHOT" },
+		{ 6, "DISABLED" }
+	};
 
-    const StateMap STATES_COMMANDMODULE_LIBRARYPANE_GEN[]
-    {
-        { 0, "Common" },
-        { 1, "NORMAL" },
-        { 2, "HOT" }
-    };
+	const StateMap STATES_COMMANDMODULE_LIBRARYPANE_GEN[]
+	{
+		{ 0, "Common" },
+		{ 1, "NORMAL" },
+		{ 2, "HOT" }
+	};
 
-    const StateMap STATES_CONTROLPANEL_CONTENTPANE[] =
-    {
-        { 0, "Common" },
-        { 1, "STANDALONE" },
-    };
+	const StateMap STATES_CONTROLPANEL_CONTENTPANE[] =
+	{
+		{ 0, "Common" },
+		{ 1, "STANDALONE" },
+	};
 
-    const StateMap STATES_COPYCLOSEBTN[] =
-    {
-        { 0, "Common" },
-        { 1, "NORMAL" },
-        { 2, "HOT" },
-        { 3, "PRESSED" },
-        { 4, "DISABLEDPRESSED" },
-        { 5, "DISABLED" },
-    };
+	const StateMap STATES_COPYCLOSEBTN[] =
+	{
+		{ 0, "Common" },
+		{ 1, "NORMAL" },
+		{ 2, "HOT" },
+		{ 3, "PRESSED" },
+		{ 4, "DISABLEDPRESSED" },
+		{ 5, "DISABLED" },
+	};
 
 	const StateMap STATES_CB_STYLE[] =
 	{

@@ -46,10 +46,10 @@ namespace libmsstyle
 		std::string GetQueuedResourceUpdate(int nameId, StyleResourceType type);
 		void QueueResourceUpdate(int nameId, StyleResourceType type, const std::string& pathToNew);
 
-        StyleResource GetResource(int id, StyleResourceType type);
+		StyleResource GetResource(int id, StyleResourceType type);
 		StyleResource GetResourceFromProperty(const StyleProperty& prop);
 
-        StringTable& GetStringTable();
+		StringTable& GetStringTable();
 
 	private:
 		class Impl;

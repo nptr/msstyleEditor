@@ -16,7 +16,7 @@ public:
 	virtual ~wxCategoryToolbarRenderer();
 
 	virtual bool Render(wxDC& dc, const wxRect& rect, const wxPropertyGrid* propertyGrid,
-						wxPGProperty* property, int column, int item, int flags) const;
+		wxPGProperty* property, int column, int item, int flags) const;
 };
 
 

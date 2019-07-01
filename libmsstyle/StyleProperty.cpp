@@ -150,8 +150,8 @@ namespace libmsstyle
 
 	void StyleProperty::UpdateImageLink(int imageID)
 	{
-		assert(	header.typeID == IDENTIFIER::FILENAME ||
-				header.typeID == IDENTIFIER::DISKSTREAM );
+		assert(header.typeID == IDENTIFIER::FILENAME ||
+			header.typeID == IDENTIFIER::DISKSTREAM);
 		header.shortFlag = imageID;
 
 	}
@@ -282,8 +282,8 @@ namespace libmsstyle
 		} break;
 		case IDENTIFIER::FONT:
 		{
-            // TODO: need style ref. here to print the actual font name
-            return std::to_string(header.shortFlag);
+			// TODO: need style ref. here to print the actual font name
+			return std::to_string(header.shortFlag);
 		} break;
 		case IDENTIFIER::INTLIST:
 		{

@@ -9,7 +9,6 @@
 #include <codecvt>	// codecvt_utf8_utf16
 #include <locale>	// wstring_convert
 
-
 static std::string WideToUTF8(const std::wstring& str)
 {
 	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> convert;
@@ -44,7 +43,8 @@ ThemeManager::~ThemeManager()
 		Rollback();
 	}
 	catch (...)
-	{ }
+	{
+	}
 }
 
 void ThemeManager::ApplyTheme(libmsstyle::VisualStyle& style)
@@ -74,10 +74,18 @@ void ThemeManager::ApplyTheme(libmsstyle::VisualStyle& style)
 	style.Save(newPathUTF8);
 
 	// I saw the following values being recommended for the fourth parameter: 0, 32, 33, 65
-	if (uxtheme::SetSystemTheme(newPathUTF16.c_str(), L"NormalColor", L"NormalSize", 33) != S_OK)
+	HRESULT res = uxtheme::SetSystemTheme(newPathUTF16.c_str(), L"NormalColor", L"NormalSize", 33);
+	if (res != S_OK)
 	{
+		//DWORD facility = (res & 0x07FF0000) >> 16;
+		//DWORD code = (res & 0x0000FFFF);
+
+		char textbuffer[512];
+		sprintf(textbuffer, "Failed to apply the theme as the OS rejected it!\r\n\r\n"
+			"SetSystemVisualStyle() returned 0x%x.", res);
+
 		DeleteFileW(newPath);
-		throw std::runtime_error("Failed to apply the theme as the OS rejected it!");
+		throw std::runtime_error(textbuffer);
 	}
 	else
 	{

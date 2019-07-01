@@ -26,13 +26,13 @@ namespace libmsstyle
 
 	extern const StateMap STATES_COMMANDLINKGLYPHS[6];
 
-    extern const StateMap STATES_COMMANDMODULE_SPLITBUTTON[7];
+	extern const StateMap STATES_COMMANDMODULE_SPLITBUTTON[7];
 
-    extern const StateMap STATES_COMMANDMODULE_LIBRARYPANE_GEN[3];
+	extern const StateMap STATES_COMMANDMODULE_LIBRARYPANE_GEN[3];
 
-    extern const StateMap STATES_CONTROLPANEL_CONTENTPANE[2];
+	extern const StateMap STATES_CONTROLPANEL_CONTENTPANE[2];
 
-    extern const StateMap STATES_COPYCLOSEBTN[6];
+	extern const StateMap STATES_COPYCLOSEBTN[6];
 
 	extern const StateMap STATES_CB_STYLE[5];
 

@@ -88,7 +88,7 @@ namespace libmsstyle
 	{
 		return static_cast<const char*>(impl->m_data);
 	}
-	
+
 	int StyleResource::GetSize() const
 	{
 		return impl->m_size;

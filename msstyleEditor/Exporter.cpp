@@ -13,8 +13,8 @@ std::string WStringToUTF8(const std::wstring& str)
 
 void Exporter::ExportLogicalStructure(const std::wstring& path, libmsstyle::VisualStyle& style)
 {
-    FILE* file = _wfopen(path.c_str(), L"w");
-    if (!file)
+	FILE* file = _wfopen(path.c_str(), L"w");
+	if (!file)
 		throw new std::runtime_error("Can't open or create the file!");
 
 	char buffer[128];
@@ -28,23 +28,23 @@ void Exporter::ExportLogicalStructure(const std::wstring& path, libmsstyle::Visu
 
 	switch (style.GetCompatiblePlatform())
 	{
-		case libmsstyle::WIN7:
-		{
-			txt.append("\nPlatform: Windows 7\n\n");
-		} break;
-		case libmsstyle::WIN8:
-		case libmsstyle::WIN81:
-		{
-			txt.append("\nPlatform: Windows 8 / 8.1\n\n");
-		} break;
-		case libmsstyle::WIN10:
-		{
-			txt.append("\nPlatform: Windows 10\n\n");
-		} break;
-		default:
-		{
-			txt.append("\nPlatform: Unknown!\n\n");
-		} break;
+	case libmsstyle::WIN7:
+	{
+		txt.append("\nPlatform: Windows 7\n\n");
+	} break;
+	case libmsstyle::WIN8:
+	case libmsstyle::WIN81:
+	{
+		txt.append("\nPlatform: Windows 8 / 8.1\n\n");
+	} break;
+	case libmsstyle::WIN10:
+	{
+		txt.append("\nPlatform: Windows 10\n\n");
+	} break;
+	default:
+	{
+		txt.append("\nPlatform: Unknown!\n\n");
+	} break;
 	}
 
 	txt.append("BEGIN STRUCTURE"); txt.append("\n");
@@ -81,7 +81,7 @@ void Exporter::ExportLogicalStructure(const std::wstring& path, libmsstyle::Visu
 
 	txt.append("END STRUCTURE");
 
-    fwrite(txt.c_str(), txt.length(), 1, file);
-    fclose(file);
+	fwrite(txt.c_str(), txt.length(), 1, file);
+	fclose(file);
 	return;
 }

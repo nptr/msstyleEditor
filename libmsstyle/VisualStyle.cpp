@@ -55,7 +55,7 @@ namespace libmsstyle
 		Impl()
 			: m_propsFound(0)
 			, m_moduleHandle(0)
-            , m_canSaveStringTable(false)
+			, m_canSaveStringTable(false)
 		{
 		}
 
@@ -80,7 +80,7 @@ namespace libmsstyle
 				}
 			}
 
-            priv::CloseModule(m_moduleHandle);
+			priv::CloseModule(m_moduleHandle);
 		}
 
 		void Log(const char* format, ...)
@@ -107,72 +107,72 @@ namespace libmsstyle
 			return m_classes.size();
 		}
 
-        void BuildStyleTree(std::map<int32_t, StyleClass>& classes, Platform os)
-        {
-            for (auto& cls : classes)
-            {
-                lookup::PartList partList = lookup::FindParts(cls.second.className.c_str(), os);
-                for (int i = 0; i < partList.numParts; ++i)
-                {
-                    PartMap partEntry = partList.parts[i];
-                    
-                    StylePart newPart;
-                    newPart.partID = partEntry.partID;
-                    newPart.partName = partEntry.partName;
-                    StylePart* addedPart = cls.second.AddPart(newPart);
+		void BuildStyleTree(std::map<int32_t, StyleClass>& classes, Platform os)
+		{
+			for (auto& cls : classes)
+			{
+				lookup::PartList partList = lookup::FindParts(cls.second.className.c_str(), os);
+				for (int i = 0; i < partList.numParts; ++i)
+				{
+					PartMap partEntry = partList.parts[i];
 
-                    for (int j = 0; j < partEntry.numStates; ++j)
-                    {
-                        const StateMap stateEntry = partEntry.states[j];
+					StylePart newPart;
+					newPart.partID = partEntry.partID;
+					newPart.partName = partEntry.partName;
+					StylePart* addedPart = cls.second.AddPart(newPart);
 
-                        StyleState newState;
-                        newState.stateID = stateEntry.stateID;
-                        newState.stateName = stateEntry.stateName;
-                        addedPart->AddState(newState);
-                    }
-                }
-                
-            }
-        }
+					for (int j = 0; j < partEntry.numStates; ++j)
+					{
+						const StateMap stateEntry = partEntry.states[j];
+
+						StyleState newState;
+						newState.stateID = stateEntry.stateID;
+						newState.stateName = stateEntry.stateName;
+						addedPart->AddState(newState);
+					}
+				}
+
+			}
+		}
 
 		void Load(const std::string& path)
 		{
 			m_stylePath = path;
-            m_moduleHandle = priv::OpenModule(path);
+			m_moduleHandle = priv::OpenModule(path);
 			if (m_moduleHandle != 0)
 			{
-                priv::Resource cmap = priv::GetResource(m_moduleHandle, "CMAP", "CMAP");
+				priv::Resource cmap = priv::GetResource(m_moduleHandle, "CMAP", "CMAP");
 				if (cmap.size != 0)
 					LoadClassmap(cmap);
 				else throw std::runtime_error("Style contains no class map!");
 
 				m_stylePlatform = DeterminePlatform();
-                BuildStyleTree(m_classes, m_stylePlatform);
+				BuildStyleTree(m_classes, m_stylePlatform);
 
-                priv::Resource pmap = priv::GetResource(m_moduleHandle, "NORMAL", "VARIANT");
+				priv::Resource pmap = priv::GetResource(m_moduleHandle, "NORMAL", "VARIANT");
 				if (pmap.size != 0)
 					LoadProperties(pmap);
 				else throw std::runtime_error("Style contains no properties!");
 
-                priv::LoadStringTable(m_moduleHandle, m_stringTable);
+				priv::LoadStringTable(m_moduleHandle, m_stringTable);
 			}
 			else throw std::runtime_error("Couldn't open file as PE resource!");
 		}
 
-        bool SaveResources(priv::ModuleHandle moduleHandle, priv::UpdateHandle updateHandle, std::runtime_error& error)
+		bool SaveResources(priv::ModuleHandle moduleHandle, priv::UpdateHandle updateHandle, std::runtime_error& error)
 		{
 			for (auto& resource : m_resourceUpdates)
 			{
-                char* buffer;
-                unsigned int length;
-                const char* resName;
+				char* buffer;
+				unsigned int length;
+				const char* resName;
 
-                if (!priv::FileReadAllBytes(resource.second, &buffer, &length))
+				if (!priv::FileReadAllBytes(resource.second, &buffer, &length))
 				{
-                    char errorMsg[512];
-                    sprintf(errorMsg, "Replacing resource with id '%d' failed because '%s' is not accessible or missing!", resource.first.GetNameID(), resource.second.c_str());
-                    error = std::runtime_error(errorMsg);
-                    return false;
+					char errorMsg[512];
+					sprintf(errorMsg, "Replacing resource with id '%d' failed because '%s' is not accessible or missing!", resource.first.GetNameID(), resource.second.c_str());
+					error = std::runtime_error(errorMsg);
+					return false;
 				}
 
 				switch (resource.first.GetType())
@@ -188,21 +188,21 @@ namespace libmsstyle
 				}
 
 
-                priv::LanguageId lid = priv::GetFirstLanguageId(moduleHandle, resName, resource.first.GetNameID());
-                bool success = priv::UpdateStyleResource(updateHandle, resName, resource.first.GetNameID(), lid, buffer, length);
-                priv::FileFreeBytes(buffer);
+				priv::LanguageId lid = priv::GetFirstLanguageId(moduleHandle, resName, resource.first.GetNameID());
+				bool success = priv::UpdateStyleResource(updateHandle, resName, resource.first.GetNameID(), lid, buffer, length);
+				priv::FileFreeBytes(buffer);
 
 				if (!success)
 				{
-                    error = std::runtime_error("Could not update IMAGE/STREAM resource!");
-                    return false;
+					error = std::runtime_error("Could not update IMAGE/STREAM resource!");
+					return false;
 				}
 			}
 
-            return true;
+			return true;
 		}
 
-        bool SavePropertiesSorted(priv::ModuleHandle moduleHandle, priv::UpdateHandle updateHandle, std::runtime_error& error)
+		bool SavePropertiesSorted(priv::ModuleHandle moduleHandle, priv::UpdateHandle updateHandle, std::runtime_error& error)
 		{
 			// assume that twice the size common properties require is enough
 			int estimatedSize = m_propsFound * 48 * 2;
@@ -236,11 +236,11 @@ namespace libmsstyle
 						{
 							dataptr = writer.WriteProperty(dataptr, *(*propIt));
 
-                            if (dataptr - data > estimatedSize)
-                            {
-                                error = std::runtime_error("I haven't allocated enough memory to save the file..sorry for that!");
-                                return false;
-                            }
+							if (dataptr - data > estimatedSize)
+							{
+								error = std::runtime_error("I haven't allocated enough memory to save the file..sorry for that!");
+								return false;
+							}
 						}
 					}
 				}
@@ -250,91 +250,91 @@ namespace libmsstyle
 				// the properties, this shouldn't be necessary
 			}
 
-            priv::LanguageId lid = priv::GetFirstLanguageId(moduleHandle, "VARIANT", "NORMAL");
+			priv::LanguageId lid = priv::GetFirstLanguageId(moduleHandle, "VARIANT", "NORMAL");
 			unsigned int length = static_cast<unsigned int>(dataptr - data);
 
-            if (!priv::UpdateStyleResource(updateHandle, "VARIANT", "NORMAL", lid, data, length))
+			if (!priv::UpdateStyleResource(updateHandle, "VARIANT", "NORMAL", lid, data, length))
 			{
 				error = std::runtime_error("Could not update properties!");
-                return false;
+				return false;
 			}
 
-            return true;
+			return true;
 		}
 
 
-        void Save(const std::string& path)
-        {
-            // if source != destination
-            if (path != m_stylePath)
-            {
-                // copy the source file and modify the new one
-                // since we cant create a file from scratch
-                const std::string& originalFile = m_stylePath;
-                const std::string& newFile = path;
+		void Save(const std::string& path)
+		{
+			// if source != destination
+			if (path != m_stylePath)
+			{
+				// copy the source file and modify the new one
+				// since we cant create a file from scratch
+				const std::string& originalFile = m_stylePath;
+				const std::string& newFile = path;
 
-                priv::DuplicateFile(originalFile, newFile);
-            }
-            else
-            {
-                throw std::runtime_error("Cannot overwrite the original file!");
-            }
+				priv::DuplicateFile(originalFile, newFile);
+			}
+			else
+			{
+				throw std::runtime_error("Cannot overwrite the original file!");
+			}
 
-            priv::UpdateHandle updHandle = priv::BeginUpdate(path);
-            if (updHandle == NULL)
-            {
-                priv::RemoveFile(path);
-                throw std::runtime_error("Could not open the file for writing! (BeginUpdateResource)");
-            }
+			priv::UpdateHandle updHandle = priv::BeginUpdate(path);
+			if (updHandle == NULL)
+			{
+				priv::RemoveFile(path);
+				throw std::runtime_error("Could not open the file for writing! (BeginUpdateResource)");
+			}
 
-            std::runtime_error error("");
+			std::runtime_error error("");
 
-            // we could reuse m_moduleHandle here (from the original file) to query information
-            // but to be safe i am opening the new file and get its module handle instead.
-            priv::ModuleHandle modHandle = priv::OpenModule(path);
-            if (modHandle == NULL)
-            {
-                priv::EndUpdate(updHandle, true);
-                priv::RemoveFile(path);
-                throw std::runtime_error("Could not open the file for writing! (LoadLibraryEx)");
-            }
+			// we could reuse m_moduleHandle here (from the original file) to query information
+			// but to be safe i am opening the new file and get its module handle instead.
+			priv::ModuleHandle modHandle = priv::OpenModule(path);
+			if (modHandle == NULL)
+			{
+				priv::EndUpdate(updHandle, true);
+				priv::RemoveFile(path);
+				throw std::runtime_error("Could not open the file for writing! (LoadLibraryEx)");
+			}
 
-            if (!SaveResources(modHandle, updHandle, error))
-            {
-                priv::CloseModule(modHandle);
-                priv::EndUpdate(updHandle, true);
-                priv::RemoveFile(path);
-                throw error;
-            }
+			if (!SaveResources(modHandle, updHandle, error))
+			{
+				priv::CloseModule(modHandle);
+				priv::EndUpdate(updHandle, true);
+				priv::RemoveFile(path);
+				throw error;
+			}
 
-            if (!SavePropertiesSorted(modHandle, updHandle, error))
-            {
-                priv::CloseModule(modHandle);
-                priv::EndUpdate(updHandle, true);
-                priv::RemoveFile(path);
-                throw error;
-            }
+			if (!SavePropertiesSorted(modHandle, updHandle, error))
+			{
+				priv::CloseModule(modHandle);
+				priv::EndUpdate(updHandle, true);
+				priv::RemoveFile(path);
+				throw error;
+			}
 
-            if (m_canSaveStringTable)
-            {
-                if (!priv::UpdateStringTable(modHandle, updHandle, m_stringTable, error))
-                {
-                    priv::CloseModule(modHandle);
-                    priv::EndUpdate(updHandle, true);
-                    priv::RemoveFile(path);
-                    throw error;
-                }
-            }
+			if (m_canSaveStringTable)
+			{
+				if (!priv::UpdateStringTable(modHandle, updHandle, m_stringTable, error))
+				{
+					priv::CloseModule(modHandle);
+					priv::EndUpdate(updHandle, true);
+					priv::RemoveFile(path);
+					throw error;
+				}
+			}
 
-            // close the module before calling EndUpdate(). If not
-            // updating fails because the file is in use.
-            priv::CloseModule(modHandle);
+			// close the module before calling EndUpdate(). If not
+			// updating fails because the file is in use.
+			priv::CloseModule(modHandle);
 
-            int updateError = priv::EndUpdate(updHandle, false);
+			int updateError = priv::EndUpdate(updHandle, false);
 			if (updateError)
 			{
 				std::string msg = format_string("Could not write the changes to the file! Error Code: %d", updateError);
-                priv::RemoveFile(path);
+				priv::RemoveFile(path);
 				throw std::runtime_error(msg);
 				return;
 			}
@@ -361,39 +361,39 @@ namespace libmsstyle
 		}
 
 
-        StyleResource GetResource(int id, StyleResourceType type)
-        {
-            priv::Resource r;
-            switch (type)
-            {
-            case rtImage:
-                r = priv::GetResource(m_moduleHandle, id, "IMAGE");
-                return StyleResource(r.data, r.size, 0, StyleResourceType::rtImage);
-            case rtAtlas:
-                r = priv::GetResource(m_moduleHandle, id, "STREAM");
-                return StyleResource(r.data, r.size, 0, StyleResourceType::rtAtlas);
-            default:
-                return StyleResource(nullptr, 0, 0, StyleResourceType::rtNone);
-            }
-        }
+		StyleResource GetResource(int id, StyleResourceType type)
+		{
+			priv::Resource r;
+			switch (type)
+			{
+			case rtImage:
+				r = priv::GetResource(m_moduleHandle, id, "IMAGE");
+				return StyleResource(r.data, r.size, 0, StyleResourceType::rtImage);
+			case rtAtlas:
+				r = priv::GetResource(m_moduleHandle, id, "STREAM");
+				return StyleResource(r.data, r.size, 0, StyleResourceType::rtAtlas);
+			default:
+				return StyleResource(nullptr, 0, 0, StyleResourceType::rtNone);
+			}
+		}
 
 
-        StyleResource GetResourceFromProperty(const StyleProperty& prop)
-        {
-            priv::Resource r;
-            switch (prop.GetTypeID())
-            {
-            case FILENAME:
-            case FILENAME_LITE:
-                r = priv::GetResource(m_moduleHandle, prop.header.shortFlag, "IMAGE");
-                return StyleResource(r.data, r.size, 0, StyleResourceType::rtImage);
-            case DISKSTREAM:
-                r = priv::GetResource(m_moduleHandle, prop.header.shortFlag, "STREAM");
-                return StyleResource(r.data, r.size, 0, StyleResourceType::rtAtlas);
-            default:
-                return StyleResource(nullptr, 0, 0, StyleResourceType::rtNone);
-            }
-        }
+		StyleResource GetResourceFromProperty(const StyleProperty& prop)
+		{
+			priv::Resource r;
+			switch (prop.GetTypeID())
+			{
+			case FILENAME:
+			case FILENAME_LITE:
+				r = priv::GetResource(m_moduleHandle, prop.header.shortFlag, "IMAGE");
+				return StyleResource(r.data, r.size, 0, StyleResourceType::rtImage);
+			case DISKSTREAM:
+				r = priv::GetResource(m_moduleHandle, prop.header.shortFlag, "STREAM");
+				return StyleResource(r.data, r.size, 0, StyleResourceType::rtAtlas);
+			default:
+				return StyleResource(nullptr, 0, 0, StyleResourceType::rtNone);
+			}
+		}
 
 
 		void LoadClassmap(priv::Resource classResource)
@@ -559,11 +559,11 @@ namespace libmsstyle
 			else return Platform::WIN7;
 		}
 
-        bool m_canSaveStringTable;
+		bool m_canSaveStringTable;
 		int m_propsFound;
 		priv::ModuleHandle m_moduleHandle;
 		Platform m_stylePlatform;
-        StringTable m_stringTable;
+		StringTable m_stringTable;
 
 		std::string m_stylePath;
 		std::map<int32_t, StyleClass> m_classes;
@@ -606,10 +606,10 @@ namespace libmsstyle
 		return impl->m_propsFound;
 	}
 
-    StyleResource VisualStyle::GetResource(int id, StyleResourceType type)
-    {
-        return impl->GetResource(id, type);
-    }
+	StyleResource VisualStyle::GetResource(int id, StyleResourceType type)
+	{
+		return impl->GetResource(id, type);
+	}
 
 	StyleResource VisualStyle::GetResourceFromProperty(const StyleProperty& prop)
 	{
@@ -659,8 +659,8 @@ namespace libmsstyle
 		else return nullptr;
 	}
 
-    StringTable& VisualStyle::GetStringTable()
-    {
-        return impl->m_stringTable;
-    }
+	StringTable& VisualStyle::GetStringTable()
+	{
+		return impl->m_stringTable;
+	}
 }

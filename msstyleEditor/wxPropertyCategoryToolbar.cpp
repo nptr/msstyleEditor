@@ -11,7 +11,7 @@ bool wxCategoryToolbarRenderer::Render(wxDC& dc, const wxRect& rect,
 {
 	wxString text;
 	const wxPGCell* cell = NULL;
-	
+
 	int preDrawFlags = flags;
 	property->GetDisplayInfo(column, item, flags, &text, &cell);
 	PreDrawCell(dc, rect, *cell, preDrawFlags);

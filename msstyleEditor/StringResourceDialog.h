@@ -18,24 +18,24 @@
 class StringResourceDialog : public wxDialog
 {
 private:
-    libmsstyle::StringTable& m_table;
+	libmsstyle::StringTable& m_table;
 
 protected:
-    wxListCtrl* resourceTable;
-    wxTextCtrl* idField;
-    wxTextCtrl* textField;
-    wxButton* addButton;
-    wxButton* deleteButton;
+	wxListCtrl* resourceTable;
+	wxTextCtrl* idField;
+	wxTextCtrl* textField;
+	wxButton* addButton;
+	wxButton* deleteButton;
 
 public:
 
-    StringResourceDialog(wxWindow* parent, libmsstyle::StringTable& table, wxWindowID id = wxID_ANY, const wxString& title = wxT("String Resources"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(495, 440), long style = wxDEFAULT_DIALOG_STYLE);
-    ~StringResourceDialog();
+	StringResourceDialog(wxWindow* parent, libmsstyle::StringTable& table, wxWindowID id = wxID_ANY, const wxString& title = wxT("String Resources"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(495, 440), long style = wxDEFAULT_DIALOG_STYLE);
+	~StringResourceDialog();
 
-    void OnListItemSelected(wxListEvent&);
-    void OnListKeyDown(wxListEvent& args);
-    void OnSetStringEntry(wxCommandEvent& event);
-    void OnRemoveResourceEntry(wxCommandEvent& event);
+	void OnListItemSelected(wxListEvent&);
+	void OnListKeyDown(wxListEvent& args);
+	void OnSetStringEntry(wxCommandEvent& event);
+	void OnRemoveResourceEntry(wxCommandEvent& event);
 
-    void FillTableControl(libmsstyle::StringTable& table);
+	void FillTableControl(libmsstyle::StringTable& table);
 };

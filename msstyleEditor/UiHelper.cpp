@@ -55,7 +55,7 @@ wxPGProperty* GetWXPropertyFromMsStyleProperty(VisualStyle& style, StyleProperty
 	{
 		wxPGChoices* cp = GetEnumsFromMsStyleProperty(prop);
 		wxPGProperty* p;
-		
+
 		if (cp != nullptr)
 		{
 			p = new wxEnumProperty(propName, *wxPGProperty::sm_wxPG_LABEL, *cp, prop.data.enumtype.enumvalue);
@@ -118,9 +118,9 @@ wxPGProperty* GetWXPropertyFromMsStyleProperty(VisualStyle& style, StyleProperty
 	{
 		wxPGProperty* p;
 
-        if (style.GetStringTable().size() > 0)
+		if (style.GetStringTable().size() > 0)
 		{
-            wxPGChoices* cp = GetChoicesFromStringTable(style);
+			wxPGChoices* cp = GetChoicesFromStringTable(style);
 			p = new wxEnumProperty(propName, *wxPGProperty::sm_wxPG_LABEL, *cp, prop.GetResourceID());
 			delete cp;
 		}
@@ -143,9 +143,9 @@ wxPGProperty* GetWXPropertyFromMsStyleProperty(VisualStyle& style, StyleProperty
 		if (prop.data.intlist.numInts >= 3)
 		{
 			sprintf(str, "Len: %d, Values: %d, %d, %d, ...", prop.data.intlist.numInts
-                , prop.intlist[0]
-                , prop.intlist[1]
-                , prop.intlist[2]);
+				, prop.intlist[0]
+				, prop.intlist[1]
+				, prop.intlist[2]);
 		}
 		else sprintf(str, "Len: %d, Values omitted", prop.data.intlist.numInts);
 		wxStringProperty* p = new wxStringProperty(propName, *wxPGProperty::sm_wxPG_LABEL, str);
@@ -177,15 +177,15 @@ wxPGChoices* GetEnumsFromMsStyleProperty(libmsstyle::StyleProperty& prop)
 
 wxPGChoices* GetChoicesFromStringTable(libmsstyle::VisualStyle& style)
 {
-    char textbuffer[128];
+	char textbuffer[128];
 	wxPGChoices* choices = new wxPGChoices();
-    
-    libmsstyle::StringTable table = style.GetStringTable();
-    for (auto& entry : table)
-    {
-        sprintf(textbuffer, "%d - %s", entry.first, entry.second.c_str());
-        choices->Add(wxString::FromUTF8(textbuffer), entry.first);
-    }
+
+	libmsstyle::StringTable table = style.GetStringTable();
+	for (auto& entry : table)
+	{
+		sprintf(textbuffer, "%d - %s", entry.first, entry.second.c_str());
+		choices->Add(wxString::FromUTF8(textbuffer), entry.first);
+	}
 
 	return choices;
 }

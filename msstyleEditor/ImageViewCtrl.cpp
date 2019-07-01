@@ -4,7 +4,7 @@
 
 ImageViewCtrl::ImageViewCtrl()
 	: wxScrolledWindow()
-	, bitmap(0,0)
+	, bitmap(0, 0)
 	, backgroundStyle(BackgroundStyle::LightGrey)
 	, cellSize(CELL_SIZE, CELL_SIZE)
 {
@@ -102,7 +102,7 @@ void ImageViewCtrl::OnPaint(wxPaintEvent &event)
 	int drawX = (dcSize.GetWidth() / 2) - (bmpSize.GetWidth() / 2);
 	int drawY = (dcSize.GetHeight() / 2) - (bmpSize.GetHeight() / 2);
 	dc.DrawBitmap(bitmap, drawX, drawY, false);
-	
+
 	wxString txt;
 	txt << bitmap.GetWidth() << " x " << bitmap.GetHeight() << "px";
 	dc.DrawText(txt, 5, 5);

@@ -13,7 +13,7 @@ namespace libmsstyle
 		{
 		}
 
-		
+
 		const char* PropertyReader::ReadNextProperty(const char* source, Result& result, StyleProperty* prop)
 		{
 			const char* cursor = source;
@@ -35,12 +35,12 @@ namespace libmsstyle
 			// Copy the data
 			switch (prop->header.typeID)
 			{
-			// Arbitrary
+				// Arbitrary
 			case IDENTIFIER::INTLIST:
 			{
-                if (prop->header.sizeInBytes == 0)
+				if (prop->header.sizeInBytes == 0)
 				{
-                    prop->data.intlist.numInts = 0;
+					prop->data.intlist.numInts = 0;
 				}
 				else
 				{
@@ -95,7 +95,7 @@ namespace libmsstyle
 			case IDENTIFIER::FILENAME_LITE:
 			case IDENTIFIER::DISKSTREAM:
 			case IDENTIFIER::FONT:
-			// 40 bytes
+				// 40 bytes
 			case IDENTIFIER::INT:
 			case IDENTIFIER::SIZE:
 			case IDENTIFIER::BOOLTYPE:
@@ -103,7 +103,7 @@ namespace libmsstyle
 			case IDENTIFIER::ENUM:
 			case IDENTIFIER::POSITION:
 			case IDENTIFIER::HIGHCONTRASTCOLORTYPE:
-			// 48 bytes
+				// 48 bytes
 			case IDENTIFIER::RECTTYPE:
 			case IDENTIFIER::MARGINS:
 			{

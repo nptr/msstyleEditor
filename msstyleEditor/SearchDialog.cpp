@@ -37,18 +37,18 @@ SearchDialog::SearchDialog(wxWindow* parent, wxWindowID id, const wxString& titl
 	typeBox->Connect(wxEVT_CHOICE, wxCommandEventHandler(SearchDialog::OnSearchTypeChanged), NULL, this);
 	searchBar->Connect(wxEVT_SEARCHCTRL_SEARCH_BTN, wxCommandEventHandler(SearchDialog::OnNextButtonClicked), NULL, this);
 	searchBar->Connect(wxEVT_TEXT_ENTER, wxCommandEventHandler(SearchDialog::OnNextButtonClicked), NULL, this);
-	
+
 	typeBox->Enable(false);
-	typeBox->Append("COLOR",	(void*)libmsstyle::IDENTIFIER::COLOR);
-	typeBox->Append("MARGINS",	(void*)libmsstyle::IDENTIFIER::MARGINS);
-	typeBox->Append("SIZE",		(void*)libmsstyle::IDENTIFIER::SIZE);
+	typeBox->Append("COLOR", (void*)libmsstyle::IDENTIFIER::COLOR);
+	typeBox->Append("MARGINS", (void*)libmsstyle::IDENTIFIER::MARGINS);
+	typeBox->Append("SIZE", (void*)libmsstyle::IDENTIFIER::SIZE);
 	typeBox->Append("POSITION", (void*)libmsstyle::IDENTIFIER::POSITION);
-	typeBox->Append("RECT",		(void*)libmsstyle::IDENTIFIER::RECTTYPE);
+	typeBox->Append("RECT", (void*)libmsstyle::IDENTIFIER::RECTTYPE);
 	typeBox->Select(0);
 
 	this->SetSizer(bSizer9);
 	this->Layout();
-    bSizer9->Fit(this);
+	bSizer9->Fit(this);
 
 	this->Centre(wxBOTH);
 
@@ -88,27 +88,27 @@ void SearchDialog::OnSearchTypeChanged(wxCommandEvent& evt)
 	search.type = (int)evt.GetClientData();
 	switch (search.type)
 	{
-		case libmsstyle::IDENTIFIER::COLOR:
-		{
-			searchBar->SetDescriptiveText("r, g, b");
-		} break;
-		case libmsstyle::IDENTIFIER::SIZE:
-		{
-			searchBar->SetDescriptiveText("size");
-		} break;
-		case libmsstyle::IDENTIFIER::MARGINS:
-		case libmsstyle::IDENTIFIER::RECTTYPE:
-		{
-			searchBar->SetDescriptiveText("l, t, r, b");
-		} break;
-		case libmsstyle::IDENTIFIER::POSITION:
-		{
-			searchBar->SetDescriptiveText("x, y");
-		} break;
-		default:
-		{
-			assert(false);
-		} break;
+	case libmsstyle::IDENTIFIER::COLOR:
+	{
+		searchBar->SetDescriptiveText("r, g, b");
+	} break;
+	case libmsstyle::IDENTIFIER::SIZE:
+	{
+		searchBar->SetDescriptiveText("size");
+	} break;
+	case libmsstyle::IDENTIFIER::MARGINS:
+	case libmsstyle::IDENTIFIER::RECTTYPE:
+	{
+		searchBar->SetDescriptiveText("l, t, r, b");
+	} break;
+	case libmsstyle::IDENTIFIER::POSITION:
+	{
+		searchBar->SetDescriptiveText("x, y");
+	} break;
+	default:
+	{
+		assert(false);
+	} break;
 	}
 }
 
