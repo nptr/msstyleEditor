@@ -10,25 +10,25 @@ namespace libmsstyle
 {
 	const PartMap PARTS_ADDRESSBAND[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "BACKGROUND", VS_STATE(STATES_EDITTEXT_BG) }, // reuse states
 	};
 
 	const PartMap PARTS_BARRIERPAGE[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "PANEBACKGROUND", VS_STATE_NONE },
 	};
 
 	const PartMap PARTS_BREADCRUMBBAR[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "OVERFLOWCHEVRON", VS_STATE_NONE },
 	};
 
 	const PartMap PARTS_BUTTON[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "PUSHBUTTON", VS_STATE(STATES_PUSHBUTTON) },
 		{ 2, "RADIOBUTTON", VS_STATE(STATES_RADIOBUTTON) },
 		{ 3, "CHECKBOX", VS_STATE(STATES_CHECKBOX) },
@@ -49,7 +49,7 @@ namespace libmsstyle
 
 	const PartMap PARTS_CHARTVIEW[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "CPU_BACKGROUND", VS_STATE_NONE },
 		{ 2, "CPU_BORDER", VS_STATE_NONE },
 		{ 3, "CPU_GRID", VS_STATE_NONE },
@@ -96,7 +96,7 @@ namespace libmsstyle
 
 	const PartMap PARTS_COMMANDMODULE_WIN7[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "MODULEBACKGROUND", VS_STATE_NONE },
 		{ 2, "MODULEBACKGROUNDCOLORS", VS_STATE_NONE },
 		{ 3, "TASKBUTTON", VS_STATE(STATES_COMMANDMODULE_SPLITBUTTON) },
@@ -113,7 +113,7 @@ namespace libmsstyle
 
 	const PartMap PARTS_COMMANDMODULE_WIN8[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "MODULEBACKGROUND", VS_STATE_NONE },
 		{ 2, "MODULEBACKGROUNDCOLORS", VS_STATE_NONE },
 		{ 3, "TASKBUTTON", VS_STATE(STATES_COMMANDMODULE_SPLITBUTTON) },
@@ -128,13 +128,13 @@ namespace libmsstyle
 
 	const PartMap PARTS_COMMUNICATIONS[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "TAB", VS_STATE(STATES_TAB) },
 	};
 
 	const PartMap PARTS_COMBOBOX[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "DROPDOWNBUTTON", VS_STATE_NONE },
 		{ 2, "BACKGROUND", VS_STATE_NONE },
 		{ 3, "TRANSPARENTBACKGROUND", VS_STATE(STATES_CB_TRANSPARENTBG) },
@@ -147,7 +147,7 @@ namespace libmsstyle
 
 	const PartMap PARTS_CONTROLPANEL[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "NAVIGATIONPANE", VS_STATE_NONE },
 		{ 2, "CONTENTPANE", VS_STATE(STATES_CONTROLPANEL_CONTENTPANE) },
 		{ 3, "NAVPANELLABEL", VS_STATE_NONE },
@@ -171,25 +171,25 @@ namespace libmsstyle
 
 	const PartMap PARTS_COPYCLOSE[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "COPYCLOSEBTN", VS_STATE(STATES_COPYCLOSEBTN) },
 	};
 
 	const PartMap PARTS_DROPLIST[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "MENUBUTTON", VS_STATE_NONE },
 	};
 
 	const PartMap PARTS_EMPTYMARKUP[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "MARKUPTEXT", VS_STATE_NONE },
 	};
 
 	const PartMap PARTS_EXPLORERBAR[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "HEADERBACKGROUND", VS_STATE_NONE },
 		{ 2, "HEADERCLOSE", VS_STATE(STATES_EXPLORERBAR_GENERAL) },
 		{ 3, "HEADERPIN", VS_STATE(STATES_EXPLORERBAR_HDRPIN) },
@@ -206,14 +206,14 @@ namespace libmsstyle
 
 	const PartMap PARTS_INFOBAR[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "BACKGROUND", VS_STATE_NONE },
 		{ 2, "FOREGROUND", VS_STATE_NONE }, // W10
 	};
 
 	const PartMap PARTS_ITEMSVIEW[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "SEARCHHIT", VS_STATE(STATES_ITEMSVIEW_SEARCHHIT) },
 		{ 2, "SUBSETBUTTON", VS_STATE_NONE },
 		{ 3, "FOCUSRECT", VS_STATE(STATES_ITEMSVIEW_FOCUSRECT) },
@@ -224,7 +224,7 @@ namespace libmsstyle
 
 	const PartMap PARTS_LISTBOX[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "BORDER_HSCROLL", VS_STATE(STATES_LISTBOX_SCROLL) },
 		{ 2, "BORDER_HVSCROLL", VS_STATE(STATES_LISTBOX_SCROLL) },
 		{ 3, "BORDER_NOSCROLL", VS_STATE(STATES_LISTBOX_SCROLL) },
@@ -234,7 +234,7 @@ namespace libmsstyle
 
 	const PartMap PARTS_LISTVIEW[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "LISTITEM", VS_STATE(STATES_LISTVIEW_ITEMS) },
 		{ 2, "LISTGROUP", VS_STATE_NONE },
 		{ 3, "LISTDETAIL", VS_STATE_NONE },
@@ -249,13 +249,13 @@ namespace libmsstyle
 
 	const PartMap PARTS_LINK[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "HyperLink", VS_STATE(STATES_TOOLTIP_BALLOON_AND_STANDARD) }, // reuse states
 	};
 
 	const PartMap PARTS_MENU[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "MENUITEM", VS_STATE_NONE },
 		{ 2, "MENUDROPDOWN", VS_STATE_NONE },
 		{ 3, "MENUBARITEM", VS_STATE(STATES_MENU_BARITEM) },
@@ -280,7 +280,7 @@ namespace libmsstyle
 
 	const PartMap PARTS_NAVIGATION[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "BACKBUTTON", VS_STATE(STATES_PUSHBUTTON) }, // reuse button states
 		{ 2, "FORWARDBUTTON", VS_STATE(STATES_PUSHBUTTON) },
 		{ 3, "MENUBUTTON", VS_STATE(STATES_PUSHBUTTON) },
@@ -288,7 +288,7 @@ namespace libmsstyle
 
 	const PartMap PARTS_TREEVIEW[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "TREEITEM", VS_STATE(STATES_TREEVIEW_ITEM) },
 		{ 2, "GLYPH", VS_STATE(STATES_TREEVIEW_GLYPH) },
 		{ 3, "BRANCH", VS_STATE_NONE },
@@ -297,7 +297,7 @@ namespace libmsstyle
 
 	const PartMap PARTS_WINDOW[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "CAPTION", VS_STATE(STATES_WINDOW_CAPTION_GEN) },
 		{ 2, "SMALLCAPTION", VS_STATE(STATES_WINDOW_CAPTION_GEN) },
 		{ 3, "MINCAPTION", VS_STATE(STATES_WINDOW_CAPTION_GEN) },
@@ -341,7 +341,7 @@ namespace libmsstyle
 
 	const PartMap PARTS_DWMPEN[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "PENBARREL", VS_STATE_NONE },
 		{ 2, "PENHOLD", VS_STATE_NONE },
 		{ 3, "PENRIGHTTAP", VS_STATE_NONE },
@@ -370,7 +370,7 @@ namespace libmsstyle
 
 	const PartMap PARTS_DWMTOUCH[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "TOUCHDRAG", VS_STATE_NONE },
 		{ 2, "TOUCHCONTACT", VS_STATE_NONE },
 		{ 3, "TETHER", VS_STATE_NONE },
@@ -384,7 +384,7 @@ namespace libmsstyle
 	// Uses custom naming.
 	const PartMap PARTS_DWMWINDOW_WIN7[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "FRAMEBOTTOM", VS_STATE(STATES_WINDOW_FRAME_GEN) },
 		{ 2, "FRAMEBOTTOMSHADOW", VS_STATE(STATES_WINDOW_FRAME_GEN) },
 		{ 3, "RESTOREBUTTON", VS_STATE(STATES_WINDOW_BTN_AND_THUMB) },
@@ -462,7 +462,7 @@ namespace libmsstyle
 	// and guesswork?? Can't remember. Uses custom naming.. TODO: consult PDBs
 	const PartMap PARTS_DWMWINDOW_WIN81[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "FRAMEBOTTOM", VS_STATE(STATES_WINDOW_FRAME_GEN) },
 		{ 2, "FRAMEBOTTOMSHADOW", VS_STATE(STATES_WINDOW_FRAME_GEN) },
 		{ 3, "RESTOREBUTTON", VS_STATE(STATES_WINDOW_BTN_AND_THUMB) },
@@ -532,7 +532,7 @@ namespace libmsstyle
 	// States are generic and might not match every part.
 	const PartMap PARTS_DWMWINDOW_WIN10[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "BOTTOMFRAME", VS_STATE(STATES_WINDOW_FRAME_GEN) },
 		{ 2, "BOTTOMSHADOW", VS_STATE(STATES_WINDOW_FRAME_GEN) },
 		{ 3, "BUTTONACTIVECAPTION", VS_STATE(STATES_WINDOW_BTN_AND_THUMB) },
@@ -628,7 +628,7 @@ namespace libmsstyle
 
 	const PartMap PARTS_EDIT[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "EDITTEXT", VS_STATE(STATES_EDITTEXT) },
 		{ 2, "CARET", VS_STATE_NONE },
 		{ 3, "BACKGROUND", VS_STATE(STATES_EDITTEXT_BG) },
@@ -642,7 +642,7 @@ namespace libmsstyle
 
 	const PartMap PARTS_TASKDIALOG[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "PRIMARYPANEL", VS_STATE_NONE },
 		{ 2, "MAININSTRUCTIONPANE", VS_STATE_NONE },
 		{ 3, "MAINICON", VS_STATE_NONE },
@@ -668,7 +668,7 @@ namespace libmsstyle
 
 	const PartMap PARTS_HEADER[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "HEADERITEM", VS_STATE(STATES_HEADER_ITEMSTATES) },
 		{ 2, "HEADERITEMLEFT", VS_STATE(STATES_HEADER_LEFT_AND_RIGHT) },
 		{ 3, "HEADERITEMRIGHT", VS_STATE(STATES_HEADER_LEFT_AND_RIGHT) },
@@ -680,14 +680,14 @@ namespace libmsstyle
 
 	const PartMap PARTS_READINGPANE[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "BACKGROUNDCOLORS", VS_STATE_NONE },
 		{ 2, "LABEL", VS_STATE_NONE },
 	};
 
 	const PartMap PARTS_REBAR[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "GRIPPER", VS_STATE_NONE },
 		{ 2, "GRIPPERVERT", VS_STATE_NONE },
 		{ 3, "BAND", VS_STATE_NONE },
@@ -700,7 +700,7 @@ namespace libmsstyle
 
 	const PartMap PARTS_AEROWIZARD[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "TITLEBAR", VS_STATE(STATES_WINDOW_FRAME_GEN) }, // reuse
 		{ 2, "HEADERAREA", VS_STATE(STATES_AEROWIZARD_HEADERAREA) },
 		{ 3, "CONTENTAREA", VS_STATE(STATES_AEROWIZARD_HEADERAREA) },
@@ -710,13 +710,13 @@ namespace libmsstyle
 
 	const PartMap PARTS_PAUSE[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "PAUSEBUTTON", VS_STATE_NONE },
 	};
 
 	const PartMap PARTS_PROGRESS[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "BAR", VS_STATE_NONE },
 		{ 2, "BARVERT", VS_STATE_NONE },
 		{ 3, "CHUNK", VS_STATE_NONE },
@@ -733,14 +733,14 @@ namespace libmsstyle
 
 	const PartMap PARTS_PROPERTREE[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "FOLDERSHEADER", VS_STATE_NONE },
 		{ 2, "BACKGROUND", VS_STATE_NONE },
 	};
 
 	const PartMap PARTS_PREVIEWPANE[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "PREVIEWBACKGROUND", VS_STATE_NONE },
 		{ 2, "EDITPROPERTIES", VS_STATE_NONE },
 		{ 3, "NAVPANESIZER", VS_STATE_NONE },
@@ -754,7 +754,7 @@ namespace libmsstyle
 
 	const PartMap PARTS_TRACKBAR[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "TRACK", VS_STATE(STATES_TRACKBAR_GENERAL) },
 		{ 2, "TRACKVERT", VS_STATE(STATES_TRACKBAR_GENERAL) },
 		{ 3, "THUMB", VS_STATE(STATES_TRACKBAR_THUMB_GEN) },
@@ -769,7 +769,7 @@ namespace libmsstyle
 
 	const PartMap PARTS_TAB[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "TABITEM", VS_STATE(STATES_TABITEM_GENERAL) },
 		{ 2, "TABITEMLEFTEDGE", VS_STATE(STATES_TABITEM_GENERAL) },
 		{ 3, "TABITEMRIGHTEDGE", VS_STATE(STATES_TABITEM_GENERAL) },
@@ -785,7 +785,7 @@ namespace libmsstyle
 
 	const PartMap PARTS_TOOLTIP[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "STANDARD", VS_STATE(STATES_TOOLTIP_BALLOON_AND_STANDARD) },
 		{ 2, "STANDARDTITLE", VS_STATE_NONE },
 		{ 3, "BALLOON", VS_STATE(STATES_TOOLTIP_BALLOON_AND_STANDARD) },
@@ -809,21 +809,21 @@ namespace libmsstyle
 
 	const PartMap PARTS_TASKBARPEARL[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "PEARLICON", VS_STATE_NONE },
 		{ 2, "TABLETMODEPEARLICON", VS_STATE_NONE },
 	};
 
 	const PartMap PARTS_TASKBARSHOWDESKTOP[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "SHOWDESKTOPTHEME", VS_STATE_NONE },
 		{ 2, "DIVIDERLINE", VS_STATE_NONE },
 	};
 
 	const PartMap PARTS_TASKBAND[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "GROUPCONTENT", VS_STATE_NONE },
 		{ 2, "FLASHBUTTON", VS_STATE_NONE },
 		{ 3, "FLASHBUTTONGROUPMENU", VS_STATE_NONE },
@@ -831,7 +831,7 @@ namespace libmsstyle
 
 	const PartMap PARTS_TASKBAND2[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "BARTOP", VS_STATE_NONE },
 		{ 2, "BARBOTTOM", VS_STATE_NONE },
 		{ 3, "BARRIGHT", VS_STATE_NONE },
@@ -850,7 +850,7 @@ namespace libmsstyle
 
 	const PartMap PARTS_TASKBANDEXUI[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "BACKGROUND", VS_STATE_NONE },
 		{ 2, "BACKGROUNDSHADOW", VS_STATE_NONE },
 		{ 3, "THUMBRECT", VS_STATE_NONE },
@@ -871,7 +871,7 @@ namespace libmsstyle
 
 	const PartMap PARTS_TASKMANAGER[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "ROW", VS_STATE_NONE },
 		{ 2, "COLUMNDIVIDER", VS_STATE_NONE },
 		{ 3, "HEATMAP_COLOR0", VS_STATE_NONE },
@@ -922,19 +922,19 @@ namespace libmsstyle
 
 	const PartMap PARTS_TEXTSELECTIONGRIPPER[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "GRIPPER", VS_STATE_NONE },
 	};
 
 	const PartMap PARTS_TEXTGLOW[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "BACKGROUND", VS_STATE_NONE },
 	};
 
 	const PartMap PARTS_TEXTSTYLE[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "MAININSTRUCTION", VS_STATE_NONE },
 		{ 2, "INSTRUCTION", VS_STATE_NONE },
 		{ 3, "BODYTITLE", VS_STATE_NONE },
@@ -948,21 +948,21 @@ namespace libmsstyle
 
 	const PartMap PARTS_TRAYNOTIFY[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "BACKGROUND", VS_STATE_NONE },
 		{ 2, "ANIMBACKGROUND", VS_STATE_NONE },
 	};
 
 	const PartMap PARTS_TRYHARDER[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "BUTTON", VS_STATE_NONE },
 		{ 2, "VERTICAL", VS_STATE_NONE },
 	};
 
 	const PartMap PARTS_SPIN[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "UP", VS_STATE(STATES_SPIN_GENERAL) },
 		{ 2, "DOWN", VS_STATE(STATES_SPIN_GENERAL) },
 		{ 3, "UPHORZ", VS_STATE(STATES_SPIN_GENERAL) },
@@ -971,7 +971,7 @@ namespace libmsstyle
 
 	const PartMap PARTS_SEARCHBOX[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "BACKGROUND", VS_STATE_NONE },
 		{ 2, "CLEARBUTTON", VS_STATE(STATES_PUSHBUTTON) }, //W10
 		{ 3, "SEARCHBUTTON", VS_STATE(STATES_PUSHBUTTON) }, //W10
@@ -979,7 +979,7 @@ namespace libmsstyle
 
 	const PartMap PARTS_SEARCHHOME[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "BACKGROUND", VS_STATE_NONE },
 		{ 2, "LINE", VS_STATE_NONE },
 	};
@@ -1001,13 +1001,13 @@ namespace libmsstyle
 
 	const PartMap PARTS_STATIC[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "TEXT", VS_STATE_NONE },
 	};
 
 	const PartMap PARTS_STATUS[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "PANE", VS_STATE_NONE },
 		{ 2, "GRIPPERPANE", VS_STATE_NONE },
 		{ 3, "GRIPPER", VS_STATE_NONE },
@@ -1015,7 +1015,7 @@ namespace libmsstyle
 
 	const PartMap PARTS_FLYOUT[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "HEADER", VS_STATE(STATES_FLYOUT_HEADER) },
 		{ 2, "BODY", VS_STATE(STATES_FLYOUT_BODY) },
 		{ 3, "LABEL", VS_STATE(STATES_FLYOUT_LABEL) },
@@ -1028,7 +1028,7 @@ namespace libmsstyle
 
 	const PartMap PARTS_DRAGDROP[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "COPY", VS_STATE(STATES_DND_GENERAL) },
 		{ 2, "MOVE", VS_STATE(STATES_DND_GENERAL) },
 		{ 3, "UPDATEMETADATA", VS_STATE(STATES_DND_GENERAL) },
@@ -1041,7 +1041,7 @@ namespace libmsstyle
 
 	const PartMap PARTS_DATEPICKER[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "DATETEXT", VS_STATE(STATES_DATE_TEXT) },
 		{ 2, "DATEBORDER", VS_STATE(STATES_DATE_BORDER) },
 		{ 3, "SHOWCALENDARBUTTONRIGHT", VS_STATE(STATES_DATE_CALENDERBUTTONRIGHT) },
@@ -1049,7 +1049,7 @@ namespace libmsstyle
 
 	const PartMap PARTS_TASKBAR[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "BACKGROUNDBOTTOM", VS_STATE_NONE },
 		{ 2, "BACKGROUNDRIGHT", VS_STATE_NONE },
 		{ 3, "BACKGROUNDTOP", VS_STATE_NONE },
@@ -1062,7 +1062,7 @@ namespace libmsstyle
 
 	const PartMap PARTS_STARTPANEL[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "USERPANE", VS_STATE_NONE },
 		{ 2, "MOREPROGRAMS", VS_STATE_NONE },
 		{ 3, "MOREPROGRAMSARROW", VS_STATE_NONE },
@@ -1086,7 +1086,7 @@ namespace libmsstyle
 
 	const PartMap PARTS_STARTPANELPRIV[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "USERPANE", VS_STATE_NONE },
 		{ 2, "MOREPROGRAMS", VS_STATE_NONE },
 		{ 3, "MOREPROGRAMSDEST", VS_STATE_NONE },
@@ -1129,7 +1129,7 @@ namespace libmsstyle
 
 	const PartMap PARTS_MONTHCAL[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "BACKGROUND", VS_STATE_NONE },
 		{ 2, "BORDERS", VS_STATE_NONE },
 		{ 3, "GRIDBACKGROUND", VS_STATE_NONE },
@@ -1145,7 +1145,7 @@ namespace libmsstyle
 
 	const PartMap PARTS_USERTILE[] =
 	{
-		{ 0, "Common Properties", VS_STATE_NONE },
+		{ 0, "Common Properties", VS_STATE(STATES_COMMON_DEFAULT) },
 		{ 1, "STROKEBACKGROUND", VS_STATE_NONE },
 		{ 2, "HOVERBACKGROUND", VS_STATE_NONE },
 	};

@@ -124,5 +124,6 @@ namespace libmsstyle
 		void UpdateMargin(int left, int top, int right, int bottom);
 		void UpdatePosition(int x, int y);
 		void UpdateFont(int fontID);
+		void UpdateHCC(int enumValHCC);
 	};
 }

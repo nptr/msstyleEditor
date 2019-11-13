@@ -10,7 +10,10 @@ const char* typeNameArray[] =
 	"Bool",
 	"Color",
 	"Margin",
-	"Position"
+	"Filename",
+	"Size",
+	"Position",
+	"HighContrastColor"
 };
 
 const int typeIdArray[] =
@@ -20,7 +23,10 @@ const int typeIdArray[] =
 	203,
 	204,
 	205,
-	208
+	206,
+	207,
+	208,
+	241
 };
 
 
@@ -70,6 +76,9 @@ AddPropertyDialog::AddPropertyDialog(wxWindow* parent, wxWindowID id, const wxSt
 	typeBoxChoices.Add(typeNameArray[3]);
 	typeBoxChoices.Add(typeNameArray[4]);
 	typeBoxChoices.Add(typeNameArray[5]);
+	typeBoxChoices.Add(typeNameArray[6]);
+	typeBoxChoices.Add(typeNameArray[7]);
+	typeBoxChoices.Add(typeNameArray[8]);
 	typeBox = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, typeBoxChoices, 0);
 	typeBox->SetSelection(0);
 	typeBox->SetMaxSize(wxSize(120, -1));

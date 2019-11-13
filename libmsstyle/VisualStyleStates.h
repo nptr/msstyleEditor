@@ -10,6 +10,8 @@ namespace libmsstyle
 		const char* stateName;
 	} StateMap;
 
+	extern const StateMap STATES_COMMON_DEFAULT[1];
+
 	extern const StateMap STATES_AEROWIZARD_HEADERAREA[2];
 
 	extern const StateMap STATES_PUSHBUTTON[7];

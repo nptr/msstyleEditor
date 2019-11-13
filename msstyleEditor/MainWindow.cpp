@@ -445,7 +445,6 @@ void MainWindow::OnPropertyGridChanging(wxPropertyGridEvent& event)
 		styleProp->UpdateInteger(event.GetValidationInfo().GetValue().GetInteger()); break;
 	case IDENTIFIER::SIZE:
 		styleProp->UpdateSize(event.GetValidationInfo().GetValue().GetInteger()); break;
-	case IDENTIFIER::HIGHCONTRASTCOLORTYPE:
 	case IDENTIFIER::ENUM:
 		styleProp->UpdateEnum(event.GetValidationInfo().GetValue().GetInteger()); break;
 	case IDENTIFIER::BOOLTYPE:
@@ -490,6 +489,8 @@ void MainWindow::OnPropertyGridChanging(wxPropertyGridEvent& event)
 	} break;
 	case IDENTIFIER::FONT:
 		styleProp->UpdateFont(event.GetValidationInfo().GetValue().GetInteger()); break;
+	case IDENTIFIER::HIGHCONTRASTCOLORTYPE:
+		styleProp->UpdateHCC(event.GetValidationInfo().GetValue().GetInteger()); break;
 	default:
 	{
 		char msg[100];
@@ -548,7 +549,7 @@ void MainWindow::OnPropertyGridItemDelete(wxCommandEvent& event)
 	}
 
 	StyleProperty* prop = static_cast<StyleProperty*>(wxprop->GetClientData());
-	if (prop->GetTypeID() == IDENTIFIER::FILENAME ||
+	if (/*prop->GetTypeID() == IDENTIFIER::FILENAME ||*/
 		prop->GetTypeID() == IDENTIFIER::FILENAME_LITE ||
 		prop->GetTypeID() == IDENTIFIER::DISKSTREAM)
 	{

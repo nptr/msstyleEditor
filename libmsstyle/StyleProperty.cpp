@@ -224,6 +224,12 @@ namespace libmsstyle
 		header.shortFlag = fontID;
 	}
 
+	void StyleProperty::UpdateHCC(int enumValHCC)
+	{
+		assert(header.typeID == IDENTIFIER::HIGHCONTRASTCOLORTYPE);
+		data.enumtype.enumvalue = enumValHCC;
+	}
+
 	int StyleProperty::GetResourceID() const
 	{
 		return header.shortFlag;
@@ -360,6 +366,9 @@ namespace libmsstyle
 		case libmsstyle::BITMAPREF:
 			break;
 		case libmsstyle::FLOAT:
+			break;
+		case libmsstyle::HIGHCONTRASTCOLORTYPE:
+			this->header.sizeInBytes = 0x4;
 			break;
 		default:
 			break;
