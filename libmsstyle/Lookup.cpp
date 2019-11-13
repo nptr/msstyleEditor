@@ -165,8 +165,26 @@ namespace libmsstyle
 			}
 			else if (strstr(className, "CommandModule"))
 			{
-				m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_COMMANDMODULE);
-				m.parts = PARTS_COMMANDMODULE;
+				switch (platform)
+				{
+				case Platform::WIN7:
+				{
+					m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_COMMANDMODULE_WIN7);
+					m.parts = PARTS_COMMANDMODULE_WIN7;
+				} break;
+				case Platform::WIN8:
+				case Platform::WIN81:
+				case Platform::WIN10:
+				{
+					m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_COMMANDMODULE_WIN8);
+					m.parts = PARTS_COMMANDMODULE_WIN8;
+				} break;
+				default:
+				{
+					m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_COMMANDMODULE_WIN8);
+					m.parts = PARTS_COMMANDMODULE_WIN8;
+				} break;
+				}
 			}
 			else if (strstr(className, "CommunicationsStyle"))
 			{

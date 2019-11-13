@@ -25,7 +25,9 @@ namespace libmsstyle
 
 	extern const PartMap PARTS_CHARTVIEW[43];
 
-	extern const PartMap PARTS_COMMANDMODULE[13];
+	extern const PartMap PARTS_COMMANDMODULE_WIN7[13];
+
+	extern const PartMap PARTS_COMMANDMODULE_WIN8[11];
 
 	extern const PartMap PARTS_COMMUNICATIONS[2];
 
@@ -65,7 +67,7 @@ namespace libmsstyle
 
 	extern const PartMap PARTS_DWMWINDOW_WIN7[72];
 
-	extern const PartMap PARTS_DWMWINDOW_WIN81[51];
+	extern const PartMap PARTS_DWMWINDOW_WIN81[64];
 
 	extern const PartMap PARTS_DWMWINDOW_WIN10[92];
 
