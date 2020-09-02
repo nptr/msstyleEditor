@@ -167,6 +167,11 @@ namespace libmsstyle
 			{
 				switch (platform)
 				{
+				case Platform::WINVista:
+				{
+					m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_COMMANDMODULE_WINVista);
+					m.parts = PARTS_COMMANDMODULE_WINVista;
+				} break;
 				case Platform::WIN7:
 				{
 					m.numParts = MSSTYLE_ARRAY_LENGTH(PARTS_COMMANDMODULE_WIN7);

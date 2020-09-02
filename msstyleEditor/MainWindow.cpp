@@ -247,6 +247,13 @@ void MainWindow::OnExportLogicalStructure(wxCommandEvent& event)
 	}
 }
 
+namespace ntdll
+{
+	typedef NTSTATUS(WINAPI *RtlGetVersionPtr)(PRTL_OSVERSIONINFOW lpVersionInformation);
+	HMODULE hModule = LoadLibraryW(L"ntdll.dll");
+	RtlGetVersionPtr RtlGetVersionFunction = (RtlGetVersionPtr)GetProcAddress(hModule, "RtlGetVersion");
+}
+
 void MainWindow::OnThemeApply(wxCommandEvent& event)
 {
 	if (currentStyle == nullptr)
@@ -267,14 +274,22 @@ void MainWindow::OnThemeApply(wxCommandEvent& event)
 	}
 
 	bool needConfirmation = false;
-	OSVERSIONINFO version;
-	ZeroMemory(&version, sizeof(OSVERSIONINFO));
-	version.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 
-#pragma warning( disable : 4996 )
-	GetVersionEx(&version);
+	RTL_OSVERSIONINFOW version;
+	ZeroMemory(&version, sizeof(RTL_OSVERSIONINFOW));
+	version.dwOSVersionInfoSize = sizeof(RTL_OSVERSIONINFOW);
+
+	// the user function lies sometimes, so we use the kernel one...
+	ntdll::RtlGetVersionFunction(&version);
 
 	libmsstyle::Platform styleplatform = currentStyle->GetCompatiblePlatform();
+
+	if (version.dwMajorVersion == 6 &&
+		version.dwMinorVersion == 0 &&
+		styleplatform != libmsstyle::Platform::WINVista)
+	{
+		needConfirmation = true;
+	}
 
 	if (version.dwMajorVersion == 6 &&
 		version.dwMinorVersion == 1 &&
@@ -284,7 +299,7 @@ void MainWindow::OnThemeApply(wxCommandEvent& event)
 	}
 
 	if (version.dwMajorVersion == 6 &&
-		version.dwMinorVersion >= 2 &&
+		(version.dwMinorVersion == 2 || version.dwMinorVersion == 3) &&
 		styleplatform != libmsstyle::Platform::WIN8 &&
 		styleplatform != libmsstyle::Platform::WIN81)
 	{

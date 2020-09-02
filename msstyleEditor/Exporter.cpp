@@ -28,6 +28,10 @@ void Exporter::ExportLogicalStructure(const std::wstring& path, libmsstyle::Visu
 
 	switch (style.GetCompatiblePlatform())
 	{
+	case libmsstyle::WINVista:
+	{
+		txt.append("\nPlatform: Windows Vista\n\n");
+	} break;
 	case libmsstyle::WIN7:
 	{
 		txt.append("\nPlatform: Windows 7\n\n");

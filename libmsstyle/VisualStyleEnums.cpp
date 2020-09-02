@@ -43,8 +43,8 @@ namespace libmsstyle
 	const EnumMap ENUM_ALIGNMENT_H[] =
 	{
 		{ 0, "LEFT" },
-		{ 1, "RIGHT" },
-		{ 2, "CENTER" }
+		{ 1, "CENTER" },
+		{ 2, "RIGHT" }
 	};
 
 	const EnumMap ENUM_ALIGNMENT_V[] =

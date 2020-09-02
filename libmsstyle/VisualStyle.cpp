@@ -542,20 +542,33 @@ namespace libmsstyle
 			bool foundDWMTouch = false;
 			bool foundDWMPen = false;
 			bool foundW8Taskband = false;
+			bool foundVistaQueryBuilder = false;
 			for (auto& cls : m_classes)
 			{
 				if (!cls.second.className.compare("DWMTouch"))
-					foundDWMTouch = true;
+				{
+					foundDWMTouch = true; continue;
+				}
 				if (!cls.second.className.compare("DWMPen"))
-					foundDWMPen = true;
+				{
+					foundDWMPen = true; continue;
+				}
 				if (!cls.second.className.compare("W8::TaskbandExtendedUI"))
-					foundW8Taskband = true;
+				{
+					foundW8Taskband = true; continue;
+				}
+				if (!cls.second.className.compare("QueryBuilder"))
+				{
+					foundVistaQueryBuilder = true; continue;
+				}
 			}
 
 			if (foundW8Taskband)
 				return Platform::WIN81;
 			else if (foundDWMTouch || foundDWMPen)
 				return Platform::WIN10;
+			else if (foundVistaQueryBuilder)
+				return Platform::WINVista;
 			else return Platform::WIN7;
 		}
 

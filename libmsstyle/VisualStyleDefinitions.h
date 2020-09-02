@@ -326,6 +326,7 @@ namespace libmsstyle
 
 	enum Platform
 	{
+		WINVista,
 		WIN7,
 		WIN8,
 		WIN81,
