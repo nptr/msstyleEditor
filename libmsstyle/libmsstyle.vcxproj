@@ -137,6 +137,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Signature.h" />
     <ClInclude Include="StringTable.h" />
     <ClInclude Include="Lookup.h" />
     <ClInclude Include="PropertyReader.h" />
@@ -155,6 +156,7 @@
     <ClInclude Include="VisualStyleStates.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Signature.cpp" />
     <ClCompile Include="StringTable.cpp" />
     <ClCompile Include="Lookup.cpp" />
     <ClCompile Include="PropertyReader.cpp" />

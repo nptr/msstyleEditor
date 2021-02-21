@@ -23,6 +23,7 @@
     <ClInclude Include="StyleProperty.h" />
     <ClInclude Include="StringUtil.h" />
     <ClInclude Include="StringTable.h" />
+    <ClInclude Include="Signature.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ResourceUtil.cpp" />
@@ -41,5 +42,6 @@
     <ClCompile Include="StyleProperty.cpp" />
     <ClCompile Include="StringUtil.cpp" />
     <ClCompile Include="StringTable.cpp" />
+    <ClCompile Include="Signature.cpp" />
   </ItemGroup>
 </Project>

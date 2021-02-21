@@ -23,11 +23,11 @@ AboutDialog::AboutDialog(wxWindow* parent, wxWindowID id, const wxString& title,
 	wxBoxSizer* bSizer21;
 	bSizer21 = new wxBoxSizer(wxVERTICAL);
 
-	m_staticText2 = new wxStaticText(staticBoxSizer->GetStaticBox(), wxID_ANY, wxT("msstyleEditor v1.4.0.7"), wxDefaultPosition, wxDefaultSize, 0);
+	m_staticText2 = new wxStaticText(staticBoxSizer->GetStaticBox(), wxID_ANY, wxT("msstyleEditor v1.5.0.0"), wxDefaultPosition, wxDefaultSize, 0);
 	m_staticText2->Wrap(-1);
 	bSizer21->Add(m_staticText2, 0, wxBOTTOM | wxLEFT, 5);
 
-	m_staticText3 = new wxStaticText(staticBoxSizer->GetStaticBox(), wxID_ANY, wxT("© 2015-2019, Jakob K."), wxDefaultPosition, wxDefaultSize, 0);
+	m_staticText3 = new wxStaticText(staticBoxSizer->GetStaticBox(), wxID_ANY, wxT("\u00A9 2015-2021, Jakob K."), wxDefaultPosition, wxDefaultSize, 0);
 	m_staticText3->Wrap(-1);
 	bSizer21->Add(m_staticText3, 0, wxBOTTOM | wxLEFT, 5);
 

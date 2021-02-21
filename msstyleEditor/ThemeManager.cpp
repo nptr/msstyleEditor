@@ -65,7 +65,7 @@ void ThemeManager::ApplyTheme(libmsstyle::VisualStyle& style)
 	int rnum = rand() % 10000;
 
 	wchar_t newPath[MAX_THEMECHARS];
-	swprintf(newPath, MAX_THEMECHARS, L"%s\\tmp%05d.msstyle", publicFolder, rnum);
+	swprintf(newPath, MAX_THEMECHARS, L"%s\\tmp%05d.msstyles", publicFolder, rnum);
 	CoTaskMemFree(publicFolder);
 
 	std::wstring newPathUTF16(newPath);
@@ -74,7 +74,7 @@ void ThemeManager::ApplyTheme(libmsstyle::VisualStyle& style)
 	style.Save(newPathUTF8);
 
 	// I saw the following values being recommended for the fourth parameter: 0, 32, 33, 65
-	HRESULT res = uxtheme::SetSystemTheme(newPathUTF16.c_str(), L"NormalColor", L"NormalSize", 33);
+	HRESULT res = uxtheme::SetSystemTheme(newPathUTF16.c_str(), L"NormalColor", L"NormalSize", 0);
 	if (res != S_OK)
 	{
 		//DWORD facility = (res & 0x07FF0000) >> 16;
