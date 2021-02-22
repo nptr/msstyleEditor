@@ -110,7 +110,7 @@ void ThemeManager::Rollback()
 	if (!m_usertheme) // same theme as when we started
 		return;
 
-	if (uxtheme::SetSystemTheme(m_prevTheme, m_prevColor, m_prevSize, 33) != S_OK)
+	if (uxtheme::SetSystemTheme(m_prevTheme, m_prevColor, m_prevSize, 0) != S_OK)
 	{
 		throw std::runtime_error("Failed to switch back to the previous theme!");
 	}
