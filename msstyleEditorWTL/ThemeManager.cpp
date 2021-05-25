@@ -65,7 +65,7 @@ void ThemeManager::ApplyTheme(libmsstyle::VisualStyle& style)
 	int rnum = rand() % 10000;
 
 	wchar_t newPath[MAX_THEMECHARS];
-	swprintf(newPath, MAX_THEMECHARS, L"%s\\tmp%05d.msstyle", publicFolder, rnum);
+	swprintf(newPath, MAX_THEMECHARS, L"%s\\tmp%05d.msstyles", publicFolder, rnum);
 	CoTaskMemFree(publicFolder);
 
 	std::wstring newPathUTF16(newPath);
@@ -74,10 +74,15 @@ void ThemeManager::ApplyTheme(libmsstyle::VisualStyle& style)
 	style.Save(newPathUTF8);
 
 	// I saw the following values being recommended for the fourth parameter: 0, 32, 33, 65
-	if (uxtheme::SetSystemTheme(newPathUTF16.c_str(), L"NormalColor", L"NormalSize", 33) != S_OK)
+	HRESULT res = uxtheme::SetSystemTheme(newPathUTF16.c_str(), L"NormalColor", L"NormalSize", 0);
+	if (res != S_OK)
 	{
+		char textbuffer[512];
+		sprintf(textbuffer, "Failed to apply the theme as the OS rejected it!\r\n\r\n"
+			"SetSystemVisualStyle() returned 0x%x.", res);
+
 		DeleteFileW(newPath);
-		throw std::runtime_error("Failed to apply the theme as the OS rejected it!");
+		throw std::runtime_error(textbuffer);
 	}
 	else
 	{
@@ -102,7 +107,7 @@ void ThemeManager::Rollback()
 	if (!m_usertheme) // same theme as when we started
 		return;
 
-	if (uxtheme::SetSystemTheme(m_prevTheme, m_prevColor, m_prevSize, 33) != S_OK)
+	if (uxtheme::SetSystemTheme(m_prevTheme, m_prevColor, m_prevSize, 0) != S_OK)
 	{
 		throw std::runtime_error("Failed to switch back to the previous theme!");
 	}
