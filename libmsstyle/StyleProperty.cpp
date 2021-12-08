@@ -257,7 +257,7 @@ namespace libmsstyle
 		} break;
 		case IDENTIFIER::BOOLTYPE:
 		{
-			if (data.booltype.boolvalue > 0)
+			if (data.booltype.boolvalue != 0)
 				return std::string("true");
 			else return std::string("false");
 		} break;
@@ -293,14 +293,12 @@ namespace libmsstyle
 		} break;
 		case IDENTIFIER::INTLIST:
 		{
-			if (data.intlist.numInts >= 3)
-			{
-				return format_string("Len: %d, Values: %d, %d, %d, ...", data.intlist.numInts
-					, *(&data.intlist.firstInt + 0)
-					, *(&data.intlist.firstInt + 1)
-					, *(&data.intlist.firstInt + 2));
-			}
-			else return format_string("Len: %d, Values omitted", data.intlist.numInts);
+			int s = intlist.size();
+			if (s <= 0) return format_string("Len: %d", s);
+			if (s == 1) return format_string("Len: %d, Values: %d", s, intlist[0]);
+			if (s == 2) return format_string("Len: %d, Values: %d, %d", s, intlist[0], intlist[1]);
+			if (s == 3) return format_string("Len: %d, Values: %d, %d, %d", s, intlist[0], intlist[1], intlist[2]);
+			else return format_string("Len: %d, Values: %d, %d, %d, ...", s, intlist[0], intlist[1], intlist[2]);
 		} break;
 		default:
 		{
