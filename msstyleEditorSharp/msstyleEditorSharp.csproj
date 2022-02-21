@@ -127,6 +127,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="PropView\ColorEditor.cs" />
+    <Compile Include="PropView\TypeDescriptors.cs" />
+    <Compile Include="PropView\TypeConverters.cs" />
     <Compile Include="RegistrySettings.cs" />
     <Compile Include="TreeRootSorter.cs" />
     <Compile Include="Dialogs\ImageControl.cs">
@@ -140,7 +143,6 @@
     </Compile>
     <Compile Include="Selection.cs" />
     <Compile Include="TreeViewSearch.cs" />
-    <Compile Include="TypeDescriptor.cs" />
     <Compile Include="Dialogs\MainWindow.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -1,17 +1,12 @@
 ﻿using libmsstyle;
 using msstyleEditor.Properties;
+using msstyleEditor.PropView;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Resources;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace msstyleEditor
@@ -358,6 +353,7 @@ namespace msstyleEditor
                 Debug.Assert(cls != null);
 
                 UpdateItemSelection(cls, part, null, prop.Header.shortFlag);
+                FillPropertyView(part);
 
                 StyleResourceType resType = StyleResourceType.None;
                 if (prop.Header.typeID == (int)IDENTIFIER.FILENAME ||
