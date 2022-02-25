@@ -2370,18 +2370,6 @@ namespace System.Windows.Forms
             {
                 OnOrbDoubleClicked(EventArgs.Empty);
             }
-
-            if (Tabs.Count != 1 || Tabs[0].Invisible == false)
-            {
-                foreach (RibbonTab tab in Tabs)
-                {
-                    if (tab.Bounds.Contains(e.Location))
-                    {
-                        Minimized = !Minimized;
-                        break;
-                    }
-                }
-            }
         }
 
         protected override void OnPaintBackground(PaintEventArgs pevent)
