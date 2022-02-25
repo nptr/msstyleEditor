@@ -50,7 +50,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>msstyleEditorNew.ico</ApplicationIcon>
+    <ApplicationIcon>msstyleEditor.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>false</SignAssembly>
@@ -82,9 +82,6 @@
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Windows.Forms.Ribbon, Version=2.0.0.0, Culture=neutral, PublicKeyToken=928736e248aa81f9, processorArchitecture=MSIL">
-      <HintPath>..\packages\RibbonWinForms.5.1.0-beta\lib\net45\System.Windows.Forms.Ribbon.dll</HintPath>
-    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -197,10 +194,15 @@
       <Project>{79394118-bb99-4524-b6ae-0d0604a41d92}</Project>
       <Name>libmsstyle</Name>
     </ProjectReference>
+    <ProjectReference Include="..\System.Windows.Forms.Ribbon\System.Windows.Forms.Ribbon.csproj">
+      <Project>{46a18a55-5ae8-49ce-91cd-c7421b642e7e}</Project>
+      <Name>System.Windows.Forms.Ribbon</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="Icons\Play32.png" />
     <None Include="Icons\Stop32.png" />
+    <Content Include="msstyleEditor.ico" />
     <Content Include="msstyleEditorNew.ico" />
   </ItemGroup>
   <ItemGroup>

@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ApplicationIcon />
+    <StartupObject />
+    <Authors>RibbonWinForms</Authors>
+    <PackageId />
+    <Company>https://github.com/RibbonWinForms/RibbonWinForms</Company>
+    <Product>System.Windows.Forms.Ribbon</Product>
+    <AssemblyVersion>5.0.0.0</AssemblyVersion>
+    <FileVersion>5.1.0.0</FileVersion>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>WinFormsRibbon.snk</AssemblyOriginatorKeyFile>
+    <DelaySign>false</DelaySign>
+    <RootNamespace>System.Windows.Forms</RootNamespace>
+    <AssemblyName>System.Windows.Forms.Ribbon</AssemblyName>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>TRACE;DEBUG;NetCore</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DefineConstants>TRACE;NetCore</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Setup\**" />
+    <EmbeddedResource Remove="Setup\**" />
+    <None Remove="Setup\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="NativeMethods.cs" />
+  </ItemGroup>
+
+</Project>

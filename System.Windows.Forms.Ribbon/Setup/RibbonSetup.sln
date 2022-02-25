@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.645
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "RibbonSetup_NET4", "RibbonSetup_NET4.wixproj", "{814C2811-CEC3-4A68-861A-DF88D6554479}"
+Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "RibbonSetup_NET2", "RibbonSetup_NET2.wixproj", "{E17EF66E-C91D-4888-BCA4-0CE991C0DB30}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{814C2811-CEC3-4A68-861A-DF88D6554479}.Release|x86.ActiveCfg = Release|x86
+		{814C2811-CEC3-4A68-861A-DF88D6554479}.Release|x86.Build.0 = Release|x86
+		{E17EF66E-C91D-4888-BCA4-0CE991C0DB30}.Release|x86.ActiveCfg = Release|x86
+		{E17EF66E-C91D-4888-BCA4-0CE991C0DB30}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C31C89F0-5ACA-43B9-870F-A25A99136FA9}
+	EndGlobalSection
+EndGlobal

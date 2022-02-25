@@ -71,7 +71,6 @@ namespace msstyleEditor
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.classView = new System.Windows.Forms.TreeView();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
-            this.imageView = new msstyleEditor.ImageControl();
             this.imageViewContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.whiteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.greyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -91,13 +90,14 @@ namespace msstyleEditor
             this.ribbonPanel8 = new System.Windows.Forms.RibbonPanel();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.lbStatusMessage = new System.Windows.Forms.ToolStripStatusLabel();
-            this.lbStylePlatform = new System.Windows.Forms.ToolStripStatusLabel();
             this.lbImageInfo = new System.Windows.Forms.ToolStripStatusLabel();
+            this.lbStylePlatform = new System.Windows.Forms.ToolStripStatusLabel();
             this.ribbonButton3 = new System.Windows.Forms.RibbonButton();
             this.ribbonButton2 = new System.Windows.Forms.RibbonButton();
             this.ribbonButton1 = new System.Windows.Forms.RibbonButton();
             this.ribbonButton4 = new System.Windows.Forms.RibbonButton();
             this.ribbonButton5 = new System.Windows.Forms.RibbonButton();
+            this.imageView = new msstyleEditor.ImageControl();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -108,10 +108,12 @@ namespace msstyleEditor
             this.splitContainer2.SuspendLayout();
             this.imageViewContextMenu.SuspendLayout();
             this.propViewContextMenu.SuspendLayout();
+            this.statusStrip.SuspendLayout();
             this.SuspendLayout();
             // 
             // ribbonMenu
             // 
+            this.ribbonMenu.BorderMode = System.Windows.Forms.RibbonWindowMode.InsideWindow;
             this.ribbonMenu.CaptionBarVisible = false;
             this.ribbonMenu.Cursor = System.Windows.Forms.Cursors.Default;
             this.ribbonMenu.Font = new System.Drawing.Font("Segoe UI", 9F);
@@ -522,24 +524,6 @@ namespace msstyleEditor
             this.splitContainer2.SplitterDistance = 204;
             this.splitContainer2.TabIndex = 0;
             // 
-            // imageView
-            // 
-            this.imageView.AutoScroll = true;
-            this.imageView.AutoScrollMinSize = new System.Drawing.Size(202, 306);
-            this.imageView.Background = msstyleEditor.ImageControl.BackgroundStyle.Chessboard;
-            this.imageView.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.imageView.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.imageView.ContextMenuStrip = this.imageViewContextMenu;
-            this.imageView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.imageView.Location = new System.Drawing.Point(0, 0);
-            this.imageView.MaxZoom = 8F;
-            this.imageView.MinZoom = 0.5F;
-            this.imageView.Name = "imageView";
-            this.imageView.Size = new System.Drawing.Size(204, 308);
-            this.imageView.TabIndex = 1;
-            this.imageView.TabStop = true;
-            this.imageView.ZoomFactor = 1F;
-            // 
             // imageViewContextMenu
             // 
             this.imageViewContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -668,14 +652,15 @@ namespace msstyleEditor
             // 
             // statusStrip
             // 
+            this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.lbStatusMessage,
+            this.lbImageInfo,
+            this.lbStylePlatform});
             this.statusStrip.Location = new System.Drawing.Point(0, 428);
             this.statusStrip.Name = "statusStrip";
             this.statusStrip.Size = new System.Drawing.Size(800, 22);
             this.statusStrip.TabIndex = 3;
             this.statusStrip.Text = "statusStrip1";
-            this.statusStrip.Items.Add(lbStatusMessage);
-            this.statusStrip.Items.Add(lbImageInfo);
-            this.statusStrip.Items.Add(lbStylePlatform);
             // 
             // lbStatusMessage
             // 
@@ -684,6 +669,13 @@ namespace msstyleEditor
             this.lbStatusMessage.Text = "C: 0 P: 0";
             this.lbStatusMessage.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
+            // lbImageInfo
+            // 
+            this.lbImageInfo.BorderSides = System.Windows.Forms.ToolStripStatusLabelBorderSides.Left;
+            this.lbImageInfo.Name = "lbImageInfo";
+            this.lbImageInfo.Size = new System.Drawing.Size(4, 17);
+            this.lbImageInfo.Visible = false;
+            // 
             // lbStylePlatform
             // 
             this.lbStylePlatform.BorderSides = System.Windows.Forms.ToolStripStatusLabelBorderSides.Left;
@@ -691,13 +683,6 @@ namespace msstyleEditor
             this.lbStylePlatform.Name = "lbStylePlatform";
             this.lbStylePlatform.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.lbStylePlatform.Size = new System.Drawing.Size(4, 17);
-            // 
-            // lbImageInfo
-            // 
-            this.lbImageInfo.BorderSides = System.Windows.Forms.ToolStripStatusLabelBorderSides.Left;
-            this.lbImageInfo.Name = "lbImageInfo";
-            this.lbImageInfo.Size = new System.Drawing.Size(4, 17);
-            this.lbImageInfo.Visible = false;
             // 
             // ribbonButton3
             // 
@@ -741,6 +726,24 @@ namespace msstyleEditor
             this.ribbonButton5.SmallImage = ((System.Drawing.Image)(resources.GetObject("ribbonButton5.SmallImage")));
             this.ribbonButton5.Text = "Theme Folder";
             // 
+            // imageView
+            // 
+            this.imageView.AutoScroll = true;
+            this.imageView.AutoScrollMinSize = new System.Drawing.Size(202, 306);
+            this.imageView.Background = msstyleEditor.ImageControl.BackgroundStyle.Chessboard;
+            this.imageView.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.imageView.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.imageView.ContextMenuStrip = this.imageViewContextMenu;
+            this.imageView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.imageView.Location = new System.Drawing.Point(0, 0);
+            this.imageView.MaxZoom = 8F;
+            this.imageView.MinZoom = 0.5F;
+            this.imageView.Name = "imageView";
+            this.imageView.Size = new System.Drawing.Size(204, 308);
+            this.imageView.TabIndex = 1;
+            this.imageView.TabStop = true;
+            this.imageView.ZoomFactor = 1F;
+            // 
             // MainWindow
             // 
             this.AllowDrop = true;
@@ -768,6 +771,8 @@ namespace msstyleEditor
             this.splitContainer2.ResumeLayout(false);
             this.imageViewContextMenu.ResumeLayout(false);
             this.propViewContextMenu.ResumeLayout(false);
+            this.statusStrip.ResumeLayout(false);
+            this.statusStrip.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 

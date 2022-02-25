@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension"
+     xmlns:WixUI="http://schemas.microsoft.com/wix/UIExtension">
+  <Product Id="*" Name="WinFormsRibbon_NET2" Language="1033" Version="5.0.1.0" Manufacturer="WinFormsRibbon" UpgradeCode="D3CF2A4A-B3E9-4E75-BE88-D431F886B0D3">
+    <Package InstallerVersion="301" Compressed="yes" InstallScope="perMachine" Platform="x86" Description="Ribbon Control for .NET2 WinForms" Comments="Office Ribbon Control for .NET2 WinForms" />
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    <Media Id="1" Cabinet="Data.cab" EmbedCab="yes" />
+
+    <Feature Id="ProductFeature" Title="WinFormsRibbon .NET2 Setup" Level="1">
+      <ComponentGroupRef Id="GACComponents" />
+      <ComponentGroupRef Id="ProductComponents" />
+    </Feature>
+    <UI />
+    <PropertyRef Id="NETFRAMEWORK20" />
+    <Condition Message="This library requires .NET Framework 2.0.">Installed OR NETFRAMEWORK20</Condition>
+    <UIRef Id="WixUI_Minimal" />
+    <UIRef Id="WixUI_ErrorProgressText" />
+    <WixVariable Id="WixUILicenseRtf" Value="Ms-PL_License.rtf" />
+  </Product>
+
+  <Fragment>
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="Di.INSTALLFOLDER" Name="WinFormsRibbon">
+        </Directory>
+      </Directory>
+    </Directory>
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="GACComponents" Directory="TARGETDIR">
+      <Component Id="C.RegistryEntries" Guid="DC659167-AE0C-4BAD-B67A-00785AB4FE54">
+          <!--
+          .NET2.0, 3.5 GAC Assembly
+          -->
+          <RegistryKey Root="HKLM" Key="Software\Microsoft\.NETFramework\AssemblyFolders\[ProductName]" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes" Id="R.AssemblyRef">
+              <RegistryValue Type="string" Value="[ProgramFilesFolder]WinFormsRibbon\" KeyPath="yes" />
+          </RegistryKey>
+          <!--
+          .NET4.x GAC Assembly
+          <RegistryKey Root="HKLM" Key="Software\Microsoft\.NETFramework\v4.0.30319\AssemblyFoldersEx\[ProductName]" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes" Id="R.AssemblyRef4">
+              <RegistryValue Type="string" Value="[ProgramFilesFolder]WinFormsRibbon\bin4\" KeyPath="yes" />
+          </RegistryKey>
+          -->
+      </Component>
+      <Component Id="C.Gac2RibbonDll" Guid="A1E817B4-CBE1-4BC9-87E2-C06E6D3A6C78">
+        <File Id="Fi.Gac2RibbonDll" Name="System.Windows.Forms.Ribbon.dll" Source="..\bin\Release\System.Windows.Forms.Ribbon.dll" KeyPath="yes" Assembly=".net" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="ProductComponents" Directory="Di.INSTALLFOLDER">
+      <Component Id="C.RibbonBin2" Guid="AD544472-2E5C-49B7-BFC1-2F9EE754E4AA">
+        <File Id="Fi.RibbonDllClone2" Name="System.Windows.Forms.Ribbon.dll" Source="..\bin\Release\System.Windows.Forms.Ribbon.dll" KeyPath="yes" />
+        <File Id="Fi.RibbonPdb" Name="System.Windows.Forms.Ribbon.pdb" Source="..\bin\Release\System.Windows.Forms.Ribbon.pdb" />
+        <File Id="Fi.RibbonXml" Name="System.Windows.Forms.Ribbon.xml" Source="..\bin\Release\System.Windows.Forms.Ribbon.xml" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>
