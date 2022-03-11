@@ -111,6 +111,12 @@
     <Compile Include="Dialogs\LicenseDialog.Designer.cs">
       <DependentUpon>LicenseDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\ToolStripTabBar.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Dialogs\ToolStripTabBar.Designer.cs">
+      <DependentUpon>ToolStripTabBar.cs</DependentUpon>
+    </Compile>
     <Compile Include="Exporter.cs" />
     <Compile Include="Dialogs\SearchDialog.cs">
       <SubType>Form</SubType>
@@ -119,6 +125,7 @@
       <DependentUpon>SearchDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="IThemeManager2.cs" />
+    <Compile Include="PartRenderer.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -163,6 +170,9 @@
     <EmbeddedResource Include="Dialogs\MainWindow.resx">
       <DependentUpon>MainWindow.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\ToolStripTabBar.resx">
+      <DependentUpon>ToolStripTabBar.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -223,7 +233,7 @@
     <Error Condition="!Exists('..\packages\ILMerge.3.0.41\build\ILMerge.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\ILMerge.3.0.41\build\ILMerge.props'))" />
   </Target>
   <Target Name="AfterBuild" Condition="'$(Configuration)' == 'Release'">
-    <Exec Command="$(ILMergeConsolePath) $(OutputPath)msstyleEditor.exe /out:$(OutputPath)msstyleEditor_static.exe ^&#xD;&#xA;    $(OutputPath)libmsstyle.dll ^&#xD;&#xA;    $(OutputPath)System.Windows.Forms.Ribbon.dll" />
+    <Exec Command="$(ILMergeConsolePath) $(OutputPath)msstyleEditor.exe /ndebug /out:$(OutputPath)msstyleEditor_static.exe ^&#xD;&#xA;    $(OutputPath)libmsstyle.dll ^&#xD;&#xA;    $(OutputPath)System.Windows.Forms.Ribbon.dll" />
   </Target>
   <PropertyGroup>
     <PostBuildEvent>

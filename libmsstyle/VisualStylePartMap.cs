@@ -188,7 +188,7 @@ namespace libmsstyle
             new VisualStylePartEntry(8, "TASKLIST", VisualStyleStates.STATES_LINK_TASK ),
             new VisualStylePartEntry(9, "GROUPTEXT", VisualStyleStates.STATES_COMMON_DEFAULT ),
             new VisualStylePartEntry(10, "CONTENTLINK", VisualStyleStates.STATES_LINK_CONTENT ),
-            new VisualStylePartEntry(11, "SECIONTITLELINK", VisualStyleStates.STATES_LINK_SECTIONTITLE ),
+            new VisualStylePartEntry(11, "SECTIONTITLELINK", VisualStyleStates.STATES_LINK_SECTIONTITLE ),
             new VisualStylePartEntry(12, "LARGECOMMANDAREA", VisualStyleStates.STATES_COMMON_DEFAULT ),
             new VisualStylePartEntry(13, "SMALLCOMMANDAREA", VisualStyleStates.STATES_COMMON_DEFAULT ),
             new VisualStylePartEntry(14, "BUTTON", VisualStyleStates.STATES_COMMON_DEFAULT ),

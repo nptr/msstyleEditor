@@ -16,5 +16,18 @@ namespace libmsstyle
         {
             Properties = new List<StyleProperty>();
         }
+
+        public bool TryGetPropertyValue<T>(IDENTIFIER ident, ref T value)
+        {
+            var prop = this.Properties.Find((p) => p.Header.nameID == (int)ident);
+            if (prop == default(StyleProperty))
+            {
+                return false;
+            }
+            
+            value = prop.GetValueAs<T>();
+            return true;
+        }
+
     }
 }

@@ -2,6 +2,7 @@
 using msstyleEditor.Properties;
 using msstyleEditor.PropView;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -166,45 +167,64 @@ namespace msstyleEditor
                 {
                     var partNode = new TreeNode(part.Value.PartName);
                     partNode.Tag = part.Value;
-
-                    foreach (var state in part.Value.States)
-                    {
-                        foreach (var prop in state.Value.Properties)
-                        {
-                            // Add images
-                            if (prop.Header.typeID == (int)IDENTIFIER.FILENAME ||
-                                prop.Header.typeID == (int)IDENTIFIER.FILENAME_LITE ||
-                                prop.Header.typeID == (int)IDENTIFIER.DISKSTREAM)
-                            {
-                                PropertyInfo propInfo;
-                                TreeNode imageNode = new TreeNode()
-                                {
-                                    Text = prop.Header.nameID.ToString(),
-                                    Tag = prop
-                                };
-
-                                if (VisualStyleProperties.PROPERTY_INFO_MAP.TryGetValue(prop.Header.nameID, out propInfo))
-                                {
-                                    imageNode.Text = propInfo.Name;
-                                }
-
-                                partNode.Nodes.Add(imageNode);
-                            }
-                        }
-                    }
-
+                    
                     clsNode.Nodes.Add(partNode);
                 }
-
                 classView.Nodes.Add(clsNode);
             }
             classView.Sort();
             classView.EndUpdate();
         }
 
-        private void FillPropertyView(StylePart part)
+        private void UpdatePropertyView(StylePart part)
         {
-            propertyView.SelectedObject = new TypeDescriptor(part, m_style);
+            propertyView.SelectedObject = (part != null)
+                ? new TypeDescriptor(part, m_style)
+                : null;
+        }
+
+        private StyleResource UpdateImageView(StyleProperty prop)
+        {
+            if (prop == null)
+            {
+                imageView.BackgroundImage = null;
+                UpdateImageInfo(null);
+                return null;
+            }
+
+            // determine type for resource update
+            StyleResourceType resType = StyleResourceType.None;
+            if (prop.Header.typeID == (int)IDENTIFIER.FILENAME ||
+               prop.Header.typeID == (int)IDENTIFIER.FILENAME_LITE)
+            {
+                resType = StyleResourceType.Image;
+            }
+            else if (prop.Header.typeID == (int)IDENTIFIER.DISKSTREAM)
+            {
+                resType = StyleResourceType.Atlas;
+            }
+
+            // see if there is a pending update to the resource
+            string file = m_style.GetQueuedResourceUpdate(prop.Header.shortFlag, resType);
+            
+            // in any case, we have to store the update info of the real resource
+            // we need that in order to export/replace?
+            var resource = m_style.GetResourceFromProperty(prop);
+
+            if (!String.IsNullOrEmpty(file))
+            {
+                imageView.BackgroundImage = Image.FromFile(file);
+            }
+            else
+            {
+                if (resource?.Data != null)
+                {
+                    imageView.BackgroundImage = Image.FromStream(new MemoryStream(resource.Data));
+                }
+            }
+
+            UpdateImageInfo(imageView.BackgroundImage);
+            return resource;
         }
 
         #endregion
@@ -245,9 +265,9 @@ namespace msstyleEditor
             try
             {
                 if(sender == btFileSave)
-                    m_style.Save(sfd.FileName);
-                else if(sender == btFileSaveNoMUI)
                     m_style.Save(sfd.FileName, true);
+                else if(sender == btFileSaveWithMUI)
+                    m_style.Save(sfd.FileName, false);
 
                 lbStatusMessage.Text = "Style saved successfully!";
             }
@@ -325,12 +345,13 @@ namespace msstyleEditor
                 return;
             }
 
-            m_selectedImage = null;
-
             StyleClass cls = e.Node.Tag as StyleClass;
             if (cls != null)
             {
                 UpdateItemSelection(cls);
+                UpdatePropertyView(null);
+                m_selectedImage = UpdateImageView(null);
+                return;
             }
 
             StylePart part = e.Node.Tag as StylePart;
@@ -340,7 +361,47 @@ namespace msstyleEditor
                 Debug.Assert(cls != null);
 
                 UpdateItemSelection(cls, part);
-                FillPropertyView(part);
+                UpdatePropertyView(part);
+
+                // Select first image, or search parent
+                // If ATLASRECT, set highlight
+                var def = default(KeyValuePair<int, StyleState>);
+                var state = part.States.FirstOrDefault();
+                if(!state.Equals(def))
+                {
+                    var rectProp = state.Value.Properties.Find((p) => p.Header.nameID == (int)IDENTIFIER.ATLASRECT);
+                    if (rectProp != null)
+                    {
+                        var mt = rectProp.GetValueAs<Margins>();
+                        imageView.HighlightArea = new Rectangle(
+                            new Point(mt.Left, mt.Top),
+                            new Size(mt.Right - mt.Left, mt.Bottom - mt.Top)
+                        );
+                    }
+                    else imageView.HighlightArea = null;
+                }
+                else imageView.HighlightArea = null;
+
+
+                StyleProperty imagePropToShow = null;
+                var imgProps = part.GetImageProperties().ToList();
+                if (imgProps.Count > 0)
+                {
+                    imagePropToShow = imgProps[0];
+                }
+                else if(imagePropToShow == null && cls.Parts[0] != part)
+                {
+                    imagePropToShow = cls.Parts[0].GetImageProperties().FirstOrDefault();
+                }
+
+                m_selectedImage = UpdateImageView(imagePropToShow);
+                imageTabs.SetActiveTabs(0, imgProps.Count);
+
+                // TODO: move this elsewhere. experimental code.
+                var renderer = new PartRenderer(m_style, part);
+                imageView.BackgroundImage = renderer.RenderPreview();
+
+                return;
             }
 
             StyleProperty prop = e.Node.Tag as StyleProperty;
@@ -353,40 +414,9 @@ namespace msstyleEditor
                 Debug.Assert(cls != null);
 
                 UpdateItemSelection(cls, part, null, prop.Header.shortFlag);
-                FillPropertyView(part);
-
-                StyleResourceType resType = StyleResourceType.None;
-                if (prop.Header.typeID == (int)IDENTIFIER.FILENAME ||
-                   prop.Header.typeID == (int)IDENTIFIER.FILENAME_LITE)
-                {
-                    resType = StyleResourceType.Image;
-                }
-                else if(prop.Header.typeID == (int)IDENTIFIER.DISKSTREAM)
-                {
-                    resType = StyleResourceType.Atlas;
-                }
-
-                string file = m_style.GetQueuedResourceUpdate(prop.Header.shortFlag, resType);
-                m_selectedImage = m_style.GetResourceFromProperty(prop);
-
-                if (!String.IsNullOrEmpty(file))
-                {
-                    imageView.BackgroundImage = Image.FromFile(file);
-                }
-                else
-                {
-                    if (m_selectedImage?.Data != null)
-                    {
-                        imageView.BackgroundImage = Image.FromStream(new MemoryStream(m_selectedImage.Data));
-                    }
-                }
-
-                UpdateImageInfo(imageView.BackgroundImage);
-            }
-            else
-            {
-                imageView.BackgroundImage = null;
-                UpdateImageInfo(imageView.BackgroundImage);
+                UpdatePropertyView(part);
+                m_selectedImage = UpdateImageView(prop);
+                return;
             }
         }
 
@@ -850,6 +880,29 @@ namespace msstyleEditor
                 {
                     Close();
                 }
+            }
+        }
+
+        private void OnImageSelectIndex(object sender, EventArgs e)
+        {
+            if(m_selection.Part == null)
+            {
+                return;
+            }
+
+            var it = m_selection.Part.GetImageProperties();
+            var imgProp = it.ElementAtOrDefault(imageTabs.SelectedIndex);
+            if(imgProp != null)
+            {
+                UpdateImageView(imgProp);
+            }
+        }
+
+        private void classView_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if(e.KeyChar >= '1' && e.KeyChar <= '9')
+            {
+                imageTabs.SetActiveTabIndex(e.KeyChar - 0x30 - 1);
             }
         }
     }

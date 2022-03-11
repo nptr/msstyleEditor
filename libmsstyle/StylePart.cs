@@ -16,5 +16,22 @@ namespace libmsstyle
         {
             States = new Dictionary<int, StyleState>();
         }
+
+        public IEnumerable<StyleProperty> GetImageProperties()
+        {
+            foreach (var state in States)
+            {
+                var imgProps = state.Value.Properties.FindAll((p) =>
+                    p.Header.typeID == (int)IDENTIFIER.FILENAME ||
+                    p.Header.typeID == (int)IDENTIFIER.FILENAME_LITE ||
+                    p.Header.typeID == (int)IDENTIFIER.DISKSTREAM
+                );
+
+                foreach(var imgProp in imgProps)
+                {
+                    yield return imgProp;
+                }
+            }
+        }
     }
 }

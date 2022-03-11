@@ -37,7 +37,7 @@ namespace msstyleEditor
             this.ribbonPanel6 = new System.Windows.Forms.RibbonPanel();
             this.btFileOpen = new System.Windows.Forms.RibbonButton();
             this.btFileSave = new System.Windows.Forms.RibbonButton();
-            this.btFileSaveNoMUI = new System.Windows.Forms.RibbonButton();
+            this.btFileSaveWithMUI = new System.Windows.Forms.RibbonButton();
             this.ribbonPanel5 = new System.Windows.Forms.RibbonPanel();
             this.btFileInfoExport = new System.Windows.Forms.RibbonButton();
             this.btThemeFolder = new System.Windows.Forms.RibbonButton();
@@ -71,6 +71,8 @@ namespace msstyleEditor
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.classView = new System.Windows.Forms.TreeView();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
+            this.imageTabs = new msstyleEditor.Dialogs.ToolStripTabBar();
+            this.imageView = new msstyleEditor.ImageControl();
             this.imageViewContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.whiteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.greyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -97,7 +99,6 @@ namespace msstyleEditor
             this.ribbonButton1 = new System.Windows.Forms.RibbonButton();
             this.ribbonButton4 = new System.Windows.Forms.RibbonButton();
             this.ribbonButton5 = new System.Windows.Forms.RibbonButton();
-            this.imageView = new msstyleEditor.ImageControl();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -182,7 +183,7 @@ namespace msstyleEditor
             // 
             // btFileSave
             // 
-            this.btFileSave.DropDownItems.Add(this.btFileSaveNoMUI);
+            this.btFileSave.DropDownItems.Add(this.btFileSaveWithMUI);
             this.btFileSave.Image = ((System.Drawing.Image)(resources.GetObject("btFileSave.Image")));
             this.btFileSave.LargeImage = ((System.Drawing.Image)(resources.GetObject("btFileSave.LargeImage")));
             this.btFileSave.Name = "btFileSave";
@@ -191,15 +192,15 @@ namespace msstyleEditor
             this.btFileSave.Text = "Save";
             this.btFileSave.Click += new System.EventHandler(this.OnFileSaveClick);
             // 
-            // btFileSaveNoMUI
+            // btFileSaveWithMUI
             // 
-            this.btFileSaveNoMUI.DropDownArrowDirection = System.Windows.Forms.RibbonArrowDirection.Left;
-            this.btFileSaveNoMUI.Image = ((System.Drawing.Image)(resources.GetObject("btFileSaveNoMUI.Image")));
-            this.btFileSaveNoMUI.LargeImage = ((System.Drawing.Image)(resources.GetObject("btFileSaveNoMUI.LargeImage")));
-            this.btFileSaveNoMUI.Name = "btFileSaveNoMUI";
-            this.btFileSaveNoMUI.SmallImage = ((System.Drawing.Image)(resources.GetObject("btFileSaveNoMUI.SmallImage")));
-            this.btFileSaveNoMUI.Text = "Save as Standalone";
-            this.btFileSaveNoMUI.Click += new System.EventHandler(this.OnFileSaveClick);
+            this.btFileSaveWithMUI.DropDownArrowDirection = System.Windows.Forms.RibbonArrowDirection.Left;
+            this.btFileSaveWithMUI.Image = ((System.Drawing.Image)(resources.GetObject("btFileSaveWithMUI.Image")));
+            this.btFileSaveWithMUI.LargeImage = ((System.Drawing.Image)(resources.GetObject("btFileSaveWithMUI.LargeImage")));
+            this.btFileSaveWithMUI.Name = "btFileSaveWithMUI";
+            this.btFileSaveWithMUI.SmallImage = ((System.Drawing.Image)(resources.GetObject("btFileSaveWithMUI.SmallImage")));
+            this.btFileSaveWithMUI.Text = "Save with MUI";
+            this.btFileSaveWithMUI.Click += new System.EventHandler(this.OnFileSaveClick);
             // 
             // ribbonPanel5
             // 
@@ -506,6 +507,7 @@ namespace msstyleEditor
             this.classView.Size = new System.Drawing.Size(266, 308);
             this.classView.TabIndex = 0;
             this.classView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.OnTreeItemSelected);
+            this.classView.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.classView_KeyPress);
             // 
             // splitContainer2
             // 
@@ -515,6 +517,7 @@ namespace msstyleEditor
             // 
             // splitContainer2.Panel1
             // 
+            this.splitContainer2.Panel1.Controls.Add(this.imageTabs);
             this.splitContainer2.Panel1.Controls.Add(this.imageView);
             // 
             // splitContainer2.Panel2
@@ -523,6 +526,37 @@ namespace msstyleEditor
             this.splitContainer2.Size = new System.Drawing.Size(530, 308);
             this.splitContainer2.SplitterDistance = 204;
             this.splitContainer2.TabIndex = 0;
+            // 
+            // imageTabs
+            // 
+            this.imageTabs.AutoSize = true;
+            this.imageTabs.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.imageTabs.Location = new System.Drawing.Point(0, 283);
+            this.imageTabs.Name = "imageTabs";
+            this.imageTabs.Size = new System.Drawing.Size(204, 25);
+            this.imageTabs.TabIndex = 2;
+            this.imageTabs.SelectedIndexChanged += new System.EventHandler(this.OnImageSelectIndex);
+            // 
+            // imageView
+            // 
+            this.imageView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.imageView.AutoScroll = true;
+            this.imageView.AutoScrollMinSize = new System.Drawing.Size(202, 278);
+            this.imageView.Background = msstyleEditor.ImageControl.BackgroundStyle.Chessboard;
+            this.imageView.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.imageView.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.imageView.ContextMenuStrip = this.imageViewContextMenu;
+            this.imageView.HighlightArea = new System.Drawing.Rectangle(2, 2, 10, 10);
+            this.imageView.Location = new System.Drawing.Point(0, 0);
+            this.imageView.MaxZoom = 8F;
+            this.imageView.MinZoom = 0.5F;
+            this.imageView.Name = "imageView";
+            this.imageView.Size = new System.Drawing.Size(204, 280);
+            this.imageView.TabIndex = 1;
+            this.imageView.TabStop = true;
+            this.imageView.ZoomFactor = 1F;
             // 
             // imageViewContextMenu
             // 
@@ -726,24 +760,6 @@ namespace msstyleEditor
             this.ribbonButton5.SmallImage = ((System.Drawing.Image)(resources.GetObject("ribbonButton5.SmallImage")));
             this.ribbonButton5.Text = "Theme Folder";
             // 
-            // imageView
-            // 
-            this.imageView.AutoScroll = true;
-            this.imageView.AutoScrollMinSize = new System.Drawing.Size(202, 306);
-            this.imageView.Background = msstyleEditor.ImageControl.BackgroundStyle.Chessboard;
-            this.imageView.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.imageView.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.imageView.ContextMenuStrip = this.imageViewContextMenu;
-            this.imageView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.imageView.Location = new System.Drawing.Point(0, 0);
-            this.imageView.MaxZoom = 8F;
-            this.imageView.MinZoom = 0.5F;
-            this.imageView.Name = "imageView";
-            this.imageView.Size = new System.Drawing.Size(204, 308);
-            this.imageView.TabIndex = 1;
-            this.imageView.TabStop = true;
-            this.imageView.ZoomFactor = 1F;
-            // 
             // MainWindow
             // 
             this.AllowDrop = true;
@@ -766,6 +782,7 @@ namespace msstyleEditor
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
             this.splitContainer2.Panel1.ResumeLayout(false);
+            this.splitContainer2.Panel1.PerformLayout();
             this.splitContainer2.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
@@ -846,6 +863,7 @@ namespace msstyleEditor
         private System.Windows.Forms.RibbonPanel ribbonPanel14;
         private System.Windows.Forms.RibbonButton btSearch;
         private System.Windows.Forms.ToolStripStatusLabel lbImageInfo;
-        private System.Windows.Forms.RibbonButton btFileSaveNoMUI;
+        private System.Windows.Forms.RibbonButton btFileSaveWithMUI;
+        private Dialogs.ToolStripTabBar imageTabs;
     }
 }

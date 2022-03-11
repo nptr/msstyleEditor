@@ -35,6 +35,8 @@ namespace msstyleEditor
 			}
 		}
 
+        public Rectangle? HighlightArea { get; set; }
+
 
 		public ImageControl()
         {
@@ -113,6 +115,25 @@ namespace msstyleEditor
             e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
             e.Graphics.DrawImage(BackgroundImage, dst, src, GraphicsUnit.Pixel);
             e.Graphics.InterpolationMode = InterpolationMode.Default;
+
+            if(HighlightArea != null)
+            {
+                int hl = HighlightArea.Value.Left + xMargin;
+                int ht = HighlightArea.Value.Top + yMargin;
+                int hr = hl + HighlightArea.Value.Width;
+                int hb = ht + HighlightArea.Value.Height;
+
+                e.Graphics.TranslateTransform(this.AutoScrollPosition.X, this.AutoScrollPosition.Y);
+
+                using (Pen p = new Pen(Color.Violet, 2.0f))
+                {
+                    e.Graphics.DrawLine(p, hl, 0, hl, AutoScrollMinSize.Height);
+                    e.Graphics.DrawLine(p, hr, 0, hr, AutoScrollMinSize.Height);
+
+                    e.Graphics.DrawLine(p, 0, ht, AutoScrollMinSize.Width, ht);
+                    e.Graphics.DrawLine(p, 0, hb, AutoScrollMinSize.Width, hb);
+                }
+            }
         }
     }
 }
