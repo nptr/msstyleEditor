@@ -13,11 +13,11 @@ namespace msstyleEditor
 			Chessboard
 		}
 
-		private Size m_cellSize = new Size(16, 16);
-
 		public BackgroundStyle Background { get; set; } = BackgroundStyle.Chessboard;
 
-		public float MinZoom { get; set; } = 0.5f;
+        private Size m_cellSize = new Size(16, 16);
+
+        public float MinZoom { get; set; } = 0.5f;
 		public float MaxZoom { get; set; } = 8.0f;
 		
 		private float m_zoomFactor = 1.0f;

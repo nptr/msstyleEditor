@@ -29,7 +29,6 @@ namespace msstyleEditor
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             this.ribbonMenu = new System.Windows.Forms.Ribbon();
             this.ribbonButton6 = new System.Windows.Forms.RibbonButton();
@@ -68,20 +67,6 @@ namespace msstyleEditor
             this.btDocumentation = new System.Windows.Forms.RibbonButton();
             this.btAbout = new System.Windows.Forms.RibbonButton();
             this.btLicense = new System.Windows.Forms.RibbonButton();
-            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.classView = new System.Windows.Forms.TreeView();
-            this.splitContainer2 = new System.Windows.Forms.SplitContainer();
-            this.imageTabs = new msstyleEditor.Dialogs.ToolStripTabBar();
-            this.imageView = new msstyleEditor.ImageControl();
-            this.imageViewContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.whiteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.greyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.blackToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.checkerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.propertyView = new System.Windows.Forms.PropertyGrid();
-            this.propViewContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.newPropertyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ribbonPanel3 = new System.Windows.Forms.RibbonPanel();
             this.ribbonPanel2 = new System.Windows.Forms.RibbonPanel();
             this.ribbonPanel1 = new System.Windows.Forms.RibbonPanel();
@@ -94,21 +79,15 @@ namespace msstyleEditor
             this.lbStatusMessage = new System.Windows.Forms.ToolStripStatusLabel();
             this.lbImageInfo = new System.Windows.Forms.ToolStripStatusLabel();
             this.lbStylePlatform = new System.Windows.Forms.ToolStripStatusLabel();
+            this.dockPanel = new WeifenLuo.WinFormsUI.Docking.DockPanel();
             this.ribbonButton3 = new System.Windows.Forms.RibbonButton();
             this.ribbonButton2 = new System.Windows.Forms.RibbonButton();
             this.ribbonButton1 = new System.Windows.Forms.RibbonButton();
             this.ribbonButton4 = new System.Windows.Forms.RibbonButton();
             this.ribbonButton5 = new System.Windows.Forms.RibbonButton();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
-            this.splitContainer1.Panel1.SuspendLayout();
-            this.splitContainer1.Panel2.SuspendLayout();
-            this.splitContainer1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
-            this.splitContainer2.Panel1.SuspendLayout();
-            this.splitContainer2.Panel2.SuspendLayout();
-            this.splitContainer2.SuspendLayout();
-            this.imageViewContextMenu.SuspendLayout();
-            this.propViewContextMenu.SuspendLayout();
+            this.ribbonPanel16 = new System.Windows.Forms.RibbonPanel();
+            this.btShowRenderView = new System.Windows.Forms.RibbonButton();
+            this.btShowImageView = new System.Windows.Forms.RibbonButton();
             this.statusStrip.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -136,7 +115,7 @@ namespace msstyleEditor
             // 
             this.ribbonMenu.QuickAccessToolbar.Items.Add(this.ribbonButton6);
             this.ribbonMenu.RibbonTabFont = new System.Drawing.Font("Trebuchet MS", 9F);
-            this.ribbonMenu.Size = new System.Drawing.Size(800, 117);
+            this.ribbonMenu.Size = new System.Drawing.Size(884, 117);
             this.ribbonMenu.TabIndex = 0;
             this.ribbonMenu.Tabs.Add(this.tabTheme);
             this.ribbonMenu.Tabs.Add(this.tabView);
@@ -351,6 +330,7 @@ namespace msstyleEditor
             this.tabView.Name = "tabView";
             this.tabView.Panels.Add(this.ribbonPanel12);
             this.tabView.Panels.Add(this.ribbonPanel13);
+            this.tabView.Panels.Add(this.ribbonPanel16);
             this.tabView.Text = "View";
             // 
             // ribbonPanel12
@@ -478,166 +458,6 @@ namespace msstyleEditor
             this.btLicense.Text = "Legal";
             this.btLicense.Click += new System.EventHandler(this.OnLicenseClicked);
             // 
-            // splitContainer1
-            // 
-            this.splitContainer1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.splitContainer1.Location = new System.Drawing.Point(0, 117);
-            this.splitContainer1.Name = "splitContainer1";
-            // 
-            // splitContainer1.Panel1
-            // 
-            this.splitContainer1.Panel1.Controls.Add(this.classView);
-            // 
-            // splitContainer1.Panel2
-            // 
-            this.splitContainer1.Panel2.Controls.Add(this.splitContainer2);
-            this.splitContainer1.Size = new System.Drawing.Size(800, 308);
-            this.splitContainer1.SplitterDistance = 266;
-            this.splitContainer1.TabIndex = 2;
-            // 
-            // classView
-            // 
-            this.classView.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.classView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.classView.HideSelection = false;
-            this.classView.Location = new System.Drawing.Point(0, 0);
-            this.classView.Name = "classView";
-            this.classView.Size = new System.Drawing.Size(266, 308);
-            this.classView.TabIndex = 0;
-            this.classView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.OnTreeItemSelected);
-            this.classView.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.classView_KeyPress);
-            // 
-            // splitContainer2
-            // 
-            this.splitContainer2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer2.Location = new System.Drawing.Point(0, 0);
-            this.splitContainer2.Name = "splitContainer2";
-            // 
-            // splitContainer2.Panel1
-            // 
-            this.splitContainer2.Panel1.Controls.Add(this.imageTabs);
-            this.splitContainer2.Panel1.Controls.Add(this.imageView);
-            // 
-            // splitContainer2.Panel2
-            // 
-            this.splitContainer2.Panel2.Controls.Add(this.propertyView);
-            this.splitContainer2.Size = new System.Drawing.Size(530, 308);
-            this.splitContainer2.SplitterDistance = 204;
-            this.splitContainer2.TabIndex = 0;
-            // 
-            // imageTabs
-            // 
-            this.imageTabs.AutoSize = true;
-            this.imageTabs.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.imageTabs.Location = new System.Drawing.Point(0, 283);
-            this.imageTabs.Name = "imageTabs";
-            this.imageTabs.Size = new System.Drawing.Size(204, 25);
-            this.imageTabs.TabIndex = 2;
-            this.imageTabs.SelectedIndexChanged += new System.EventHandler(this.OnImageSelectIndex);
-            // 
-            // imageView
-            // 
-            this.imageView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.imageView.AutoScroll = true;
-            this.imageView.AutoScrollMinSize = new System.Drawing.Size(202, 278);
-            this.imageView.Background = msstyleEditor.ImageControl.BackgroundStyle.Chessboard;
-            this.imageView.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.imageView.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.imageView.ContextMenuStrip = this.imageViewContextMenu;
-            this.imageView.HighlightArea = new System.Drawing.Rectangle(2, 2, 10, 10);
-            this.imageView.Location = new System.Drawing.Point(0, 0);
-            this.imageView.MaxZoom = 8F;
-            this.imageView.MinZoom = 0.5F;
-            this.imageView.Name = "imageView";
-            this.imageView.Size = new System.Drawing.Size(204, 280);
-            this.imageView.TabIndex = 1;
-            this.imageView.TabStop = true;
-            this.imageView.ZoomFactor = 1F;
-            // 
-            // imageViewContextMenu
-            // 
-            this.imageViewContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.whiteToolStripMenuItem,
-            this.greyToolStripMenuItem,
-            this.blackToolStripMenuItem,
-            this.checkerToolStripMenuItem});
-            this.imageViewContextMenu.Name = "imageViewContextMenu";
-            this.imageViewContextMenu.Size = new System.Drawing.Size(118, 92);
-            // 
-            // whiteToolStripMenuItem
-            // 
-            this.whiteToolStripMenuItem.CheckOnClick = true;
-            this.whiteToolStripMenuItem.Name = "whiteToolStripMenuItem";
-            this.whiteToolStripMenuItem.Size = new System.Drawing.Size(117, 22);
-            this.whiteToolStripMenuItem.Text = "White";
-            this.whiteToolStripMenuItem.Click += new System.EventHandler(this.OnImageViewBackgroundChange);
-            // 
-            // greyToolStripMenuItem
-            // 
-            this.greyToolStripMenuItem.CheckOnClick = true;
-            this.greyToolStripMenuItem.Name = "greyToolStripMenuItem";
-            this.greyToolStripMenuItem.Size = new System.Drawing.Size(117, 22);
-            this.greyToolStripMenuItem.Text = "Grey";
-            this.greyToolStripMenuItem.Click += new System.EventHandler(this.OnImageViewBackgroundChange);
-            // 
-            // blackToolStripMenuItem
-            // 
-            this.blackToolStripMenuItem.CheckOnClick = true;
-            this.blackToolStripMenuItem.Name = "blackToolStripMenuItem";
-            this.blackToolStripMenuItem.Size = new System.Drawing.Size(117, 22);
-            this.blackToolStripMenuItem.Text = "Black";
-            this.blackToolStripMenuItem.Click += new System.EventHandler(this.OnImageViewBackgroundChange);
-            // 
-            // checkerToolStripMenuItem
-            // 
-            this.checkerToolStripMenuItem.Checked = true;
-            this.checkerToolStripMenuItem.CheckOnClick = true;
-            this.checkerToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkerToolStripMenuItem.Name = "checkerToolStripMenuItem";
-            this.checkerToolStripMenuItem.Size = new System.Drawing.Size(117, 22);
-            this.checkerToolStripMenuItem.Text = "Checker";
-            this.checkerToolStripMenuItem.Click += new System.EventHandler(this.OnImageViewBackgroundChange);
-            // 
-            // propertyView
-            // 
-            this.propertyView.ContextMenuStrip = this.propViewContextMenu;
-            this.propertyView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.propertyView.HelpBorderColor = System.Drawing.SystemColors.ControlDarkDark;
-            this.propertyView.Location = new System.Drawing.Point(0, 0);
-            this.propertyView.Name = "propertyView";
-            this.propertyView.PropertySort = System.Windows.Forms.PropertySort.Categorized;
-            this.propertyView.Size = new System.Drawing.Size(322, 308);
-            this.propertyView.TabIndex = 2;
-            this.propertyView.ToolbarVisible = false;
-            this.propertyView.ViewBorderColor = System.Drawing.SystemColors.ControlDarkDark;
-            this.propertyView.SelectedGridItemChanged += new System.Windows.Forms.SelectedGridItemChangedEventHandler(this.OnPropertySelected);
-            // 
-            // propViewContextMenu
-            // 
-            this.propViewContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.newPropertyToolStripMenuItem,
-            this.deleteToolStripMenuItem});
-            this.propViewContextMenu.Name = "contextMenuStrip1";
-            this.propViewContextMenu.Size = new System.Drawing.Size(145, 48);
-            // 
-            // newPropertyToolStripMenuItem
-            // 
-            this.newPropertyToolStripMenuItem.Name = "newPropertyToolStripMenuItem";
-            this.newPropertyToolStripMenuItem.Size = new System.Drawing.Size(144, 22);
-            this.newPropertyToolStripMenuItem.Text = "Add Property";
-            this.newPropertyToolStripMenuItem.Click += new System.EventHandler(this.OnPropertyAdd);
-            // 
-            // deleteToolStripMenuItem
-            // 
-            this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
-            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(144, 22);
-            this.deleteToolStripMenuItem.Text = "Delete";
-            this.deleteToolStripMenuItem.Click += new System.EventHandler(this.OnPropertyRemove);
-            // 
             // ribbonPanel3
             // 
             this.ribbonPanel3.Name = "ribbonPanel3";
@@ -690,9 +510,9 @@ namespace msstyleEditor
             this.lbStatusMessage,
             this.lbImageInfo,
             this.lbStylePlatform});
-            this.statusStrip.Location = new System.Drawing.Point(0, 428);
+            this.statusStrip.Location = new System.Drawing.Point(0, 540);
             this.statusStrip.Name = "statusStrip";
-            this.statusStrip.Size = new System.Drawing.Size(800, 22);
+            this.statusStrip.Size = new System.Drawing.Size(884, 22);
             this.statusStrip.TabIndex = 3;
             this.statusStrip.Text = "statusStrip1";
             // 
@@ -717,6 +537,16 @@ namespace msstyleEditor
             this.lbStylePlatform.Name = "lbStylePlatform";
             this.lbStylePlatform.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.lbStylePlatform.Size = new System.Drawing.Size(4, 17);
+            // 
+            // dockPanel
+            // 
+            this.dockPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dockPanel.DockLeftPortion = 0.35D;
+            this.dockPanel.DockRightPortion = 0.35D;
+            this.dockPanel.Location = new System.Drawing.Point(0, 117);
+            this.dockPanel.Name = "dockPanel";
+            this.dockPanel.Size = new System.Drawing.Size(884, 423);
+            this.dockPanel.TabIndex = 4;
             // 
             // ribbonButton3
             // 
@@ -760,16 +590,50 @@ namespace msstyleEditor
             this.ribbonButton5.SmallImage = ((System.Drawing.Image)(resources.GetObject("ribbonButton5.SmallImage")));
             this.ribbonButton5.Text = "Theme Folder";
             // 
+            // ribbonPanel16
+            // 
+            this.ribbonPanel16.Items.Add(this.btShowRenderView);
+            this.ribbonPanel16.Items.Add(this.btShowImageView);
+            this.ribbonPanel16.Name = "ribbonPanel16";
+            this.ribbonPanel16.Text = "Windows";
+            // 
+            // btShowRenderView
+            // 
+            this.btShowRenderView.Checked = true;
+            this.btShowRenderView.CheckedGroup = "rv";
+            this.btShowRenderView.CheckOnClick = true;
+            this.btShowRenderView.Image = ((System.Drawing.Image)(resources.GetObject("btShowRenderView.Image")));
+            this.btShowRenderView.LargeImage = ((System.Drawing.Image)(resources.GetObject("btShowRenderView.LargeImage")));
+            this.btShowRenderView.MaxSizeMode = System.Windows.Forms.RibbonElementSizeMode.Medium;
+            this.btShowRenderView.Name = "btShowRenderView";
+            this.btShowRenderView.SmallImage = ((System.Drawing.Image)(resources.GetObject("btShowRenderView.SmallImage")));
+            this.btShowRenderView.Text = "Render View";
+            this.btShowRenderView.Click += new System.EventHandler(this.OnToggleRenderView);
+            // 
+            // btShowImageView
+            // 
+            this.btShowImageView.Checked = true;
+            this.btShowImageView.CheckedGroup = "iv";
+            this.btShowImageView.CheckOnClick = true;
+            this.btShowImageView.Image = ((System.Drawing.Image)(resources.GetObject("btShowImageView.Image")));
+            this.btShowImageView.LargeImage = ((System.Drawing.Image)(resources.GetObject("btShowImageView.LargeImage")));
+            this.btShowImageView.MaxSizeMode = System.Windows.Forms.RibbonElementSizeMode.Medium;
+            this.btShowImageView.Name = "btShowImageView";
+            this.btShowImageView.SmallImage = ((System.Drawing.Image)(resources.GetObject("btShowImageView.SmallImage")));
+            this.btShowImageView.Text = "Image View";
+            this.btShowImageView.Click += new System.EventHandler(this.OnToggleImageView);
+            // 
             // MainWindow
             // 
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(884, 562);
+            this.Controls.Add(this.dockPanel);
             this.Controls.Add(this.statusStrip);
-            this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.ribbonMenu);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.IsMdiContainer = true;
             this.KeyPreview = true;
             this.MinimumSize = new System.Drawing.Size(640, 480);
             this.Name = "MainWindow";
@@ -777,17 +641,6 @@ namespace msstyleEditor
             this.Load += new System.EventHandler(this.OnMainWindowLoad);
             this.DragDrop += new System.Windows.Forms.DragEventHandler(this.OnDragDrop);
             this.DragEnter += new System.Windows.Forms.DragEventHandler(this.OnDragEnter);
-            this.splitContainer1.Panel1.ResumeLayout(false);
-            this.splitContainer1.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
-            this.splitContainer1.ResumeLayout(false);
-            this.splitContainer2.Panel1.ResumeLayout(false);
-            this.splitContainer2.Panel1.PerformLayout();
-            this.splitContainer2.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
-            this.splitContainer2.ResumeLayout(false);
-            this.imageViewContextMenu.ResumeLayout(false);
-            this.propViewContextMenu.ResumeLayout(false);
             this.statusStrip.ResumeLayout(false);
             this.statusStrip.PerformLayout();
             this.ResumeLayout(false);
@@ -798,11 +651,6 @@ namespace msstyleEditor
         #endregion
 
         private System.Windows.Forms.Ribbon ribbonMenu;
-        private System.Windows.Forms.SplitContainer splitContainer1;
-        private System.Windows.Forms.TreeView classView;
-        private System.Windows.Forms.SplitContainer splitContainer2;
-        private msstyleEditor.ImageControl imageView;
-        private System.Windows.Forms.PropertyGrid propertyView;
         private System.Windows.Forms.RibbonPanel ribbonPanel3;
         private System.Windows.Forms.RibbonPanel ribbonPanel2;
         private System.Windows.Forms.RibbonButton ribbonButton3;
@@ -847,14 +695,6 @@ namespace msstyleEditor
         private System.Windows.Forms.RibbonButton ribbonButton4;
         private System.Windows.Forms.RibbonButton ribbonButton5;
         private System.Windows.Forms.ToolStripStatusLabel lbStylePlatform;
-        private System.Windows.Forms.ContextMenuStrip propViewContextMenu;
-        private System.Windows.Forms.ToolStripMenuItem newPropertyToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem deleteToolStripMenuItem;
-        private System.Windows.Forms.ContextMenuStrip imageViewContextMenu;
-        private System.Windows.Forms.ToolStripMenuItem whiteToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem greyToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem blackToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem checkerToolStripMenuItem;
         private System.Windows.Forms.RibbonPanel ribbonPanel15;
         private System.Windows.Forms.RibbonButton ribbonButton6;
         private System.Windows.Forms.RibbonButton btAbout;
@@ -864,6 +704,9 @@ namespace msstyleEditor
         private System.Windows.Forms.RibbonButton btSearch;
         private System.Windows.Forms.ToolStripStatusLabel lbImageInfo;
         private System.Windows.Forms.RibbonButton btFileSaveWithMUI;
-        private Dialogs.ToolStripTabBar imageTabs;
+        private WeifenLuo.WinFormsUI.Docking.DockPanel dockPanel;
+        private System.Windows.Forms.RibbonPanel ribbonPanel16;
+        private System.Windows.Forms.RibbonButton btShowRenderView;
+        private System.Windows.Forms.RibbonButton btShowImageView;
     }
 }

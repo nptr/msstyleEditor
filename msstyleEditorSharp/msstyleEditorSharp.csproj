@@ -91,6 +91,12 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="WeifenLuo.WinFormsUI.Docking, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5cded1a1a0a7b481, processorArchitecture=MSIL">
+      <HintPath>..\packages\DockPanelSuite.3.1.0\lib\net40\WeifenLuo.WinFormsUI.Docking.dll</HintPath>
+    </Reference>
+    <Reference Include="WeifenLuo.WinFormsUI.Docking.ThemeVS2015, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5cded1a1a0a7b481, processorArchitecture=MSIL">
+      <HintPath>..\packages\DockPanelSuite.ThemeVS2015.3.1.0\lib\net40\WeifenLuo.WinFormsUI.Docking.ThemeVS2015.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Dialogs\AboutDialog.cs">
@@ -99,11 +105,23 @@
     <Compile Include="Dialogs\AboutDialog.Designer.cs">
       <DependentUpon>AboutDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\ClassView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\ClassView.Designer.cs">
+      <DependentUpon>ClassView.cs</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\ControlDemoDialog.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Dialogs\ControlDemoDialog.Designer.cs">
       <DependentUpon>ControlDemoDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\ImageView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\ImageView.Designer.cs">
+      <DependentUpon>ImageView.cs</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\LicenseDialog.cs">
       <SubType>Form</SubType>
@@ -111,11 +129,29 @@
     <Compile Include="Dialogs\LicenseDialog.Designer.cs">
       <DependentUpon>LicenseDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\PropertyView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\PropertyView.Designer.cs">
+      <DependentUpon>PropertyView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\RenderView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\RenderView.Designer.cs">
+      <DependentUpon>RenderView.cs</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\ToolStripTabBar.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Dialogs\ToolStripTabBar.Designer.cs">
       <DependentUpon>ToolStripTabBar.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\ToolWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\ToolWindow.Designer.cs">
+      <DependentUpon>ToolWindow.cs</DependentUpon>
     </Compile>
     <Compile Include="Exporter.cs" />
     <Compile Include="Dialogs\SearchDialog.cs">
@@ -160,8 +196,14 @@
     <EmbeddedResource Include="Dialogs\AboutDialog.resx">
       <DependentUpon>AboutDialog.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\ClassView.resx">
+      <DependentUpon>ClassView.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\ControlDemoDialog.resx">
       <DependentUpon>ControlDemoDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\ImageView.resx">
+      <DependentUpon>ImageView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\LicenseDialog.resx">
       <DependentUpon>LicenseDialog.cs</DependentUpon>
@@ -170,6 +212,12 @@
     <EmbeddedResource Include="Dialogs\MainWindow.resx">
       <DependentUpon>MainWindow.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\PropertyView.resx">
+      <DependentUpon>PropertyView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\RenderView.resx">
+      <DependentUpon>RenderView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\ToolStripTabBar.resx">
       <DependentUpon>ToolStripTabBar.cs</DependentUpon>

@@ -1,4 +1,5 @@
 ﻿using libmsstyle;
+using msstyleEditor.Dialogs;
 using msstyleEditor.Properties;
 using msstyleEditor.PropView;
 using System;
@@ -9,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using WeifenLuo.WinFormsUI.Docking;
 
 namespace msstyleEditor
 {
@@ -19,11 +21,38 @@ namespace msstyleEditor
         private StyleResource m_selectedImage = null;
         private StyleProperty m_selectedProp = null;
         private ThemeManager m_themeManager = null;
+
         private SearchDialog m_searchDialog = new SearchDialog();
+        private ClassViewWindow m_classView;
+        private PropertyViewWindow m_propertyView;
+        private ImageView m_imageView;
+        private RenderView m_renderView;
 
         public MainWindow()
         {
             InitializeComponent();
+
+            dockPanel.Theme = new WeifenLuo.WinFormsUI.Docking.VS2015LightTheme();
+            //dockPanel.Theme.ColorPalette.ToolWindowCaptionActive.Background = SystemColors.ActiveCaption;
+
+            m_classView = new ClassViewWindow();
+            m_classView.Show(dockPanel, DockState.DockLeft);
+            m_classView.CloseButtonVisible = false;
+            m_classView.OnSelectionChanged += OnTreeItemSelected;
+
+            m_imageView = new ImageView();
+            m_imageView.SelectedIndexChanged += OnImageSelectIndex;
+            m_imageView.OnViewBackColorChanged += OnImageViewBackgroundChanged;
+            m_imageView.Show(dockPanel, DockState.Document);
+            m_imageView.VisibleChanged += (s, e) => { btShowImageView.Checked = m_imageView.Visible; };
+
+            m_renderView = new RenderView();
+            m_renderView.Show(m_imageView.Pane, DockAlignment.Top, 0.25);
+            m_renderView.VisibleChanged += (s, e) => { btShowRenderView.Checked = m_renderView.Visible; };
+
+            m_propertyView = new PropertyViewWindow();
+            m_propertyView.Show(dockPanel, DockState.DockRight);
+            m_propertyView.CloseButtonVisible = false;
 
             try 
             {
@@ -38,7 +67,6 @@ namespace msstyleEditor
                 btTestTheme.Enabled = false;
             }
 
-            classView.TreeViewNodeSorter = new TreeRootSorter();
             SetTestThemeButtonState(false);
             CloseStyle();
 
@@ -114,7 +142,7 @@ namespace msstyleEditor
                 return;
             }
 
-            FillClassView();
+            m_classView.SetVisualStyle(m_style);
 
             btFileSave.Enabled = true;
             btFileInfoExport.Enabled = true;
@@ -135,11 +163,8 @@ namespace msstyleEditor
 
         private void CloseStyle()
         {
-            classView.BeginUpdate();
-            classView.Nodes.Clear();
-            classView.EndUpdate();
-
-            propertyView.SelectedObject = null;
+            m_classView.SetVisualStyle(null);
+            m_propertyView.SetStylePart(null, null, null);
 
             btFileSave.Enabled = false;
             btFileInfoExport.Enabled = false;
@@ -155,39 +180,11 @@ namespace msstyleEditor
             m_style?.Dispose();
         }
 
-        private void FillClassView()
-        {
-            classView.BeginUpdate();
-            foreach (var cls in m_style.Classes)
-            {
-                var clsNode = new TreeNode(cls.Value.ClassName);
-                clsNode.Tag = cls.Value;
-
-                foreach (var part in cls.Value.Parts)
-                {
-                    var partNode = new TreeNode(part.Value.PartName);
-                    partNode.Tag = part.Value;
-                    
-                    clsNode.Nodes.Add(partNode);
-                }
-                classView.Nodes.Add(clsNode);
-            }
-            classView.Sort();
-            classView.EndUpdate();
-        }
-
-        private void UpdatePropertyView(StylePart part)
-        {
-            propertyView.SelectedObject = (part != null)
-                ? new TypeDescriptor(part, m_style)
-                : null;
-        }
-
         private StyleResource UpdateImageView(StyleProperty prop)
         {
             if (prop == null)
             {
-                imageView.BackgroundImage = null;
+                m_imageView.ViewImage = null;
                 UpdateImageInfo(null);
                 return null;
             }
@@ -211,19 +208,21 @@ namespace msstyleEditor
             // we need that in order to export/replace?
             var resource = m_style.GetResourceFromProperty(prop);
 
+            Image img = null;
             if (!String.IsNullOrEmpty(file))
             {
-                imageView.BackgroundImage = Image.FromFile(file);
+                img = Image.FromFile(file);
             }
             else
             {
                 if (resource?.Data != null)
                 {
-                    imageView.BackgroundImage = Image.FromStream(new MemoryStream(resource.Data));
+                    img = Image.FromStream(new MemoryStream(resource.Data));
                 }
             }
 
-            UpdateImageInfo(imageView.BackgroundImage);
+            m_imageView.ViewImage = img;
+            UpdateImageInfo(img);
             return resource;
         }
 
@@ -349,7 +348,7 @@ namespace msstyleEditor
             if (cls != null)
             {
                 UpdateItemSelection(cls);
-                UpdatePropertyView(null);
+                m_propertyView.SetStylePart(null, null, null);
                 m_selectedImage = UpdateImageView(null);
                 return;
             }
@@ -361,7 +360,7 @@ namespace msstyleEditor
                 Debug.Assert(cls != null);
 
                 UpdateItemSelection(cls, part);
-                UpdatePropertyView(part);
+                m_propertyView.SetStylePart(m_style, cls, part);
 
                 // Select first image, or search parent
                 // If ATLASRECT, set highlight
@@ -373,14 +372,15 @@ namespace msstyleEditor
                     if (rectProp != null)
                     {
                         var mt = rectProp.GetValueAs<Margins>();
-                        imageView.HighlightArea = new Rectangle(
+                        var ha = new Rectangle(
                             new Point(mt.Left, mt.Top),
                             new Size(mt.Right - mt.Left, mt.Bottom - mt.Top)
                         );
+                        m_imageView.ViewHighlightArea = ha;
                     }
-                    else imageView.HighlightArea = null;
+                    else m_imageView.ViewHighlightArea = null;
                 }
-                else imageView.HighlightArea = null;
+                else m_imageView.ViewHighlightArea = null;
 
 
                 StyleProperty imagePropToShow = null;
@@ -395,11 +395,11 @@ namespace msstyleEditor
                 }
 
                 m_selectedImage = UpdateImageView(imagePropToShow);
-                imageTabs.SetActiveTabs(0, imgProps.Count);
+                m_imageView.SetActiveTabs(0, imgProps.Count);
 
                 // TODO: move this elsewhere. experimental code.
                 var renderer = new PartRenderer(m_style, part);
-                imageView.BackgroundImage = renderer.RenderPreview();
+                m_renderView.Image = renderer.RenderPreview();
 
                 return;
             }
@@ -414,7 +414,7 @@ namespace msstyleEditor
                 Debug.Assert(cls != null);
 
                 UpdateItemSelection(cls, part, null, prop.Header.shortFlag);
-                UpdatePropertyView(part);
+                m_propertyView.SetStylePart(m_style, cls, part);
                 m_selectedImage = UpdateImageView(prop);
                 return;
             }
@@ -422,12 +422,12 @@ namespace msstyleEditor
 
         private void OnTreeExpandClick(object sender, EventArgs e)
         {
-            classView.ExpandAll();
+            m_classView.ExpandAll();
         }
 
         private void OnTreeCollapseClick(object sender, EventArgs e)
         {
-            classView.CollapseAll();
+            m_classView.CollapseAll();
         }
 
         private void OnTestTheme(object sender, EventArgs e)
@@ -512,36 +512,36 @@ namespace msstyleEditor
 
         private void OnImageViewBackgroundChange(object sender, EventArgs e)
         {
-            whiteToolStripMenuItem.Checked 
-                = greyToolStripMenuItem.Checked 
-                = blackToolStripMenuItem.Checked 
-                = checkerToolStripMenuItem.Checked 
-                = false;
+            // we want to change the color
+            if (sender == btImageBgWhite)
+            {
+                m_imageView.ViewBackColor = Color.White;
+                btImageBgWhite.Checked = true;
+            }
+            else if (sender == btImageBgGrey)
+            {
+                m_imageView.ViewBackColor = Color.LightGray;
+                btImageBgGrey.Checked = true;
+            }
+            else if (sender == btImageBgBlack)
+            {
+                m_imageView.ViewBackColor = Color.Black;
+                btImageBgBlack.Checked = true;
+            }
+            else if (sender == btImageBgChecker)
+            {
+                m_imageView.ViewBackColor = Color.MediumVioletRed;
+                btImageBgChecker.Checked = true;
+            }
+        }
 
-            if (sender == btImageBgWhite || sender == whiteToolStripMenuItem)
-            {
-                imageView.BackColor = Color.White;
-                imageView.Background = ImageControl.BackgroundStyle.Color;
-                btImageBgWhite.Checked = whiteToolStripMenuItem.Checked = true;
-            }
-            else if (sender == btImageBgGrey || sender == greyToolStripMenuItem)
-            {
-                imageView.BackColor = Color.LightGray;
-                imageView.Background = ImageControl.BackgroundStyle.Color;
-                btImageBgGrey.Checked = greyToolStripMenuItem.Checked = true;
-            }
-            else if (sender == btImageBgBlack || sender == blackToolStripMenuItem)
-            {
-                imageView.BackColor = Color.Black;
-                imageView.Background = ImageControl.BackgroundStyle.Color;
-                btImageBgBlack.Checked = blackToolStripMenuItem.Checked = true;
-            }
-            else if (sender == btImageBgChecker || sender == checkerToolStripMenuItem)
-            {
-                imageView.Background = ImageControl.BackgroundStyle.Chessboard;
-                btImageBgChecker.Checked = checkerToolStripMenuItem.Checked = true;
-            }
-            imageView.Refresh();
+        private void OnImageViewBackgroundChanged(object sender, EventArgs e)
+        {
+            // we get notified because someone else changed the color
+            if (m_imageView.ViewBackColor == Color.White) btImageBgWhite.Checked = true;
+            if (m_imageView.ViewBackColor == Color.LightGray) btImageBgGrey.Checked = true;
+            if (m_imageView.ViewBackColor == Color.Black) btImageBgBlack.Checked = true;
+            if (m_imageView.ViewBackColor == Color.MediumVioletRed) btImageBgChecker.Checked = true; // hack
         }
 
         private void OnImageExport(object sender, EventArgs e)
@@ -631,7 +631,7 @@ namespace msstyleEditor
                 newProp.Header.stateID = m_selection.State.StateId;
 
                 m_selection.State.Properties.Add(newProp);
-                propertyView.Refresh();
+                m_propertyView.Refresh();
             }
         }
 
@@ -644,53 +644,7 @@ namespace msstyleEditor
             }
 
             m_selection.State.Properties.Remove(m_selectedProp);
-            propertyView.Refresh();
-        }
-
-        private void OnPropertySelected(object sender, SelectedGridItemChangedEventArgs e)
-        {
-            const int CTX_ADD = 0;
-            const int CTX_REM = 1;
-
-            bool haveSelection = e.NewSelection != null;
-            propViewContextMenu.Items[CTX_ADD].Enabled = haveSelection;
-            propViewContextMenu.Items[CTX_REM].Enabled = haveSelection;
-            if (!haveSelection)
-                return;
-
-            var propDesc = e.NewSelection.PropertyDescriptor as StylePropertyDescriptor;
-            if (propDesc != null)
-            {
-                propViewContextMenu.Items[CTX_ADD].Text = "Add Property to [" + propDesc.Category + "]";
-                propViewContextMenu.Items[CTX_REM].Text = "Remove " + propDesc.Name;
-
-                UpdateItemSelection(m_selection.Class, m_selection.Part, propDesc.StyleState, m_selection.ResourceId);
-                m_selectedProp = propDesc.StyleProperty;
-                return;
-            }
-
-            var dummyDesc = e.NewSelection.PropertyDescriptor as PlaceHolderPropertyDescriptor;
-            if (dummyDesc != null)
-            {
-                propViewContextMenu.Items[CTX_ADD].Enabled = true;
-                propViewContextMenu.Items[CTX_ADD].Text = "Add Property to [" + dummyDesc.Category + "]";
-                propViewContextMenu.Items[CTX_REM].Enabled = false;
-                propViewContextMenu.Items[CTX_REM].Text = "Remove";
-                UpdateItemSelection(m_selection.Class, m_selection.Part, dummyDesc.StyleState, m_selection.ResourceId);
-                return;
-            }
-
-            if (e.NewSelection.GridItemType == GridItemType.Category)
-            {
-                OnPropertySelected(sender, new SelectedGridItemChangedEventArgs(null, e.NewSelection.GridItems[0])); // select child
-                return;
-            }
-
-            if (e.NewSelection.GridItemType == GridItemType.Property)
-            {
-                OnPropertySelected(sender, new SelectedGridItemChangedEventArgs(null, e.NewSelection.Parent)); // select parent
-                return;
-            }
+            m_propertyView.Refresh();
         }
 
         private void OnSearchClicked(object sender, EventArgs e)
@@ -707,7 +661,6 @@ namespace msstyleEditor
             }
         }
 
-        bool m_endReached = false;
         private void OnSearchNextItem(SearchDialog.SearchMode mode, IDENTIFIER type, string search)
         {
             if (m_style == null)
@@ -716,65 +669,21 @@ namespace msstyleEditor
             if (String.IsNullOrEmpty(search))
                 return;
 
-            
-            var searchObj = MakeObjectFromSearchString(type, search);
-            if (searchObj == null)
+            object searchObj = null;
+            if (mode == SearchDialog.SearchMode.Property)
             {
-                string typeString = VisualStyleProperties.PROPERTY_INFO_MAP[(int)type].Name;
-                MessageBox.Show($"\"{search}\" doesn't seem to be a valid {typeString} property!", ""
-                    , MessageBoxButtons.OK
-                    , MessageBoxIcon.Warning);
-                return;
-            }
-
-            var startItem = classView.SelectedNode;
-            if (startItem == null || m_endReached)
-            {
-                m_endReached = false;
-                if (classView.Nodes.Count > 0)
+                searchObj = MakeObjectFromSearchString(type, search);
+                if (searchObj == null)
                 {
-                    startItem = classView.Nodes[0];
+                    string typeString = VisualStyleProperties.PROPERTY_INFO_MAP[(int)type].Name;
+                    MessageBox.Show($"\"{search}\" doesn't seem to be a valid {typeString} property!", ""
+                        , MessageBoxButtons.OK
+                        , MessageBoxIcon.Warning);
+                    return;
                 }
-                else return;
             }
 
-            var node = TreeViewSearch.FindNextNode(classView, startItem, (_node) =>
-            {
-                switch (mode)
-                {
-                    case SearchDialog.SearchMode.Name:
-                        return _node.Text.ToUpper().Contains(search.ToUpper());
-                    case SearchDialog.SearchMode.Property:
-                        {
-                            StylePart part = _node.Tag as StylePart;
-                            if (part != null)
-                            {
-                                return part.States.Any((kvp) =>
-                                {
-                                    return kvp.Value.Properties.Any((p) =>
-                                    {
-                                        return p.Header.typeID == (int)type &&
-                                               p.GetValue().Equals(searchObj);
-                                    });
-                                });
-                            }
-                        }
-                        return false;
-                    default: return false;
-                }
-            });
-
-            if (node != null)
-            {
-                classView.SelectedNode = node;
-            }
-            else
-            {
-                MessageBox.Show($"No further match for \"{search}\" !\nSearch will begin from top again.", ""
-                    , MessageBoxButtons.OK
-                    , MessageBoxIcon.Information);
-                m_endReached = true;
-            }
+            m_classView.FindNextNode(mode, type, search, searchObj);
         }
 
         private object MakeObjectFromSearchString(IDENTIFIER type, string search)
@@ -891,7 +800,7 @@ namespace msstyleEditor
             }
 
             var it = m_selection.Part.GetImageProperties();
-            var imgProp = it.ElementAtOrDefault(imageTabs.SelectedIndex);
+            var imgProp = it.ElementAtOrDefault(m_imageView.SelectedIndex);
             if(imgProp != null)
             {
                 UpdateImageView(imgProp);
@@ -902,8 +811,18 @@ namespace msstyleEditor
         {
             if(e.KeyChar >= '1' && e.KeyChar <= '9')
             {
-                imageTabs.SetActiveTabIndex(e.KeyChar - 0x30 - 1);
+                m_imageView.SetActiveTabIndex(e.KeyChar - 0x30 - 1);
             }
+        }
+
+        private void OnToggleRenderView(object sender, EventArgs e)
+        {
+            m_renderView.IsHidden = !m_renderView.IsHidden;
+        }
+
+        private void OnToggleImageView(object sender, EventArgs e)
+        {
+            m_imageView.IsHidden = !m_imageView.IsHidden;
         }
     }
 }

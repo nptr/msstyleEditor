@@ -23,7 +23,13 @@ namespace msstyleEditor
 
         public Bitmap RenderPreview()
         {
-            Bitmap surface = new Bitmap(200, 150, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            StyleState state;
+            if(!m_part.States.TryGetValue(0, out state))
+            {
+                return null;
+            }
+
+            Bitmap surface = new Bitmap(150, 50, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             using (Graphics g = Graphics.FromImage(surface))
             {
                 DrawBackground(g);
