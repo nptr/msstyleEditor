@@ -116,8 +116,9 @@ namespace msstyleEditor.Dialogs
             int i = 0;
             foreach (ToolStripButton item in toolStrip.Items)
             {
-                item.Visible = i++ < numActive;
+                item.Visible = i < numActive;
                 item.Checked = i == activeIndex;
+                ++i;
             }
 
             m_selectedIndex = activeIndex;

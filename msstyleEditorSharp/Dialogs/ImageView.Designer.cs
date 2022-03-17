@@ -148,6 +148,7 @@ namespace msstyleEditor.Dialogs
             this.tsbImage1.Size = new System.Drawing.Size(23, 22);
             this.tsbImage1.Tag = 1;
             this.tsbImage1.Text = "1";
+            this.tsbImage1.Click += new System.EventHandler(this.OnToolButtonClicked);
             // 
             // tsbImage2
             // 
@@ -159,6 +160,7 @@ namespace msstyleEditor.Dialogs
             this.tsbImage2.Size = new System.Drawing.Size(23, 22);
             this.tsbImage2.Tag = 2;
             this.tsbImage2.Text = "2";
+            this.tsbImage2.Click += new System.EventHandler(this.OnToolButtonClicked);
             // 
             // tsbImage3
             // 
@@ -170,6 +172,7 @@ namespace msstyleEditor.Dialogs
             this.tsbImage3.Size = new System.Drawing.Size(23, 22);
             this.tsbImage3.Tag = 3;
             this.tsbImage3.Text = "3";
+            this.tsbImage3.Click += new System.EventHandler(this.OnToolButtonClicked);
             // 
             // tsbImage4
             // 
@@ -181,6 +184,7 @@ namespace msstyleEditor.Dialogs
             this.tsbImage4.Size = new System.Drawing.Size(23, 22);
             this.tsbImage4.Tag = 4;
             this.tsbImage4.Text = "4";
+            this.tsbImage4.Click += new System.EventHandler(this.OnToolButtonClicked);
             // 
             // tsbImage5
             // 
@@ -192,6 +196,7 @@ namespace msstyleEditor.Dialogs
             this.tsbImage5.Size = new System.Drawing.Size(23, 22);
             this.tsbImage5.Tag = 5;
             this.tsbImage5.Text = "5";
+            this.tsbImage5.Click += new System.EventHandler(this.OnToolButtonClicked);
             // 
             // tsbImage6
             // 
@@ -203,6 +208,7 @@ namespace msstyleEditor.Dialogs
             this.tsbImage6.Size = new System.Drawing.Size(23, 22);
             this.tsbImage6.Tag = 6;
             this.tsbImage6.Text = "6";
+            this.tsbImage6.Click += new System.EventHandler(this.OnToolButtonClicked);
             // 
             // tsbImage7
             // 
@@ -214,6 +220,7 @@ namespace msstyleEditor.Dialogs
             this.tsbImage7.Size = new System.Drawing.Size(23, 22);
             this.tsbImage7.Tag = 7;
             this.tsbImage7.Text = "7";
+            this.tsbImage7.Click += new System.EventHandler(this.OnToolButtonClicked);
             // 
             // tsbImage8
             // 
@@ -225,6 +232,7 @@ namespace msstyleEditor.Dialogs
             this.tsbImage8.Size = new System.Drawing.Size(23, 22);
             this.tsbImage8.Tag = 8;
             this.tsbImage8.Text = "8";
+            this.tsbImage8.Click += new System.EventHandler(this.OnToolButtonClicked);
             // 
             // ImageView
             // 

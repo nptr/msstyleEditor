@@ -39,6 +39,7 @@ namespace msstyleEditor
             m_classView.Show(dockPanel, DockState.DockLeft);
             m_classView.CloseButtonVisible = false;
             m_classView.OnSelectionChanged += OnTreeItemSelected;
+            m_classView.Controls[0].KeyPress += OnTreeKeyPress; // very hacky
 
             m_imageView = new ImageView();
             m_imageView.SelectedIndexChanged += OnImageSelectIndex;
@@ -49,6 +50,8 @@ namespace msstyleEditor
             m_renderView = new RenderView();
             m_renderView.Show(m_imageView.Pane, DockAlignment.Top, 0.25);
             m_renderView.VisibleChanged += (s, e) => { btShowRenderView.Checked = m_renderView.Visible; };
+            m_renderView.Visible = false;
+            m_renderView.Hide();
 
             m_propertyView = new PropertyViewWindow();
             m_propertyView.Show(dockPanel, DockState.DockRight);
@@ -420,6 +423,14 @@ namespace msstyleEditor
             }
         }
 
+        private void OnTreeKeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar >= '1' && e.KeyChar <= '9')
+            {
+                m_imageView.SetActiveTabIndex(e.KeyChar - 0x30 - 1);
+            }
+        }
+
         private void OnTreeExpandClick(object sender, EventArgs e)
         {
             m_classView.ExpandAll();
@@ -428,6 +439,16 @@ namespace msstyleEditor
         private void OnTreeCollapseClick(object sender, EventArgs e)
         {
             m_classView.CollapseAll();
+        }
+
+        private void OnToggleRenderView(object sender, EventArgs e)
+        {
+            m_renderView.IsHidden = !m_renderView.IsHidden;
+        }
+
+        private void OnToggleImageView(object sender, EventArgs e)
+        {
+            m_imageView.IsHidden = !m_imageView.IsHidden;
         }
 
         private void OnTestTheme(object sender, EventArgs e)
@@ -805,24 +826,6 @@ namespace msstyleEditor
             {
                 UpdateImageView(imgProp);
             }
-        }
-
-        private void classView_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            if(e.KeyChar >= '1' && e.KeyChar <= '9')
-            {
-                m_imageView.SetActiveTabIndex(e.KeyChar - 0x30 - 1);
-            }
-        }
-
-        private void OnToggleRenderView(object sender, EventArgs e)
-        {
-            m_renderView.IsHidden = !m_renderView.IsHidden;
-        }
-
-        private void OnToggleImageView(object sender, EventArgs e)
-        {
-            m_imageView.IsHidden = !m_imageView.IsHidden;
         }
     }
 }
