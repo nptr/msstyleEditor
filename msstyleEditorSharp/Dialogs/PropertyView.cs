@@ -30,6 +30,17 @@ namespace msstyleEditor.Dialogs
                 : null;
         }
 
+        public void ShowPropertyAddDialog()
+        {
+            OnPropertyAdd(this, null);
+        }
+
+        public void RemoveSelectedProperty()
+        {
+            OnPropertyRemove(this, null);
+        }
+
+
         private void OnPropertyAdd(object sender, EventArgs e)
         {
             if (m_state == null)

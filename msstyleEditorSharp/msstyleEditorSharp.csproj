@@ -141,12 +141,6 @@
     <Compile Include="Dialogs\RenderView.Designer.cs">
       <DependentUpon>RenderView.cs</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\ToolStripTabBar.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Dialogs\ToolStripTabBar.Designer.cs">
-      <DependentUpon>ToolStripTabBar.cs</DependentUpon>
-    </Compile>
     <Compile Include="Dialogs\ToolWindow.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -219,9 +213,6 @@
     <EmbeddedResource Include="Dialogs\RenderView.resx">
       <DependentUpon>RenderView.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\ToolStripTabBar.resx">
-      <DependentUpon>ToolStripTabBar.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <SubType>Designer</SubType>
@@ -281,7 +272,7 @@
     <Error Condition="!Exists('..\packages\ILMerge.3.0.41\build\ILMerge.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\ILMerge.3.0.41\build\ILMerge.props'))" />
   </Target>
   <Target Name="AfterBuild" Condition="'$(Configuration)' == 'Release'">
-    <Exec Command="$(ILMergeConsolePath) $(OutputPath)msstyleEditor.exe /ndebug /out:$(OutputPath)msstyleEditor_static.exe ^&#xD;&#xA;    $(OutputPath)libmsstyle.dll ^&#xD;&#xA;    $(OutputPath)System.Windows.Forms.Ribbon.dll" />
+    <Exec Command="$(ILMergeConsolePath) $(OutputPath)msstyleEditor.exe /ndebug /out:$(OutputPath)msstyleEditor_static.exe ^&#xD;&#xA;    $(OutputPath)libmsstyle.dll ^&#xD;&#xA;    $(OutputPath)System.Windows.Forms.Ribbon.dll $(OutputPath)WeifenLuo.WinFormsUI.Docking.dll $(OutputPath)WeifenLuo.WinFormsUI.Docking.ThemeVS2015.dll" />
   </Target>
   <PropertyGroup>
     <PostBuildEvent>

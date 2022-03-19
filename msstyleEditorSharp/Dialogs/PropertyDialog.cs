@@ -41,6 +41,8 @@ namespace msstyleEditor
             "Filename",
             "Size",
             "Position",
+            "Rectangle",
+            "Font",
             "HighContrastColor"
         };
 
@@ -54,6 +56,8 @@ namespace msstyleEditor
             206,
             207,
             208,
+            209,
+            210,
             241
         };
 

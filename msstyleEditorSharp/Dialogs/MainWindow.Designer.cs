@@ -107,9 +107,6 @@ namespace msstyleEditor
             this.ribbonMenu.OrbDropDown.TabIndex = 0;
             this.ribbonMenu.OrbStyle = System.Windows.Forms.RibbonOrbStyle.Office_2013;
             this.ribbonMenu.OrbVisible = false;
-            // 
-            // 
-            // 
             this.ribbonMenu.RibbonTabFont = new System.Drawing.Font("Trebuchet MS", 9F);
             this.ribbonMenu.Size = new System.Drawing.Size(884, 117);
             this.ribbonMenu.TabIndex = 0;
@@ -405,6 +402,8 @@ namespace msstyleEditor
             // 
             // ribbonPanelWindows
             // 
+            this.ribbonPanelWindows.ButtonMoreEnabled = false;
+            this.ribbonPanelWindows.ButtonMoreVisible = false;
             this.ribbonPanelWindows.Items.Add(this.btShowRenderView);
             this.ribbonPanelWindows.Items.Add(this.btShowImageView);
             this.ribbonPanelWindows.Name = "ribbonPanelWindows";

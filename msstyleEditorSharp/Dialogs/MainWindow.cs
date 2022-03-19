@@ -19,7 +19,6 @@ namespace msstyleEditor
         private VisualStyle m_style;
         private Selection m_selection = new Selection();
         private StyleResource m_selectedImage = null;
-        private StyleProperty m_selectedProp = null;
         private ThemeManager m_themeManager = null;
 
         private SearchDialog m_searchDialog = new SearchDialog();
@@ -46,6 +45,7 @@ namespace msstyleEditor
             m_imageView.OnViewBackColorChanged += OnImageViewBackgroundChanged;
             m_imageView.Show(dockPanel, DockState.Document);
             m_imageView.VisibleChanged += (s, e) => { btShowImageView.Checked = m_imageView.Visible; };
+            m_imageView.SetActiveTabs(-1, 0);
 
             m_renderView = new RenderView();
             m_renderView.Show(m_imageView.Pane, DockAlignment.Top, 0.25);
@@ -400,25 +400,10 @@ namespace msstyleEditor
                 m_selectedImage = UpdateImageView(imagePropToShow);
                 m_imageView.SetActiveTabs(0, imgProps.Count);
 
-                // TODO: move this elsewhere. experimental code.
+                // TODO: ugly code..
                 var renderer = new PartRenderer(m_style, part);
                 m_renderView.Image = renderer.RenderPreview();
 
-                return;
-            }
-
-            StyleProperty prop = e.Node.Tag as StyleProperty;
-            if (prop != null)
-            {
-                part = e.Node.Parent.Tag as StylePart;
-                Debug.Assert(part != null);
-
-                cls = e.Node.Parent.Parent.Tag as StyleClass;
-                Debug.Assert(cls != null);
-
-                UpdateItemSelection(cls, part, null, prop.Header.shortFlag);
-                m_propertyView.SetStylePart(m_style, cls, part);
-                m_selectedImage = UpdateImageView(prop);
                 return;
             }
         }
@@ -627,45 +612,19 @@ namespace msstyleEditor
                     return;
                 }
 
-                m_style.QueueResourceUpdate(m_selection.ResourceId, m_selectedImage.Type, ofd.FileName);
+                m_style.QueueResourceUpdate(m_selectedImage.ResourceId, m_selectedImage.Type, ofd.FileName);
                 // TODO: update image view?
             }
         }
 
         private void OnPropertyAdd(object sender, EventArgs e)
         {
-            if(m_selection.State == null)
-            {
-                MessageBox.Show("Select a state or property within this state first!", "Add Property", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            var dlg = new PropertyDialog();
-            dlg.StartPosition = FormStartPosition.CenterParent;
-            dlg.Text = "Add Property to " + m_selection.State.StateName;
-            var newProp = dlg.ShowDialog();
-            if(newProp != null)
-            {
-                // Add the prop where requested. TODO: test this
-                newProp.Header.classID = m_selection.Class.ClassId;
-                newProp.Header.partID = m_selection.Part.PartId;
-                newProp.Header.stateID = m_selection.State.StateId;
-
-                m_selection.State.Properties.Add(newProp);
-                m_propertyView.Refresh();
-            }
+            m_propertyView.ShowPropertyAddDialog();
         }
 
         private void OnPropertyRemove(object sender, EventArgs e)
         {
-            if (m_selection.State == null ||
-                m_selectedProp == null)
-            {
-                return;
-            }
-
-            m_selection.State.Properties.Remove(m_selectedProp);
-            m_propertyView.Refresh();
+            m_propertyView.RemoveSelectedProperty();
         }
 
         private void OnSearchClicked(object sender, EventArgs e)
