@@ -296,19 +296,25 @@ namespace libmsstyle
             }
             LoadProperties(pmap);
 
-            // Load the table for the users preferred language
-            ResourceAccess.StringTable.Load(m_moduleHandle, 1041, m_stringTable);
 
-            // Load all tables for internal purposes
+            // Load all tables for internal purposes.
             var langs = ResourceAccess.GetAllLanguageIds(m_moduleHandle, "#" + Win32Api.RT_VERSION, 1,
                 Win32Api.EnumResourceFlags.RESOURCE_ENUM_MUI |
                 Win32Api.EnumResourceFlags.RESOURCE_ENUM_LN);
-
             foreach (var lang in langs)
             {
                 var table = new Dictionary<int, string>();
                 ResourceAccess.StringTable.Load(m_moduleHandle, lang, table);
                 m_stringTables[lang] = table;
+            }
+
+            // Get users preferred language for display purposes.
+            // If we don't have it, choose any.
+            int uiLang = System.Threading.Thread.CurrentThread.CurrentUICulture.LCID;
+            if(!m_stringTables.TryGetValue(uiLang, out m_stringTable))
+            {
+                var kvp = m_stringTables.FirstOrDefault((t) => t.Value.Count > 0);
+                m_stringTable = kvp.Value ?? new Dictionary<int, string>();
             }
 
             m_stylePath = file;
