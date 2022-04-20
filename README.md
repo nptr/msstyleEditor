@@ -48,5 +48,5 @@ On selection of a part, its properties are shown on the right side, grouped by t
 
 Saving the style is done via the menubar. It is recommended to save often, and to a new file, since there is no undo/redo functionality. Also remember to backup your original style and don't work in the "Themes" directory directly (probably no write permission anyways, but still).
 
-## Contributers
+## Contributors
 * [Shomnipotence](https://github.com/Shomnipotence) - New application icon design
