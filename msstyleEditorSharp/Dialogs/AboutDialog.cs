@@ -20,7 +20,7 @@ namespace msstyleEditor
             try
             {
                 var version = Assembly.GetExecutingAssembly().GetName().Version;
-                lbVersion.Text = String.Format("msstyleEditor v{0}.{1}.{2}.{3} beta",
+                lbVersion.Text = String.Format("msstyleEditor v{0}.{1}.{2}.{3}",
                     version.Major, 
                     version.Minor, 
                     version.Build, 

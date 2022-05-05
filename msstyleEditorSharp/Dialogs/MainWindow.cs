@@ -783,7 +783,7 @@ namespace msstyleEditor
             var imgProp = it.ElementAtOrDefault(m_imageView.SelectedIndex);
             if(imgProp != null)
             {
-                UpdateImageView(imgProp);
+                m_selectedImage = UpdateImageView(imgProp);
             }
         }
     }
