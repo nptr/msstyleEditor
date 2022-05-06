@@ -480,14 +480,16 @@ namespace msstyleEditor
             }
 
             if (version.dwMajorVersion == 10 &&
-                version.dwMinorVersion >= 0 &&
+                version.dwMinorVersion == 0 &&
+                version.dwBuildNumber < 22000 &&
                 m_style.Platform != Platform.Win10)
             {
                 needConfirmation = true;
             }
 
-            if (version.dwMajorVersion == 11 &&
-                version.dwMinorVersion >= 0 &&
+            if (version.dwMajorVersion == 10 &&
+                version.dwMinorVersion == 0 &&
+                version.dwBuildNumber >= 22000 &&
                 m_style.Platform != Platform.Win11)
             {
                 needConfirmation = true;
