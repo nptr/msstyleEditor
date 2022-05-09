@@ -215,7 +215,7 @@ namespace msstyleEditor.PropView
 
         public override void SetValue(object component, object value)
         {
-            m_property.SetValue(value);
+            m_property.SetValue((dynamic)value);
         }
 
 

@@ -11,11 +11,19 @@ namespace msstyleEditor
 {
     static class Program
     {
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        private static extern bool SetProcessDPIAware();
+
         [STAThread]
         static void Main()
         {
             TypeDescriptor.AddAttributes(typeof(Color), new EditorAttribute(typeof(ColorEditor), typeof(UITypeEditor)));
             TypeDescriptor.AddAttributes(typeof(Color), new TypeConverterAttribute(typeof(NoStandardColorConverter)));
+
+            if (Environment.OSVersion.Version.Major >= 6)
+            {
+                SetProcessDPIAware();
+            }
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

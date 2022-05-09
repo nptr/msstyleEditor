@@ -56,6 +56,7 @@ namespace msstyleEditor
             m_propertyView = new PropertyViewWindow();
             m_propertyView.Show(dockPanel, DockState.DockRight);
             m_propertyView.CloseButtonVisible = false;
+            m_propertyView.OnPropertyAdded += OnPropertyAdded;
 
             try 
             {
@@ -187,6 +188,7 @@ namespace msstyleEditor
         {
             if (prop == null)
             {
+                btImageExport.Enabled = false;
                 m_imageView.ViewImage = null;
                 UpdateImageInfo(null);
                 return null;
@@ -224,6 +226,7 @@ namespace msstyleEditor
                 }
             }
 
+            btImageExport.Enabled = resource.Data != null;
             m_imageView.ViewImage = img;
             UpdateImageInfo(img);
             return resource;
@@ -560,6 +563,12 @@ namespace msstyleEditor
                 return;
             }
 
+            if(m_selectedImage.Data == null)
+            {
+                MessageBox.Show("This image resource doesn't exist yet!", "Export Image", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
             using (var sfd = new SaveFileDialog())
             {
                 string suggestedName = String.Format("{0}_{1}_{2}.png",
@@ -622,6 +631,12 @@ namespace msstyleEditor
         private void OnPropertyAdd(object sender, EventArgs e)
         {
             m_propertyView.ShowPropertyAddDialog();
+        }
+
+        private void OnPropertyAdded(StyleProperty prop)
+        {
+            // refresh image tabs
+            // m_imageView.SetActiveTabs(0, imgProps.Count);
         }
 
         private void OnPropertyRemove(object sender, EventArgs e)

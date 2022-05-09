@@ -14,6 +14,9 @@ namespace msstyleEditor.Dialogs
         private StyleState m_state;
         private StyleProperty m_prop;
 
+        public delegate void PropertyAddedHandler(StyleProperty prop);
+        public event PropertyAddedHandler OnPropertyAdded;
+
         public PropertyViewWindow()
         {
             InitializeComponent();
@@ -61,6 +64,10 @@ namespace msstyleEditor.Dialogs
                 newProp.Header.stateID = m_state.StateId;
 
                 m_state.Properties.Add(newProp);
+                if(OnPropertyAdded != null)
+                {
+                    OnPropertyAdded(newProp);
+                }
                 propertyView.Refresh();
             }
         }

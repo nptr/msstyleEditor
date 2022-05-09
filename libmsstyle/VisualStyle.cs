@@ -44,8 +44,10 @@ namespace libmsstyle
 
         private Dictionary<int, Dictionary<int, string>> m_stringTables = new Dictionary<int, Dictionary<int, string>>();
 
-
         private Dictionary<StyleResource, string> m_resourceUpdates;
+
+        private ushort m_resourceLanguage;
+        private ushort m_userLanguage;
 
         public VisualStyle()
         {
@@ -54,6 +56,7 @@ namespace libmsstyle
             m_stringTable = new Dictionary<int, string>();
             m_resourceUpdates = new Dictionary<StyleResource, string>();
             m_numProps = 0;
+            m_resourceLanguage = 0;
         }
 
         ~VisualStyle()
@@ -187,6 +190,10 @@ namespace libmsstyle
                 }
 
                 ushort lid = ResourceAccess.GetFirstLanguageId(moduleHandle, type, (uint)res.Key.ResourceId);
+                if(lid == 0xFFFF)
+                {
+                    lid = m_resourceLanguage;
+                }
                 if (!Win32Api.UpdateResource(updateHandle, type, (uint)res.Key.ResourceId, lid, data, (uint)data.Length))
                 {
                     return false;
@@ -289,6 +296,7 @@ namespace libmsstyle
             m_platform = DeterminePlatform();
             BuildPropertyTree(m_platform);
 
+            m_resourceLanguage = ResourceAccess.GetFirstLanguageId(m_moduleHandle, "VARIANT", "NORMAL");
             byte[] pmap = ResourceAccess.GetResource(m_moduleHandle, "VARIANT", "NORMAL");
             if (pmap == null)
             {
@@ -476,16 +484,12 @@ namespace libmsstyle
                 case (int)IDENTIFIER.FILENAME_LITE:
                     {
                         byte[] data = ResourceAccess.GetResource(m_moduleHandle, "IMAGE", (uint)prop.Header.shortFlag);
-                        if (data == null)
-                            return null;
-                        else return new StyleResource(data, prop.Header.shortFlag, StyleResourceType.Image);
+                        return new StyleResource(data, prop.Header.shortFlag, StyleResourceType.Image);
                     }
                 case (int)IDENTIFIER.DISKSTREAM:
                     {
                         byte[] data = ResourceAccess.GetResource(m_moduleHandle, "STREAM", (uint)prop.Header.shortFlag);
-                        if (data == null)
-                            return null;
-                        else return new StyleResource(data, prop.Header.shortFlag, StyleResourceType.Atlas);
+                        return new StyleResource(data, prop.Header.shortFlag, StyleResourceType.Atlas);
                     }
                 default:
                     { 
