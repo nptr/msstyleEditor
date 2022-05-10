@@ -81,7 +81,7 @@ namespace msstyleEditor
             {
                 // Select all properties matching our type, but not the entry of the type itself
                 if (typeId == pi.Value.TypeId &&
-                   typeId != pi.Key)
+                   (typeId != pi.Key || pi.Key == (int)IDENTIFIER.FONT))
                 {
                     cbProp.Items.Add(new PropertyWrapper(pi.Key, pi.Value));
                 }

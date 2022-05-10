@@ -369,6 +369,18 @@ namespace libmsstyle
 			}
 		}
 
+		public bool IsImageProperty()
+        {
+			switch ((IDENTIFIER)Header.typeID)
+			{
+				case IDENTIFIER.FILENAME:
+				case IDENTIFIER.FILENAME_LITE:
+				case IDENTIFIER.DISKSTREAM:
+					return true;
+				default: return false;
+			}
+		}
+
 		public override bool Equals(object o)
 		{
 			if (o == null)

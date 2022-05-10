@@ -57,6 +57,7 @@ namespace msstyleEditor
             m_propertyView.Show(dockPanel, DockState.DockRight);
             m_propertyView.CloseButtonVisible = false;
             m_propertyView.OnPropertyAdded += OnPropertyAdded;
+            m_propertyView.OnPropertyRemoved += OnPropertyRemoved;
 
             try 
             {
@@ -182,6 +183,67 @@ namespace msstyleEditor
 
             lbStylePlatform.Text = "";
             m_style?.Dispose();
+        }
+
+        private void DisplayClass(StyleClass cls)
+        {
+            // remember the shown class
+            UpdateItemSelection(cls);
+            // reset propery view
+            m_propertyView.SetStylePart(null, null, null);
+            // reset image view
+            m_selectedImage = UpdateImageView(null);
+            // reset image selector
+            m_imageView.SetActiveTabs(-1, 0);
+        }
+
+        private void DisplayPart(StyleClass cls, StylePart part)
+        {
+            // remember the shown class and part
+            UpdateItemSelection(cls, part);
+            // reset propery view
+            m_propertyView.SetStylePart(m_style, cls, part);
+
+            // find ATLASRECT property so we can set the part highlights
+            var def = default(KeyValuePair<int, StyleState>);
+            var state = part.States.FirstOrDefault();
+            if (!state.Equals(def))
+            {
+                var rectProp = state.Value.Properties.Find((p) => p.Header.nameID == (int)IDENTIFIER.ATLASRECT);
+                if (rectProp != null)
+                {
+                    var mt = rectProp.GetValueAs<Margins>();
+                    var ha = new Rectangle(
+                        new Point(mt.Left, mt.Top),
+                        new Size(mt.Right - mt.Left, mt.Bottom - mt.Top)
+                    );
+                    m_imageView.ViewHighlightArea = ha;
+                }
+                else m_imageView.ViewHighlightArea = null;
+            }
+            else m_imageView.ViewHighlightArea = null;
+
+            // select the first image property of this part.
+            // if the part doesn't have one, we take the first image of the "Common" part.
+            StyleProperty imagePropToShow = null;
+            var imgProps = part.GetImageProperties().ToList();
+            if (imgProps.Count > 0)
+            {
+                imagePropToShow = imgProps[0];
+            }
+            else if (imagePropToShow == null && cls.Parts[0] != part)
+            {
+                imagePropToShow = cls.Parts[0].GetImageProperties().FirstOrDefault();
+            }
+
+            // reset image view
+            m_selectedImage = UpdateImageView(imagePropToShow);
+            // reset image selector
+            m_imageView.SetActiveTabs(0, imgProps.Count);
+
+            // TODO: ugly code..
+            var renderer = new PartRenderer(m_style, part);
+            m_renderView.Image = renderer.RenderPreview();
         }
 
         private StyleResource UpdateImageView(StyleProperty prop)
@@ -353,9 +415,7 @@ namespace msstyleEditor
             StyleClass cls = e.Node.Tag as StyleClass;
             if (cls != null)
             {
-                UpdateItemSelection(cls);
-                m_propertyView.SetStylePart(null, null, null);
-                m_selectedImage = UpdateImageView(null);
+                DisplayClass(cls);
                 return;
             }
 
@@ -365,48 +425,7 @@ namespace msstyleEditor
                 cls = e.Node.Parent.Tag as StyleClass;
                 Debug.Assert(cls != null);
 
-                UpdateItemSelection(cls, part);
-                m_propertyView.SetStylePart(m_style, cls, part);
-
-                // Select first image, or search parent
-                // If ATLASRECT, set highlight
-                var def = default(KeyValuePair<int, StyleState>);
-                var state = part.States.FirstOrDefault();
-                if(!state.Equals(def))
-                {
-                    var rectProp = state.Value.Properties.Find((p) => p.Header.nameID == (int)IDENTIFIER.ATLASRECT);
-                    if (rectProp != null)
-                    {
-                        var mt = rectProp.GetValueAs<Margins>();
-                        var ha = new Rectangle(
-                            new Point(mt.Left, mt.Top),
-                            new Size(mt.Right - mt.Left, mt.Bottom - mt.Top)
-                        );
-                        m_imageView.ViewHighlightArea = ha;
-                    }
-                    else m_imageView.ViewHighlightArea = null;
-                }
-                else m_imageView.ViewHighlightArea = null;
-
-
-                StyleProperty imagePropToShow = null;
-                var imgProps = part.GetImageProperties().ToList();
-                if (imgProps.Count > 0)
-                {
-                    imagePropToShow = imgProps[0];
-                }
-                else if(imagePropToShow == null && cls.Parts[0] != part)
-                {
-                    imagePropToShow = cls.Parts[0].GetImageProperties().FirstOrDefault();
-                }
-
-                m_selectedImage = UpdateImageView(imagePropToShow);
-                m_imageView.SetActiveTabs(0, imgProps.Count);
-
-                // TODO: ugly code..
-                var renderer = new PartRenderer(m_style, part);
-                m_renderView.Image = renderer.RenderPreview();
-
+                DisplayPart(cls, part);
                 return;
             }
         }
@@ -635,13 +654,25 @@ namespace msstyleEditor
 
         private void OnPropertyAdded(StyleProperty prop)
         {
-            // refresh image tabs
-            // m_imageView.SetActiveTabs(0, imgProps.Count);
+            // refresh gui to account for new image property
+            if (prop.IsImageProperty())
+            {
+                DisplayPart(m_selection.Class, m_selection.Part);
+            }
         }
 
         private void OnPropertyRemove(object sender, EventArgs e)
         {
             m_propertyView.RemoveSelectedProperty();
+        }
+
+        private void OnPropertyRemoved(StyleProperty prop)
+        {
+            // refresh gui to account for removed image property
+            if (prop.IsImageProperty())
+            {
+                DisplayPart(m_selection.Class, m_selection.Part);
+            }
         }
 
         private void OnSearchClicked(object sender, EventArgs e)

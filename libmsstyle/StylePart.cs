@@ -22,9 +22,7 @@ namespace libmsstyle
             foreach (var state in States)
             {
                 var imgProps = state.Value.Properties.FindAll((p) =>
-                    p.Header.typeID == (int)IDENTIFIER.FILENAME ||
-                    p.Header.typeID == (int)IDENTIFIER.FILENAME_LITE ||
-                    p.Header.typeID == (int)IDENTIFIER.DISKSTREAM
+                    p.IsImageProperty()
                 );
 
                 foreach(var imgProp in imgProps)

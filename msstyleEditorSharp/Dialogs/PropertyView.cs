@@ -14,8 +14,9 @@ namespace msstyleEditor.Dialogs
         private StyleState m_state;
         private StyleProperty m_prop;
 
-        public delegate void PropertyAddedHandler(StyleProperty prop);
-        public event PropertyAddedHandler OnPropertyAdded;
+        public delegate void PropertyChangedHandler(StyleProperty prop);
+        public event PropertyChangedHandler OnPropertyAdded;
+        public event PropertyChangedHandler OnPropertyRemoved;
 
         public PropertyViewWindow()
         {
@@ -81,6 +82,10 @@ namespace msstyleEditor.Dialogs
             }
 
             m_state.Properties.Remove(m_prop);
+            if (OnPropertyRemoved != null)
+            {
+                OnPropertyRemoved(m_prop);
+            }
             propertyView.Refresh();
         }
 

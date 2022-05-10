@@ -103,7 +103,12 @@ namespace msstyleEditor.PropView
         {
             if (value is int i)
             {
-                return m_enumInfo[i];
+                string result;
+                if(m_enumInfo.TryGetValue(i, out result))
+                {
+                    return result;
+                }
+                else return value.ToString();
             }
             else return value.ToString();
         }

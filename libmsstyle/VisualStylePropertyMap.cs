@@ -46,7 +46,7 @@ namespace libmsstyle
             { 207, new PropertyInfo("SIZE", 207, "" )},
             { 208, new PropertyInfo("POSITION", 208, "" )},
             { 209, new PropertyInfo("RECT", 209, "" )},
-            { 210, new PropertyInfo("FONT", 210, "" )},
+            { 210, new PropertyInfo("FONT", 210, "Generic font property." )},
             { 211, new PropertyInfo("INTLIST", 211, "" )},
             { 212, new PropertyInfo("HBITMAP", 212, "" )},
             { 213, new PropertyInfo("IMAGEATLAS", 213, "" )}, // DISKSTREAM
