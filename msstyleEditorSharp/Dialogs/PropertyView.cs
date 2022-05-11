@@ -47,9 +47,12 @@ namespace msstyleEditor.Dialogs
 
         private void OnPropertyAdd(object sender, EventArgs e)
         {
-            if (m_state == null)
+            if(m_style == null 
+                || m_class == null 
+                || m_part == null 
+                || m_state == null)
             {
-                MessageBox.Show("Select a state or property within this state first!", "Add Property", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Select a state or property first!", "Add Property", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 

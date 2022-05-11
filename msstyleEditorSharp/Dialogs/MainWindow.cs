@@ -151,10 +151,10 @@ namespace msstyleEditor
 
             btFileSave.Enabled = true;
             btFileInfoExport.Enabled = true;
-            btImageExport.Enabled = true;
-            btImageImport.Enabled = true;
-            //btPropertyExport.Enabled = true;
-            //btPropertyImport.Enabled = true;
+            btImageExport.Enabled = false;
+            btImageImport.Enabled = false;
+            //btPropertyExport.Enabled = false;
+            //btPropertyImport.Enabled = false;
             btPropertyAdd.Enabled = true;
             btPropertyRemove.Enabled = true;
             btTestTheme.Enabled = true;
@@ -190,7 +190,7 @@ namespace msstyleEditor
             // remember the shown class
             UpdateItemSelection(cls);
             // reset propery view
-            m_propertyView.SetStylePart(null, null, null);
+            m_propertyView.SetStylePart(m_style, cls, null);
             // reset image view
             m_selectedImage = UpdateImageView(null);
             // reset image selector
@@ -251,6 +251,7 @@ namespace msstyleEditor
             if (prop == null)
             {
                 btImageExport.Enabled = false;
+                btImageImport.Enabled = false; 
                 m_imageView.ViewImage = null;
                 UpdateImageInfo(null);
                 return null;
@@ -289,6 +290,7 @@ namespace msstyleEditor
             }
 
             btImageExport.Enabled = resource.Data != null;
+            btImageImport.Enabled = true;
             m_imageView.ViewImage = img;
             UpdateImageInfo(img);
             return resource;
@@ -578,7 +580,7 @@ namespace msstyleEditor
         {
             if(m_selectedImage == null)
             {
-                MessageBox.Show("Select an image first!", "Export Image", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Select an image first!", "Export Image", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -629,7 +631,7 @@ namespace msstyleEditor
         {
             if(m_selectedImage == null)
             {
-                MessageBox.Show("Select an image to replace first!", "Replace Image", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Select an image to replace first!", "Replace Image", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
