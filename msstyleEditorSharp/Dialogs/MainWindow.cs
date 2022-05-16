@@ -153,7 +153,7 @@ namespace msstyleEditor
             btFileInfoExport.Enabled = true;
             btImageExport.Enabled = false;
             btImageImport.Enabled = false;
-            //btPropertyExport.Enabled = false;
+            //btPropertyExport.Enabled = true;
             //btPropertyImport.Enabled = false;
             btPropertyAdd.Enabled = true;
             btPropertyRemove.Enabled = true;
@@ -834,6 +834,20 @@ namespace msstyleEditor
             if(imgProp != null)
             {
                 m_selectedImage = UpdateImageView(imgProp);
+            }
+        }
+
+        private void OnExportSelection(object sender, EventArgs e)
+        {
+            var sfd = new SaveFileDialog()
+            {
+                Title = "Export Style Info",
+                Filter = "Style Info (*.txt)|*.txt"
+            };
+
+            if (sfd.ShowDialog() == DialogResult.OK)
+            {
+                Exporter.ExportLogicalStructure(sfd.FileName, m_style);
             }
         }
     }
