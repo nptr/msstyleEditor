@@ -116,6 +116,21 @@ namespace libmsstyle
             new VisualStyleStateEntry(5, "DEFAULTED"),
         };
 
+        public static readonly List<VisualStyleStateEntry> STATES_PUSHBUTTONDROPDOWN = new List<VisualStyleStateEntry>()
+        {
+            new VisualStyleStateEntry(0, "Common"),
+            new VisualStyleStateEntry(1, "NORMAL"),
+            new VisualStyleStateEntry(2, "DISABLED"),
+        };
+
+        public static readonly List<VisualStyleStateEntry> STATES_TIME = new List<VisualStyleStateEntry>()
+        {
+            new VisualStyleStateEntry(0, "Common"),
+            new VisualStyleStateEntry(1, "NORMAL"),
+            new VisualStyleStateEntry(2, "HOT"),
+            new VisualStyleStateEntry(3, "PRESSED"),
+        };
+
         public static readonly List<VisualStyleStateEntry> STATES_COMMANDMODULE_SPLITBUTTON = new List<VisualStyleStateEntry>()
         {
             new VisualStyleStateEntry(0, "Common"),
@@ -202,6 +217,13 @@ namespace libmsstyle
             new VisualStyleStateEntry(2, "HOT"),
             new VisualStyleStateEntry(3, "PRESSED"),
             new VisualStyleStateEntry(4, "DISABLED"),
+        };
+
+        public static readonly List<VisualStyleStateEntry> STATES_CP_DROPDOWNITEM = new List<VisualStyleStateEntry>()
+        {
+            new VisualStyleStateEntry(0, "Common"),
+            new VisualStyleStateEntry(1, "NORMAL"),
+            new VisualStyleStateEntry(2, "HIGHLIGHTED"),
         };
 
         public static readonly List<VisualStyleStateEntry> STATES_TAB = new List<VisualStyleStateEntry>()
@@ -539,6 +561,13 @@ namespace libmsstyle
             new VisualStyleStateEntry(6, "DISABLEDPUSHED"),
         };
 
+        public static readonly List<VisualStyleStateEntry> STATES_MENU_BARBACKGROUND = new List<VisualStyleStateEntry>()
+        {
+            new VisualStyleStateEntry(0, "Common"),
+            new VisualStyleStateEntry(1, "ACTIVE"),
+            new VisualStyleStateEntry(2, "INACTIVE"),
+        };
+
         public static readonly List<VisualStyleStateEntry> STATES_MENU_POPCHECK = new List<VisualStyleStateEntry>()
         {
             new VisualStyleStateEntry(0, "Common"),
@@ -572,6 +601,17 @@ namespace libmsstyle
             new VisualStyleStateEntry(2, "DISABLED"),
         };
 
+        public static readonly List<VisualStyleStateEntry> STATES_MDP_NEWAPPBUTTON = new List<VisualStyleStateEntry>()
+        {
+            new VisualStyleStateEntry(0, "Common"),
+            new VisualStyleStateEntry(1, "NORMAL"),
+            new VisualStyleStateEntry(2, "HOT"),
+            new VisualStyleStateEntry(3, "PRESSED"),
+            new VisualStyleStateEntry(4, "DISABLED"),
+            new VisualStyleStateEntry(5, "CHECKED"),
+            new VisualStyleStateEntry(6, "HOTCHECKED"),
+        };
+
         public static readonly List<VisualStyleStateEntry> STATES_MONTHCAL_CELL = new List<VisualStyleStateEntry>()
         {
             new VisualStyleStateEntry(0, "Common"),
@@ -591,6 +631,15 @@ namespace libmsstyle
             new VisualStyleStateEntry(2, "BB_HOT"),
             new VisualStyleStateEntry(3, "BB_PRESSED"),
             new VisualStyleStateEntry(4, "BB_DISABLED"),
+        };
+
+        public static readonly List<VisualStyleStateEntry> STATES_PAGE_GENERAL = new List<VisualStyleStateEntry>()
+        {
+            new VisualStyleStateEntry(0, "Common"),
+            new VisualStyleStateEntry(1, "NORMAL"),
+            new VisualStyleStateEntry(2, "HOT"),
+            new VisualStyleStateEntry(3, "PRESSED"),
+            new VisualStyleStateEntry(4, "DISABLED"),
         };
 
         public static readonly List<VisualStyleStateEntry> STATES_PROGRESS_TRANSPARENT_GENERAL = new List<VisualStyleStateEntry>()
@@ -675,6 +724,68 @@ namespace libmsstyle
             new VisualStyleStateEntry(4, "Disabled"),
         };
 
+        public static readonly List<VisualStyleStateEntry> STATES_SPP_MOREPROGRAMSARROW = new List<VisualStyleStateEntry>()
+        {
+            new VisualStyleStateEntry(0, "Common"),
+            new VisualStyleStateEntry(1, "Normal"),
+            new VisualStyleStateEntry(2, "Hot"),
+            new VisualStyleStateEntry(3, "Pressed"),
+        };
+
+        public static readonly List<VisualStyleStateEntry> STATES_SPP_LOGOFFBUTTONS = new List<VisualStyleStateEntry>()
+        {
+            new VisualStyleStateEntry(0, "Common"),
+            new VisualStyleStateEntry(1, "Normal"),
+            new VisualStyleStateEntry(2, "Hot"),
+            new VisualStyleStateEntry(3, "Pressed"),
+        };
+
+        public static readonly List<VisualStyleStateEntry> STATES_SPP_MOREPROGRAMSTAB = new List<VisualStyleStateEntry>()
+        {
+            new VisualStyleStateEntry(0, "Common"),
+            new VisualStyleStateEntry(1, "Normal"),
+            new VisualStyleStateEntry(2, "Hot"),
+            new VisualStyleStateEntry(3, "Selected"),
+            new VisualStyleStateEntry(4, "Disabled"),
+            new VisualStyleStateEntry(5, "Focused"),
+        };
+
+        public static readonly List<VisualStyleStateEntry> STATES_SPP_SOFTWAREEXPLORER = new List<VisualStyleStateEntry>()
+        {
+            new VisualStyleStateEntry(0, "Common"),
+            new VisualStyleStateEntry(1, "Normal"),
+            new VisualStyleStateEntry(2, "Hot"),
+            new VisualStyleStateEntry(3, "Selected"),
+            new VisualStyleStateEntry(4, "Disabled"),
+            new VisualStyleStateEntry(5, "Focused"),
+        };
+
+        public static readonly List<VisualStyleStateEntry> STATES_SPP_OPENBOX = new List<VisualStyleStateEntry>()
+        {
+            new VisualStyleStateEntry(0, "Common"),
+            new VisualStyleStateEntry(1, "Normal"),
+            new VisualStyleStateEntry(2, "Hot"),
+            new VisualStyleStateEntry(3, "Selected"),
+            new VisualStyleStateEntry(4, "Disabled"),
+            new VisualStyleStateEntry(5, "Focused"),
+        };
+
+        public static readonly List<VisualStyleStateEntry> STATES_SPP_MOREPROGRAMSARROWBACK = new List<VisualStyleStateEntry>()
+        {
+            new VisualStyleStateEntry(0, "Common"),
+            new VisualStyleStateEntry(1, "Normal"),
+            new VisualStyleStateEntry(2, "Hot"),
+            new VisualStyleStateEntry(3, "Pressed"),
+        };
+
+        public static readonly List<VisualStyleStateEntry> STATES_SPP_LOGOFFSPLITBUTTONDROPDOWN = new List<VisualStyleStateEntry>()
+        {
+            new VisualStyleStateEntry(0, "Common"),
+            new VisualStyleStateEntry(1, "Normal"),
+            new VisualStyleStateEntry(2, "Hot"),
+            new VisualStyleStateEntry(3, "Pressed"),
+        };
+
         public static readonly List<VisualStyleStateEntry> STATES_TABITEM_GENERAL = new List<VisualStyleStateEntry>()
         {
             new VisualStyleStateEntry(0, "Common"),
@@ -683,6 +794,12 @@ namespace libmsstyle
             new VisualStyleStateEntry(3, "SELECTED"),
             new VisualStyleStateEntry(4, "DISABLED"),
             new VisualStyleStateEntry(5, "FOCUSED"),
+        };
+
+        public static readonly List<VisualStyleStateEntry> STATES_TASKDLG_CONTROLPANE = new List<VisualStyleStateEntry>()
+        {
+            new VisualStyleStateEntry(0, "Common"),
+            new VisualStyleStateEntry(1, "STANDALONE"),
         };
 
         public static readonly List<VisualStyleStateEntry> STATES_TASKDLG_EXPANDOBUTTON = new List<VisualStyleStateEntry>()
