@@ -314,7 +314,7 @@ namespace libmsstyle
         {
             new VisualStylePartEntry(0, "Common Properties", VisualStyleStates.STATES_COMMON_DEFAULT ),
             new VisualStylePartEntry(1, "NEWAPPBUTTON", VisualStyleStates.STATES_MDP_NEWAPPBUTTON ),
-            new VisualStylePartEntry(2, "SEPERATOR", VisualStyleStates.STATES_COMMON_DEFAULT ),
+            new VisualStylePartEntry(2, "SEPARATOR", VisualStyleStates.STATES_COMMON_DEFAULT ),
         };
 
         public static readonly List<VisualStylePartEntry> PARTS_NAVIGATION = new List<VisualStylePartEntry>()
@@ -747,7 +747,7 @@ namespace libmsstyle
             new VisualStylePartEntry(5, "BUTTON", VisualStyleStates.STATES_COMMON_DEFAULT ),
         };
 
-        public static readonly List<VisualStylePartEntry> PARTS_PAGE= new List<VisualStylePartEntry>()
+        public static readonly List<VisualStylePartEntry> PARTS_PAGE = new List<VisualStylePartEntry>()
         {
             new VisualStylePartEntry(0, "Common Properties", VisualStyleStates.STATES_COMMON_DEFAULT ),
             new VisualStylePartEntry(1, "UP", VisualStyleStates.STATES_PAGE_GENERAL ),
@@ -1045,7 +1045,7 @@ namespace libmsstyle
             new VisualStylePartEntry(8, "GRIPPERHORZ", VisualStyleStates.STATES_SCROLLBAR_STYLE ),
             new VisualStylePartEntry(9, "GRIPPERVERT", VisualStyleStates.STATES_SCROLLBAR_STYLE ),
             new VisualStylePartEntry(10, "SIZEBOX", VisualStyleStates.STATES_SCROLLBAR_SIZEBOX ),
-            new VisualStylePartEntry(11, "SIZEBOXBKGND", VisualStyleStates.STATES_COMMON_DEFAULT ),
+            new VisualStylePartEntry(11, "SIZEBOXBACKGROUND", VisualStyleStates.STATES_COMMON_DEFAULT ),
         };
 
         public static readonly List<VisualStylePartEntry> PARTS_STATIC = new List<VisualStylePartEntry>()
