@@ -1045,7 +1045,7 @@ namespace libmsstyle
             new VisualStylePartEntry(8, "GRIPPERHORZ", VisualStyleStates.STATES_SCROLLBAR_STYLE ),
             new VisualStylePartEntry(9, "GRIPPERVERT", VisualStyleStates.STATES_SCROLLBAR_STYLE ),
             new VisualStylePartEntry(10, "SIZEBOX", VisualStyleStates.STATES_SCROLLBAR_SIZEBOX ),
-            new VisualStylePartEntry(11, "SIZEBOXBACKGROUND", VisualStyleStates.STATES_COMMON_DEFAULT ),
+            new VisualStylePartEntry(11, "SIZEBOXBKGND", VisualStyleStates.STATES_COMMON_DEFAULT ),
         };
 
         public static readonly List<VisualStylePartEntry> PARTS_STATIC = new List<VisualStylePartEntry>()
