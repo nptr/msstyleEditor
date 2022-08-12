@@ -164,6 +164,20 @@ namespace msstyleEditor
             else btFileSave.Style = RibbonButtonStyle.SplitDropDown;
 
             lbStylePlatform.Text = m_style.Platform.ToDisplayString();
+
+            if (m_style.StringTable.Count == 0)
+            {
+                MessageBox.Show(this,
+                    "Could not locate 'String Table' resource! Some features may not work as expected. " +
+                    "Was the file renamed or moved before initially opening it?\r\n\r\n" +
+                    "- Make sure the '.msstyles' file is next to its multilingual resource files: '[lang-id]/[name].msstyles.mui'.\r\n" +
+                    "- Make sure the names match.\r\n\r\n" +
+                    "Then, reopen the file. After properly loading and saving the style, relocating the file is safe."
+                    , "Warning, resource is missing!",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return;
+            }
         }
 
         private void CloseStyle()
