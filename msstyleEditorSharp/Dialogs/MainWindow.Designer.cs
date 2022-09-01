@@ -108,7 +108,7 @@ namespace msstyleEditor
             this.ribbonMenu.OrbStyle = System.Windows.Forms.RibbonOrbStyle.Office_2013;
             this.ribbonMenu.OrbVisible = false;
             this.ribbonMenu.RibbonTabFont = new System.Drawing.Font("Trebuchet MS", 9F);
-            this.ribbonMenu.Size = new System.Drawing.Size(884, 117);
+            this.ribbonMenu.Size = new System.Drawing.Size(884, 119);
             this.ribbonMenu.TabIndex = 0;
             this.ribbonMenu.Tabs.Add(this.tabTheme);
             this.ribbonMenu.Tabs.Add(this.tabView);
