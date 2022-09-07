@@ -658,6 +658,13 @@ namespace msstyleEditor
                     return;
                 }
 
+                var res = ImageFormats.IsImageSupported(ofd.FileName);
+                if(!res.Item1)
+                {
+                    MessageBox.Show("Bad image:\n" + res.Item2, "Replace Image", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
                 m_style.QueueResourceUpdate(m_selectedImage.ResourceId, m_selectedImage.Type, ofd.FileName);
                 // TODO: update image view?
             }
