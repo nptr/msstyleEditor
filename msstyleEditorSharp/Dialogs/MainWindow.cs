@@ -31,8 +31,17 @@ namespace msstyleEditor
         {
             InitializeComponent();
 
-            dockPanel.Theme = new WeifenLuo.WinFormsUI.Docking.VS2015LightTheme();
-            //dockPanel.Theme.ColorPalette.ToolWindowCaptionActive.Background = SystemColors.ActiveCaption;
+            // Our ribbon "SystemColors" theme adapts itself to the active visual style
+            ribbonMenu.ThemeColor = RibbonTheme.SystemColors;
+
+            // Set the best matching theme dock theme. This can only be done when no windows
+            // were added to the dock yet.
+            float brightness = SystemColors.Control.GetBrightness();
+            dockPanel.Theme = brightness < 0.5f
+                ? dockPanel.Theme = new WeifenLuo.WinFormsUI.Docking.VS2015DarkTheme()
+                : dockPanel.Theme = new WeifenLuo.WinFormsUI.Docking.VS2015LightTheme();
+
+            OnSystemColorsChanged(null, null);
 
             m_classView = new ClassViewWindow();
             m_classView.Show(dockPanel, DockState.DockLeft);
@@ -157,7 +166,7 @@ namespace msstyleEditor
             //btPropertyImport.Enabled = false;
             btPropertyAdd.Enabled = true;
             btPropertyRemove.Enabled = true;
-            btTestTheme.Enabled = true;
+            btTestTheme.Enabled = m_themeManager != null ? true : false;
 
             if (m_style.StringTable?.Count == 0)
                 btFileSave.Style = RibbonButtonStyle.Normal;
@@ -480,9 +489,9 @@ namespace msstyleEditor
             {
                 try
                 {
+                    System.Threading.Thread.Sleep(250); // prevent doubleclicks
                     m_themeManager.Rollback();
                     SetTestThemeButtonState(m_themeManager.IsThemeInUse);
-                    System.Threading.Thread.Sleep(250); // prevent doubleclicks
                     return;
                 }
                 catch (Exception) { }
@@ -546,9 +555,9 @@ namespace msstyleEditor
 
             try
             {
+                System.Threading.Thread.Sleep(250); // prevent doubleclicks
                 m_themeManager.ApplyTheme(m_style);
                 SetTestThemeButtonState(m_themeManager.IsThemeInUse);
-                System.Threading.Thread.Sleep(250); // prevent doubleclicks
             }
             catch (Exception ex)
             {
@@ -855,6 +864,19 @@ namespace msstyleEditor
             if(imgProp != null)
             {
                 m_selectedImage = UpdateImageView(imgProp);
+            }
+        }
+
+        private void OnSystemColorsChanged(object sender, EventArgs e)
+        {
+            // HACK: In order to set the new theme for the dockpanel, we'd have to
+            // close all windows and recreate them (with all the state). So instead,
+            // we only fix the most prominent mismatch manually, which is the dockpanel
+            // backcolor(s).
+            dockPanel.Theme.ColorPalette.MainWindowActive.Background = SystemColors.Control;
+            foreach (Control c in dockPanel.Controls)
+            {
+                c.BackColor = SystemColors.Control;
             }
         }
     }

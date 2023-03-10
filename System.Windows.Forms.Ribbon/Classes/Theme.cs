@@ -83,6 +83,8 @@
                     RendererColorTable = new RibbonProfesionalRendererColorTableVSLight();
                 else if (_Theme == RibbonTheme.VSDark)
                     RendererColorTable = new RibbonProfesionalRendererColorTableVSDark();
+                else if (_Theme == RibbonTheme.SystemColors)
+                    RendererColorTable = new RibbonProfesionalRendererColorTableSystemColors();
             }
         }
 

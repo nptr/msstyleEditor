@@ -86,7 +86,7 @@ namespace msstyleEditor
             this.lbCopyright.Name = "lbCopyright";
             this.lbCopyright.Size = new System.Drawing.Size(118, 13);
             this.lbCopyright.TabIndex = 2;
-            this.lbCopyright.Text = "© 2015-2022, Jakob K.";
+            this.lbCopyright.Text = "© 2015-2023, Jakob K.";
             // 
             // lbVersion
             // 

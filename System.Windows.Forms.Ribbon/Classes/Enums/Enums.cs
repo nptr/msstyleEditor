@@ -17,7 +17,8 @@
         JellyBelly,
         Halloween,
         VSLight,
-        VSDark
+        VSDark,
+        SystemColors
     }
 
     public enum RibbonOrbStyle

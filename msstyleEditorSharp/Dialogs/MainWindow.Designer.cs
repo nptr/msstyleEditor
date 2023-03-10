@@ -561,6 +561,7 @@ namespace msstyleEditor
             this.Load += new System.EventHandler(this.OnMainWindowLoad);
             this.DragDrop += new System.Windows.Forms.DragEventHandler(this.OnDragDrop);
             this.DragEnter += new System.Windows.Forms.DragEventHandler(this.OnDragEnter);
+            this.SystemColorsChanged += new System.EventHandler(this.OnSystemColorsChanged);
             this.statusStrip.ResumeLayout(false);
             this.statusStrip.PerformLayout();
             this.ResumeLayout(false);
