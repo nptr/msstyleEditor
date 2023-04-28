@@ -221,8 +221,7 @@ namespace libmsstyle
                     Win32Api.RT_STRING,
                     ctx.Callback, 
                     IntPtr.Zero, 
-                    Win32Api.EnumResourceFlags.RESOURCE_ENUM_LN | 
-                    Win32Api.EnumResourceFlags.RESOURCE_ENUM_MUI,
+                    Win32Api.EnumResourceFlags.RESOURCE_ENUM_LN,
                     Win32Api.LANG_NEUTRAL);
 
                 return true;

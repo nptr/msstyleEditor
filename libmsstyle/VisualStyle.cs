@@ -269,11 +269,17 @@ namespace libmsstyle
                         throw new Exception($"Deleting MUI for lang {langId} failed with error '{err}'!");
                     }
                 }
-            }
 
-            foreach (var table in m_stringTables)
+                // Without the MUI, all updates should go into the .msstyles file rather.
+                foreach (var table in m_stringTables)
+                {
+                    ResourceAccess.StringTable.Update(moduleHandle, updateHandle, table.Value, (ushort)table.Key);
+                }
+            }
+            else
             {
-                ResourceAccess.StringTable.Update(moduleHandle, updateHandle, table.Value, (ushort)table.Key);
+                // We can't update the string table if it's in the .mui file. But since 
+                // msstyleEditor doesn't allow editing the table, it not an immediate problem.
             }
         }
 
@@ -304,10 +310,22 @@ namespace libmsstyle
             LoadProperties(pmap);
 
 
-            // Load all tables for internal purposes.
-            var langs = ResourceAccess.GetAllLanguageIds(m_moduleHandle, "#" + Win32Api.RT_VERSION, 1,
+            // Get an overview of language resources.
+            // Type: Version Info, Name: 1
+            var l1 = ResourceAccess.GetAllLanguageIds(m_moduleHandle, "#" + Win32Api.RT_VERSION, 1,
                 Win32Api.EnumResourceFlags.RESOURCE_ENUM_MUI |
                 Win32Api.EnumResourceFlags.RESOURCE_ENUM_LN);
+            // Type: String Table, Name: 7 (typically style name & copyright)
+            var l2 = ResourceAccess.GetAllLanguageIds(m_moduleHandle, "#" + Win32Api.RT_STRING, 7,
+                Win32Api.EnumResourceFlags.RESOURCE_ENUM_MUI |
+                Win32Api.EnumResourceFlags.RESOURCE_ENUM_LN);
+            // Type: String Table, Name: 32 (typically font definitions)
+            var l3 = ResourceAccess.GetAllLanguageIds(m_moduleHandle, "#" + Win32Api.RT_STRING, 32,
+                Win32Api.EnumResourceFlags.RESOURCE_ENUM_MUI |
+                Win32Api.EnumResourceFlags.RESOURCE_ENUM_LN);
+            var langs = l1.Union(l2).Union(l3);
+
+            // Load all tables for internal purposes.
             foreach (var lang in langs)
             {
                 var table = new Dictionary<int, string>();
