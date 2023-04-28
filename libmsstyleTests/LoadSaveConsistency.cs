@@ -1,6 +1,7 @@
 ﻿using libmsstyle;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -19,21 +20,44 @@ namespace libmsstyleTests
         [DataRow(@"..\..\..\styles\w10_1709_aero.msstyles")]
         [DataRow(@"..\..\..\styles\w10_1809_aero.msstyles")]
         [DataRow(@"..\..\..\styles\w10_1903_aero.msstyles")]
+        [DataRow(@"..\..\..\styles\w10_2004_aero\aero.msstyles")]
         [DataRow(@"..\..\..\styles\w10_20h2_aero.msstyles")]
         [DataRow(@"..\..\..\styles\w11_pre_aero.msstyles")]
-        public void VerifyLoadSave(string file)
+        [DataRow(@"..\..\..\styles\w11_pre_aero.msstyles", true)]
+        public void VerifyLoadSave(string file, bool standalone = false)
         {
             using(var original = new VisualStyle())
             using(var saved = new VisualStyle())
             {
                 original.Load(file);
-                original.Save("tmp.msstyles");
+                original.Save("tmp.msstyles", standalone);
                 saved.Load("tmp.msstyles");
 
                 bool result = CompareStyles(original, saved);
                 Assert.IsTrue(result);
             }
         }
+
+
+        [DataTestMethod]
+        [DataRow(@"..\..\..\styles\w10_2004_aero\aero.msstyles", true)]
+        public void VerifyLoadSave_WithStringTable(string file, bool standalone)
+        {
+            using (var original = new VisualStyle())
+            using (var saved = new VisualStyle())
+            {
+                original.Load(file);
+                original.Save("tmp.msstyles", standalone);
+                saved.Load("tmp.msstyles");
+
+                bool result = CompareStyles(original, saved);
+                Assert.IsTrue(result);
+
+                bool sresult = CompareStringTables(original.StringTables, saved.StringTables);
+                Assert.IsTrue(sresult);
+            }
+        }
+
 
         [TestCleanup]
         public void TestCleanup()
@@ -142,6 +166,48 @@ namespace libmsstyleTests
                 {
                     result = false;
                     LogMessage(ConsoleColor.DarkRed, "Missing class {0}: {1}\r\n", cls.Value.ClassId, cls.Value.ClassName);
+                }
+            }
+
+            return result;
+        }
+
+
+        bool CompareStringTables(Dictionary<int, Dictionary<int, string>> s1, Dictionary<int, Dictionary<int, string>> s2)
+        {
+            bool result = true;
+
+            // for all languages in the original style
+            foreach (var langTable in s1)
+            {
+                // see if there is a table in the other one
+                Dictionary<int, string> s2table;
+                if (s2.TryGetValue(langTable.Key, out s2table))
+                {
+                    // foreach entry in the languages string table
+                    foreach (var entry in langTable.Value)
+                    {
+                        // see if the entry exists and matches in the other one
+                        string s2tablevalue;
+                        if (s2table.TryGetValue(entry.Key, out s2tablevalue))
+                        {
+                            if(!entry.Value.Equals(s2tablevalue))
+                            {
+                                LogMessage(ConsoleColor.DarkRed, "For language {0}, entry {1} mismatches\r\n", langTable.Key, entry.Key);
+                                result = false;
+                            }
+                        }
+                        else
+                        {
+                            LogMessage(ConsoleColor.DarkRed, "For language {0}, entry {1} is missing!\r\n", langTable.Key, entry.Key);
+                            result = false;
+                        }
+                    }
+                }
+                else
+                {
+                    LogMessage(ConsoleColor.DarkRed, "Missing string table for language {0}\r\n", langTable.Key);
+                    result = false;
                 }
             }
 

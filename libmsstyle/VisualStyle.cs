@@ -37,12 +37,17 @@ namespace libmsstyle
         }
 
         private Dictionary<int, string> m_stringTable;
-        public Dictionary<int, string> StringTable
+        public Dictionary<int, string> PreferredStringTable
         {
             get { return m_stringTable; }
         }
 
         private Dictionary<int, Dictionary<int, string>> m_stringTables = new Dictionary<int, Dictionary<int, string>>();
+
+        public Dictionary<int, Dictionary<int, string>> StringTables
+        {
+            get { return m_stringTables; }
+        }
 
         private Dictionary<StyleResource, string> m_resourceUpdates;
 

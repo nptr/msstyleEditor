@@ -179,7 +179,7 @@ namespace msstyleEditor.PropView
                 }
                 else if (m_property.Header.typeID == (int)IDENTIFIER.FONT)
                 {
-                    var fonts = StringTable.FilterFonts(m_style.StringTable);
+                    var fonts = StringTable.FilterFonts(m_style.PreferredStringTable);
                     if (fonts.Count == 0)
                     {
                         return base.Converter;
