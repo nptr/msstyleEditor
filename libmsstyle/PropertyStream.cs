@@ -155,15 +155,33 @@ namespace libmsstyle
                     }
                 // 48 byte property, (32 byte header + 12 byte rect type)
                 case IDENTIFIER.RECTTYPE:
-                case IDENTIFIER.MARGINS:
                     {
                         if (header.shortFlag == 0)
                         {
+                            // struct RECT format is LTRB (windef.h)
                             int l = BitConverter.ToInt32(data, cursor);
                             cursor += 4;
                             int t = BitConverter.ToInt32(data, cursor);
                             cursor += 4;
                             int r = BitConverter.ToInt32(data, cursor);
+                            cursor += 4;
+                            int b = BitConverter.ToInt32(data, cursor);
+                            cursor += 4;
+                            prop.SetValue(new Margins(l, t, r, b));
+                        }
+                        else prop.SetValue(new Margins(0, 0, 0, 0));
+                        break;
+                    }
+                case IDENTIFIER.MARGINS:
+                    {
+                        // struct MARGINS format is LRTB (uxtheme.h)
+                        if (header.shortFlag == 0)
+                        {
+                            int l = BitConverter.ToInt32(data, cursor);
+                            cursor += 4;
+                            int r = BitConverter.ToInt32(data, cursor);
+                            cursor += 4;
+                            int t = BitConverter.ToInt32(data, cursor);
                             cursor += 4;
                             int b = BitConverter.ToInt32(data, cursor);
                             cursor += 4;
@@ -316,14 +334,29 @@ namespace libmsstyle
                     }
                 // 48 byte property, (32 byte header + 12 byte rect type)
                 case IDENTIFIER.RECTTYPE:
-                case IDENTIFIER.MARGINS:
                     {
+                        // struct RECT format is LTRB (windef.h)
                         if (prop.Header.shortFlag == 0)
                         {
                             Margins m = prop.GetValue() as Margins;
                             writer.Write(m.Left);
                             writer.Write(m.Top);
                             writer.Write(m.Right);
+                            writer.Write(m.Bottom);
+                        }
+
+                        PadToMultipleOf(writer, 8);
+                        break;
+                    }
+                case IDENTIFIER.MARGINS:
+                    {
+                        // struct MARGINS format is LRTB (uxtheme.h)
+                        if (prop.Header.shortFlag == 0)
+                        {
+                            Margins m = prop.GetValue() as Margins;
+                            writer.Write(m.Left);
+                            writer.Write(m.Right);
+                            writer.Write(m.Top);
                             writer.Write(m.Bottom);
                         }
 
