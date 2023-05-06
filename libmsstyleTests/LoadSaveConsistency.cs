@@ -14,6 +14,7 @@ namespace libmsstyleTests
     [TestClass]
     public class LoadSaveConsistency
     {
+        // Ensure that we can load and save a visual style with all properties intact.
         [DataTestMethod]
         [DataRow(@"..\..\..\styles\w7_aero.msstyles")]
         [DataRow(@"..\..\..\styles\w81_aero.msstyles")]
@@ -23,7 +24,6 @@ namespace libmsstyleTests
         [DataRow(@"..\..\..\styles\w10_2004_aero\aero.msstyles")]
         [DataRow(@"..\..\..\styles\w10_20h2_aero.msstyles")]
         [DataRow(@"..\..\..\styles\w11_pre_aero.msstyles")]
-        [DataRow(@"..\..\..\styles\w11_pre_aero.msstyles", true)]
         public void VerifyLoadSave(string file, bool standalone = false)
         {
             using(var original = new VisualStyle())
@@ -31,30 +31,41 @@ namespace libmsstyleTests
             {
                 original.Load(file);
                 original.Save("tmp.msstyles", standalone);
+                
                 saved.Load("tmp.msstyles");
-
-                bool result = CompareStyles(original, saved);
-                Assert.IsTrue(result);
+                Assert.IsTrue(CompareStyles(original, saved));
             }
         }
 
 
+        // Ensure that we can load and save a visual style multiple times. All properties and 
+        // the string table (as far as available) should stay the same.
+        //
+        // "standalone": the MUI get removed and the string table written into the LN instead.
+        // Only set to false if there is no string table to begin with.
         [DataTestMethod]
         [DataRow(@"..\..\..\styles\w10_2004_aero\aero.msstyles", true)]
-        public void VerifyLoadSave_WithStringTable(string file, bool standalone)
+        [DataRow(@"..\..\..\styles\w10_21h2_aero\aero.msstyles", true)]
+        [DataRow(@"..\..\..\styles\w11_pre_aero.msstyles", false)]
+        public void VerifyConsecutiveLoadSave(string file, bool standalone = true)
         {
             using (var original = new VisualStyle())
             using (var saved = new VisualStyle())
+            using (var saved2 = new VisualStyle())
             {
                 original.Load(file);
                 original.Save("tmp.msstyles", standalone);
+
+                // Verify first save                
                 saved.Load("tmp.msstyles");
+                Assert.IsTrue(CompareStyles(original, saved));
+                Assert.IsTrue(CompareStringTables(original.StringTables, saved.StringTables));
+                saved.Save("tmp2.msstyles", standalone);
 
-                bool result = CompareStyles(original, saved);
-                Assert.IsTrue(result);
-
-                bool sresult = CompareStringTables(original.StringTables, saved.StringTables);
-                Assert.IsTrue(sresult);
+                // Verify second save
+                saved2.Load("tmp2.msstyles");
+                Assert.IsTrue(CompareStyles(saved, saved2));
+                Assert.IsTrue(CompareStringTables(saved.StringTables, saved2.StringTables));
             }
         }
 
@@ -65,6 +76,7 @@ namespace libmsstyleTests
             try
             { 
                 File.Delete("tmp.msstyles");
+                File.Delete("tmp2.msstyles");
             }
             catch (Exception) { }
         }
