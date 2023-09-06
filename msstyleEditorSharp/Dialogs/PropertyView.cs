@@ -14,6 +14,8 @@ namespace msstyleEditor.Dialogs
         private StyleState m_state;
         private StyleProperty m_prop;
 
+        private PropertyViewMode m_viewMode;
+
         public delegate void PropertyChangedHandler(StyleProperty prop);
         public event PropertyChangedHandler OnPropertyAdded;
         public event PropertyChangedHandler OnPropertyRemoved;
@@ -23,8 +25,30 @@ namespace msstyleEditor.Dialogs
             InitializeComponent();
         }
 
+        public void SetAnimation(Animation anim)
+        {
+            m_viewMode = PropertyViewMode.AnimationMode;
+            newPropertyToolStripMenuItem.Enabled = false;
+            deleteToolStripMenuItem.Enabled = false;
+
+            propertyView.SelectedObject = new AnimationWrapper(anim);
+        }
+
+        public void SetTimingFunction(TimingFunction timing)
+        {
+            m_viewMode = PropertyViewMode.TimingFunction;
+            newPropertyToolStripMenuItem.Enabled = false;
+            deleteToolStripMenuItem.Enabled = false;
+
+            propertyView.SelectedObject = timing;
+        }
+
         public void SetStylePart(VisualStyle style, StyleClass cls, StylePart part)
         {
+            m_viewMode = PropertyViewMode.ClassMode;
+            newPropertyToolStripMenuItem.Enabled = true;
+            deleteToolStripMenuItem.Enabled = true;
+
             m_style = style;
             m_class = cls;
             m_part = part;
@@ -78,6 +102,8 @@ namespace msstyleEditor.Dialogs
 
         private void OnPropertyRemove(object sender, EventArgs e)
         {
+            if (m_viewMode != PropertyViewMode.ClassMode)
+                return;
             if (m_state == null ||
                 m_prop == null)
             {
@@ -94,6 +120,8 @@ namespace msstyleEditor.Dialogs
 
         private void OnPropertySelected(object sender, SelectedGridItemChangedEventArgs e)
         {
+            if (m_viewMode != PropertyViewMode.ClassMode)
+                return;
             const int CTX_ADD = 0;
             const int CTX_REM = 1;
 
@@ -137,5 +165,12 @@ namespace msstyleEditor.Dialogs
                 return;
             }
         }
+    }
+
+    public enum PropertyViewMode
+    {
+        ClassMode,
+        TimingFunction,
+        AnimationMode,
     }
 }

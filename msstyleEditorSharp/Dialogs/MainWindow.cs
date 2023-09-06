@@ -27,6 +27,8 @@ namespace msstyleEditor
         private ImageView m_imageView;
         private RenderView m_renderView;
 
+        private TimingFunction m_selectedTimingFunction;
+        private Animation m_selectedAnimation;
         public MainWindow()
         {
             InitializeComponent();
@@ -67,15 +69,15 @@ namespace msstyleEditor
             m_propertyView.OnPropertyAdded += OnPropertyAdded;
             m_propertyView.OnPropertyRemoved += OnPropertyRemoved;
 
-            try 
+            try
             {
                 m_themeManager = new ThemeManager();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                MessageBox.Show(ex.Message + "\r\nIs Aero/DWM disabled? Starting without \"Test Theme\" feature.", 
-                    "Themeing API unavailable", 
-                    MessageBoxButtons.OK, 
+                MessageBox.Show(ex.Message + "\r\nIs Aero/DWM disabled? Starting without \"Test Theme\" feature.",
+                    "Themeing API unavailable",
+                    MessageBoxButtons.OK,
                     MessageBoxIcon.Warning);
                 btTestTheme.Enabled = false;
             }
@@ -128,7 +130,7 @@ namespace msstyleEditor
 
         private void UpdateImageInfo(Image img)
         {
-            if(img == null)
+            if (img == null)
             {
                 lbImageInfo.Visible = false;
             }
@@ -147,10 +149,10 @@ namespace msstyleEditor
                 m_style.Load(path);
                 UpdateWindowCaption(path);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                MessageBox.Show(this, $"Are you sure this is a Windows Vista or higher visual style?\r\n\r\nDetails: {ex.Message}", "Error loading style!", 
-                    MessageBoxButtons.OK, 
+                MessageBox.Show(this, $"Are you sure this is a Windows Vista or higher visual style?\r\n\r\nDetails: {ex.Message}", "Error loading style!",
+                    MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
                 return;
             }
@@ -273,7 +275,7 @@ namespace msstyleEditor
             if (prop == null)
             {
                 btImageExport.Enabled = false;
-                btImageImport.Enabled = false; 
+                btImageImport.Enabled = false;
                 m_imageView.ViewImage = null;
                 UpdateImageInfo(null);
                 return null;
@@ -293,7 +295,7 @@ namespace msstyleEditor
 
             // see if there is a pending update to the resource
             string file = m_style.GetQueuedResourceUpdate(prop.Header.shortFlag, resType);
-            
+
             // in any case, we have to store the update info of the real resource
             // we need that in order to export/replace?
             var resource = m_style.GetResourceFromProperty(prop);
@@ -348,21 +350,21 @@ namespace msstyleEditor
                 OverwritePrompt = true
             };
 
-            if(sfd.ShowDialog() != DialogResult.OK)
+            if (sfd.ShowDialog() != DialogResult.OK)
             {
                 return;
             }
 
             try
             {
-                if(sender == btFileSave)
+                if (sender == btFileSave)
                     m_style.Save(sfd.FileName, true);
-                else if(sender == btFileSaveWithMUI)
+                else if (sender == btFileSaveWithMUI)
                     m_style.Save(sfd.FileName, false);
 
                 lbStatusMessage.Text = "Style saved successfully!";
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "Error saving file!", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -452,6 +454,25 @@ namespace msstyleEditor
                 DisplayPart(cls, part);
                 return;
             }
+
+            TimingFunction func = e.Node.Tag as TimingFunction;
+            if (func != null)
+            {
+                m_selectedTimingFunction = func;
+                m_propertyView.SetTimingFunction(func);
+                return;
+            }
+
+            Animation animation = e.Node.Tag as Animation;
+            if (animation != null)
+            {
+                m_selectedAnimation = animation;
+                m_propertyView.SetAnimation(animation);
+                return;
+            }
+
+            //nothing valid is selected, clear the property grid
+            m_propertyView.SetStylePart(null, null, null);
         }
 
         private void OnTreeExpandClick(object sender, EventArgs e)
@@ -476,7 +497,7 @@ namespace msstyleEditor
 
         private void OnTestTheme(object sender, EventArgs e)
         {
-            if(m_themeManager.IsThemeInUse)
+            if (m_themeManager.IsThemeInUse)
             {
                 try
                 {
@@ -533,7 +554,7 @@ namespace msstyleEditor
                 needConfirmation = true;
             }
 
-            if(needConfirmation)
+            if (needConfirmation)
             {
                 if (MessageBox.Show("It looks like the style was not made for this windows version. Try to apply it anyways?"
                     , "msstyleEditor"
@@ -592,13 +613,13 @@ namespace msstyleEditor
 
         private void OnImageExport(object sender, EventArgs e)
         {
-            if(m_selectedImage == null)
+            if (m_selectedImage == null)
             {
                 MessageBox.Show("Select an image first!", "Export Image", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            if(m_selectedImage.Data == null)
+            if (m_selectedImage.Data == null)
             {
                 MessageBox.Show("This image resource doesn't exist yet!", "Export Image", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
@@ -610,8 +631,8 @@ namespace msstyleEditor
                     m_selection.Class.ClassName,
                     m_selection.Part.PartName,
                     m_selectedImage.ResourceId.ToString());
-                
-                foreach(var c in Path.GetInvalidFileNameChars())
+
+                foreach (var c in Path.GetInvalidFileNameChars())
                 {
                     suggestedName = suggestedName.Replace(c, '-');
                 }
@@ -631,7 +652,7 @@ namespace msstyleEditor
                         fs.Write(m_selectedImage.Data, 0, m_selectedImage.Data.Length);
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     MessageBox.Show(ex.Message, "Error saving image!", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
@@ -643,7 +664,7 @@ namespace msstyleEditor
 
         private void OnImageImport(object sender, EventArgs e)
         {
-            if(m_selectedImage == null)
+            if (m_selectedImage == null)
             {
                 MessageBox.Show("Select an image to replace first!", "Replace Image", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
@@ -659,7 +680,7 @@ namespace msstyleEditor
                 }
 
                 var res = ImageFormats.IsImageSupported(ofd.FileName);
-                if(!res.Item1)
+                if (!res.Item1)
                 {
                     MessageBox.Show("Bad image:\n" + res.Item2, "Replace Image", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
@@ -700,7 +721,7 @@ namespace msstyleEditor
 
         private void OnSearchClicked(object sender, EventArgs e)
         {
-            if(!m_searchDialog.Visible)
+            if (!m_searchDialog.Visible)
             {
                 m_searchDialog.Show(this);
                 if (m_searchDialog.StartPosition == FormStartPosition.CenterParent)
@@ -779,7 +800,7 @@ namespace msstyleEditor
                     default: return null;
                 }
             }
-            catch(Exception)
+            catch (Exception)
             {
                 return null;
             }
@@ -831,12 +852,12 @@ namespace msstyleEditor
         private void OnMainWindowLoad(object sender, EventArgs e)
         {
             RegistrySettings settings = new RegistrySettings();
-            if(!settings.HasConfirmedWarning)
+            if (!settings.HasConfirmedWarning)
             {
-                if(MessageBox.Show("Modifying themes can break the operating system!\r\n\r\n" +
+                if (MessageBox.Show("Modifying themes can break the operating system!\r\n\r\n" +
                     "Make sure you have a recent system restore point. Only proceed if you understand " +
                     "the risk and can deal with technical problems."
-                    
+
                     , "msstyleEditor - Risk Warning", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) == DialogResult.OK)
                 {
                     settings.HasConfirmedWarning = true;
@@ -850,14 +871,14 @@ namespace msstyleEditor
 
         private void OnImageSelectIndex(object sender, EventArgs e)
         {
-            if(m_selection.Part == null)
+            if (m_selection.Part == null)
             {
                 return;
             }
 
             var it = m_selection.Part.GetImageProperties();
             var imgProp = it.ElementAtOrDefault(m_imageView.SelectedIndex);
-            if(imgProp != null)
+            if (imgProp != null)
             {
                 m_selectedImage = UpdateImageView(imgProp);
             }

@@ -9,9 +9,10 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>libmsstyle</RootNamespace>
     <AssemblyName>libmsstyle</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -61,6 +62,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Animation.cs" />
+    <Compile Include="CubicBezierTimingFunction.cs" />
     <Compile Include="Margins.cs" />
     <Compile Include="Platform.cs" />
     <Compile Include="PropertyStream.cs" />
@@ -72,6 +75,11 @@
     <Compile Include="StyleProperty.cs" />
     <Compile Include="StyleResource.cs" />
     <Compile Include="StyleState.cs" />
+    <Compile Include="TimingFunction.cs" />
+    <Compile Include="Transform.cs" />
+    <Compile Include="Transform2D.cs" />
+    <Compile Include="Transform3D.cs" />
+    <Compile Include="TransformOpacity.cs" />
     <Compile Include="VisualStyle.cs" />
     <Compile Include="VisualStyleDefinitions.cs" />
     <Compile Include="VisualStyleEnumMap.cs" />

@@ -38,14 +38,97 @@ namespace msstyleEditor.Dialogs
                 {
                     var clsNode = new TreeNode(cls.Value.ClassName);
                     clsNode.Tag = cls.Value;
-
-                    foreach (var part in cls.Value.Parts)
+                    if (cls.Value.ClassName == "timingfunction")
                     {
-                        var partNode = new TreeNode(part.Value.PartName);
-                        partNode.Tag = part.Value;
-
-                        clsNode.Nodes.Add(partNode);
+                        foreach (TimingFunction timingFunction in m_style.TimingFunctions)
+                        {
+                            string name;
+                            if (TimingFunction.TimingFunctionNameMap.ContainsKey(timingFunction.Header.partID))
+                            {
+                                name = TimingFunction.TimingFunctionNameMap[timingFunction.Header.partID];
+                            }
+                            else
+                            {
+                                name = "Unknown part:" + timingFunction.Header.partID;
+                            }
+                            var partNode = new TreeNode(name);
+                            partNode.Tag = timingFunction;
+                            clsNode.Nodes.Add(partNode);
+                        }
                     }
+                    else if (cls.Value.ClassName == "animations")
+                    {
+                        //contains <PartID, partid node>
+                        Dictionary<int, TreeNode> nodes = new Dictionary<int, TreeNode>();
+                        foreach (Animation animation in m_style.Animations)
+                        {
+
+                            TreeNode partNode;
+                            bool exists = false;
+                            if (nodes.ContainsKey(animation.Header.partID))
+                            {
+                                exists = true;
+                                partNode = nodes[animation.Header.partID];
+                            }
+                            else
+                            {
+                                //check if the name is known
+                                if (Animation.AnimationNameMap.ContainsKey(animation.Header.partID))
+                                {
+                                    partNode = new TreeNode(Animation.AnimationNameMap[animation.Header.partID].AnimationName);
+                                }
+                                else
+                                {
+                                    partNode = new TreeNode("Unknown part " + animation.Header.partID);
+                                }
+                            }
+
+                            //Add the state
+
+
+                            string stateName;
+
+
+                            if (Animation.AnimationNameMap.ContainsKey(animation.Header.partID))
+                            {
+                                if(Animation.AnimationNameMap[animation.Header.partID].AnimationStateDict.ContainsKey(animation.Header.stateID))
+                                {
+                                    stateName = Animation.AnimationNameMap[animation.Header.partID].AnimationStateDict[animation.Header.stateID];
+                                }
+                                else
+                                {
+                                    stateName = "Unknown state: " + animation.Header.stateID;
+                                }
+                            }
+                            else
+                            {
+                                stateName = "Unknown state: "+ animation.Header.stateID;
+                            }
+                            //add the state
+                            var stateNode = new TreeNode(stateName);
+                            stateNode.Tag = animation;
+                            partNode.Nodes.Add(stateNode);
+
+                            //add the part node if it wasnt added
+                            if (!exists)
+                            {
+                                nodes.Add(animation.Header.partID, partNode);
+                                clsNode.Nodes.Add(partNode);
+                            }
+
+                        }
+                    }
+                    else
+                    {
+                        foreach (var part in cls.Value.Parts)
+                        {
+                            var partNode = new TreeNode(part.Value.PartName);
+                            partNode.Tag = part.Value;
+
+                            clsNode.Nodes.Add(partNode);
+                        }
+                    }
+
                     classView.Nodes.Add(clsNode);
                 }
                 classView.Sort();
@@ -118,7 +201,7 @@ namespace msstyleEditor.Dialogs
 
         private void OnTreeItemSelected(object sender, TreeViewEventArgs e)
         {
-            if(OnSelectionChanged != null)
+            if (OnSelectionChanged != null)
             {
                 OnSelectionChanged(sender, e);
             }

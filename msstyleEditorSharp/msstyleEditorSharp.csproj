@@ -9,7 +9,7 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>msstyleEditor</RootNamespace>
     <AssemblyName>msstyleEditor</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <NuGetPackageImportStamp>
@@ -29,6 +29,7 @@
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -166,6 +167,11 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="PropView\ColorEditor.cs" />
+    <Compile Include="PropView\EnumFlagCheckedListBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="PropView\EnumFlagUIEditor.cs" />
+    <Compile Include="PropView\AnimationWrapper.cs" />
     <Compile Include="PropView\TypeDescriptors.cs" />
     <Compile Include="PropView\TypeConverters.cs" />
     <Compile Include="RegistrySettings.cs" />
