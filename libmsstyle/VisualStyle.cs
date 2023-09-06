@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -26,8 +28,20 @@ namespace libmsstyle
 
         private Dictionary<int, StyleClass> m_classes;
         public Dictionary<int, StyleClass> Classes
-        { 
+        {
             get { return m_classes; }
+        }
+
+        private List<TimingFunction> m_timingFunctions;
+        public List<TimingFunction> TimingFunctions
+        {
+            get { return m_timingFunctions; }
+        }
+
+        private List<Animation> m_animations;
+        public List<Animation> Animations
+        {
+            get { return m_animations; }
         }
 
         private int m_numProps;
@@ -59,6 +73,8 @@ namespace libmsstyle
             m_classes = new Dictionary<int, StyleClass>();
             m_stringTable = new Dictionary<int, string>();
             m_resourceUpdates = new Dictionary<StyleResource, string>();
+            m_timingFunctions = new List<TimingFunction>();
+            m_animations = new List<Animation>();
             m_numProps = 0;
             m_resourceLanguage = 0;
         }
@@ -100,21 +116,29 @@ namespace libmsstyle
             else throw new ArgumentException("Cannot overwrite the original file!");
 
             var updateHandle = Win32Api.BeginUpdateResource(file, false);
-            if(updateHandle == IntPtr.Zero)
+            if (updateHandle == IntPtr.Zero)
             {
                 File.Delete(file);
                 throw new IOException("Could not open the file for writing! (BeginUpdateResource)");
             }
 
             var moduleHandle = Win32Api.LoadLibraryEx(file, IntPtr.Zero, Win32Api.LoadLibraryFlags.LOAD_LIBRARY_AS_DATAFILE_EXCLUSIVE);
-            if(moduleHandle == IntPtr.Zero)
+            if (moduleHandle == IntPtr.Zero)
             {
                 Win32Api.EndUpdateResource(updateHandle, true);
                 File.Delete(file);
                 throw new IOException("Could not open the file for writing! (LoadLibraryEx)");
             }
 
-            if(!SaveResources(moduleHandle, updateHandle))
+            if (!SaveResources(moduleHandle, updateHandle))
+            {
+                Win32Api.FreeLibrary(moduleHandle);
+                Win32Api.EndUpdateResource(updateHandle, true);
+                File.Delete(file);
+                throw new IOException("Could not save resources!");
+            }
+
+            if (!SaveAMap(moduleHandle, updateHandle))
             {
                 Win32Api.FreeLibrary(moduleHandle);
                 Win32Api.EndUpdateResource(updateHandle, true);
@@ -145,7 +169,7 @@ namespace libmsstyle
             // close the module before calling EndUpdate(). If not
             // updating fails because the file is in use.
             Win32Api.FreeLibrary(moduleHandle);
-            if(!Win32Api.EndUpdateResource(updateHandle, false))
+            if (!Win32Api.EndUpdateResource(updateHandle, false))
             {
                 File.Delete(file);
                 throw new IOException("Could not write the changes to the file!");
@@ -170,14 +194,14 @@ namespace libmsstyle
 
         private bool SaveResources(IntPtr moduleHandle, IntPtr updateHandle)
         {
-            foreach(var res in m_resourceUpdates)
+            foreach (var res in m_resourceUpdates)
             {
                 byte[] data = null;
                 try
                 {
                     data = File.ReadAllBytes(res.Value);
                 }
-                catch(Exception)
+                catch (Exception)
                 {
                     return false;
                 }
@@ -194,7 +218,7 @@ namespace libmsstyle
                 }
 
                 ushort lid = ResourceAccess.GetFirstLanguageId(moduleHandle, type, (uint)res.Key.ResourceId);
-                if(lid == 0xFFFF)
+                if (lid == 0xFFFF)
                 {
                     lid = m_resourceLanguage;
                 }
@@ -213,19 +237,19 @@ namespace libmsstyle
             MemoryStream ms = new MemoryStream(4096);
             BinaryWriter bw = new BinaryWriter(ms);
 
-            foreach(var cls in m_classes)
+            foreach (var cls in m_classes)
             {
-                foreach(var part in cls.Value.Parts)
+                foreach (var part in cls.Value.Parts)
                 {
-                    foreach(var state in part.Value.States)
+                    foreach (var state in part.Value.States)
                     {
                         state.Value.Properties.Sort(Comparer<StyleProperty>.Create(
-                            (p1, p2) => 
+                            (p1, p2) =>
                             {
                                 return p1.Header.nameID.CompareTo(p2.Header.nameID);
                             }));
 
-                        foreach(var prop in state.Value.Properties)
+                        foreach (var prop in state.Value.Properties)
                         {
                             PropertyStream.WriteProperty(bw, prop);
                         }
@@ -241,12 +265,12 @@ namespace libmsstyle
 
         private void SaveStringTable(IntPtr moduleHandle, IntPtr updateHandle, bool makeStandalone)
         {
-            if(m_stringTable.Count == 0)
+            if (m_stringTable.Count == 0)
             {
                 return;
             }
 
-            if(makeStandalone)
+            if (makeStandalone)
             {
                 // To make a .msstyle relocatable, we need to remove the MUI (Multilingual UI) resource
                 // entries and store the string table that was in the .mui's in the .msstyle itself.
@@ -266,7 +290,7 @@ namespace libmsstyle
                 // - If we attempt to delete via LANG_NEUTRAL we get ERROR_INVALID_PARAMETER.
 
                 ushort langId = ResourceAccess.GetFirstLanguageId(moduleHandle, "MUI", 1);
-                if(langId != 0xFFFF)
+                if (langId != 0xFFFF)
                 {
                     if (!Win32Api.UpdateResource(updateHandle, "MUI", 1, langId, null, 0))
                     {
@@ -288,6 +312,32 @@ namespace libmsstyle
             }
         }
 
+        private bool SaveAMap(IntPtr moduleHandle, IntPtr updateHandle)
+        {
+            if (m_animations.Count == 0 && m_timingFunctions.Count == 0)
+                return true;
+
+            MemoryStream ms = new MemoryStream();
+            BinaryWriter bw = new BinaryWriter(ms);
+
+            foreach (var item in m_timingFunctions)
+            {
+                item.Write(bw);
+            }
+            foreach (var item in m_animations)
+            {
+                item.Write(bw);
+            }
+
+            ushort lid = ResourceAccess.GetFirstLanguageId(moduleHandle, "AMAP", "AMAP");
+            if (lid == 0xFFFF)
+            {
+                lid = m_resourceLanguage;
+            }
+            byte[] data = ms.ToArray();
+            return Win32Api.UpdateResource(updateHandle, "AMAP", "AMAP", lid, data, (uint)data.Length);
+
+        }
         public void Load(string file)
         {
             m_moduleHandle = Win32Api.LoadLibraryEx(file, IntPtr.Zero, Win32Api.LoadLibraryFlags.LOAD_LIBRARY_AS_DATAFILE_EXCLUSIVE);
@@ -303,6 +353,15 @@ namespace libmsstyle
             }
 
             LoadClassmap(cmap);
+
+            byte[] amap = ResourceAccess.GetResource(m_moduleHandle, "AMAP", "AMAP");
+            if (amap == null)
+            {
+                throw new Exception("Style contains no animation map!");
+            }
+
+            LoadAMap(amap);
+
             m_platform = DeterminePlatform();
             BuildPropertyTree(m_platform);
 
@@ -341,7 +400,7 @@ namespace libmsstyle
             // Get users preferred language for display purposes.
             // If we don't have it, choose any.
             int uiLang = System.Threading.Thread.CurrentThread.CurrentUICulture.LCID;
-            if(!m_stringTables.TryGetValue(uiLang, out m_stringTable))
+            if (!m_stringTables.TryGetValue(uiLang, out m_stringTable))
             {
                 var kvp = m_stringTables.FirstOrDefault((t) => t.Value.Count > 0);
                 m_stringTable = kvp.Value ?? new Dictionary<int, string>();
@@ -380,7 +439,7 @@ namespace libmsstyle
         {
             int cursor = 0;
 
-            while(cursor < pmap.Length - 4)
+            while (cursor < pmap.Length - 4)
             {
                 try
                 {
@@ -389,13 +448,13 @@ namespace libmsstyle
                     //Debug.WriteLine("[N: {0}, T: {1}, C: {2}, P: {3}, S: {4}]", prop.Header.nameID, prop.Header.typeID, prop.Header.classID, prop.Header.partID, prop.Header.stateID);
 
                     StyleClass cls;
-                    if(!m_classes.TryGetValue(prop.Header.classID, out cls))
+                    if (!m_classes.TryGetValue(prop.Header.classID, out cls))
                     {
                         throw new Exception("Found property with unknown class ID");
                     }
 
                     StylePart part;
-                    if(!cls.Parts.TryGetValue(prop.Header.partID, out part))
+                    if (!cls.Parts.TryGetValue(prop.Header.partID, out part))
                     {
                         part = new StylePart()
                         {
@@ -421,9 +480,36 @@ namespace libmsstyle
                     state.Properties.Add(prop);
                     ++m_numProps;
                 }
-                catch(Exception)
+                catch (Exception)
                 {
 
+                }
+            }
+        }
+
+        void LoadAMap(byte[] amap)
+        {
+            int cursor = 0;
+
+            while (cursor < amap.Length - 4)
+            {
+                PropertyHeader header = new PropertyHeader(amap, cursor);
+
+                cursor += 32;
+                if (header.nameID == 20100)
+                {
+                    //timing function
+                    m_timingFunctions.Add(new TimingFunction(amap, cursor, header));
+                    cursor += 24; //The 4 bytes are added as there is a 4 byte padding
+                }
+                else if (header.nameID == 20000)
+                {
+                    //animation
+                    m_animations.Add(new Animation(amap, ref cursor, header));
+                }
+                else
+                {
+                    throw new Exception("unknown amap name ID");
                 }
             }
         }
@@ -452,9 +538,9 @@ namespace libmsstyle
                 }
                 if (cls.Value.ClassName == "QueryBuilder")
                 {
-                    foundVistaQueryBuilder = true; continue; 
+                    foundVistaQueryBuilder = true; continue;
                 }
-                if(cls.Value.ClassName == "DarkMode::TaskManager")
+                if (cls.Value.ClassName == "DarkMode::TaskManager")
                 {
                     foundTaskBand2Light_Taskband2 = true; continue;
                 }
@@ -473,10 +559,10 @@ namespace libmsstyle
 
         void BuildPropertyTree(Platform p)
         {
-            foreach(var cls in m_classes)
+            foreach (var cls in m_classes)
             {
                 var partList = VisualStyleParts.Find(cls.Value.ClassName, p);
-                foreach(var partDescription in partList)
+                foreach (var partDescription in partList)
                 {
                     StylePart part = new StylePart()
                     {
@@ -485,7 +571,7 @@ namespace libmsstyle
                     };
                     cls.Value.Parts.Add(part.PartId, part);
 
-                    foreach(var stateDescription in partDescription.States)
+                    foreach (var stateDescription in partDescription.States)
                     {
                         StyleState state = new StyleState()
                         {
@@ -500,7 +586,7 @@ namespace libmsstyle
 
         public StyleResource GetResourceFromProperty(StyleProperty prop)
         {
-            switch(prop.Header.typeID)
+            switch (prop.Header.typeID)
             {
                 case (int)IDENTIFIER.FILENAME:
                 case (int)IDENTIFIER.FILENAME_LITE:
@@ -514,8 +600,8 @@ namespace libmsstyle
                         return new StyleResource(data, prop.Header.shortFlag, StyleResourceType.Atlas);
                     }
                 default:
-                    { 
-                        return null; 
+                    {
+                        return null;
                     }
             }
         }
@@ -533,9 +619,9 @@ namespace libmsstyle
 
 
         public void QueueResourceUpdate(int nameId, StyleResourceType type, string pathToNew)
-		{
+        {
             var key = new StyleResource(null, nameId, type);
             m_resourceUpdates[key] = pathToNew;
-		}
+        }
     }
 }
