@@ -70,6 +70,7 @@
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BinaryComparison.cs" />
     <Compile Include="LoadSaveConsistency.cs" />
     <Compile Include="PropertyStreamTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

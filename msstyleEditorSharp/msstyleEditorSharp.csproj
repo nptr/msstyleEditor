@@ -112,9 +112,6 @@
     <Compile Include="Dialogs\ClassView.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Dialogs\ClassView.cs">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="Dialogs\ClassView.Designer.cs">
       <DependentUpon>ClassView.cs</DependentUpon>
     </Compile>
@@ -174,8 +171,6 @@
     <Compile Include="PropView\EnumFlagCheckedListBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="PropView\EnumFlagUIEditor.cs" />
-    <Compile Include="PropView\AnimationWrapper.cs" />
     <Compile Include="PropView\EnumFlagUIEditor.cs" />
     <Compile Include="PropView\TypeDescriptors.cs" />
     <Compile Include="PropView\TypeConverters.cs" />
