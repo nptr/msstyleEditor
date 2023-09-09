@@ -28,7 +28,7 @@ namespace msstyleEditor
         private RenderView m_renderView;
 
         private TimingFunction m_selectedTimingFunction;
-        private Animation m_selectedAnimation;
+        private AnimationTypeDescriptor m_selectedAnimation;
         public MainWindow()
         {
             InitializeComponent();
@@ -463,7 +463,7 @@ namespace msstyleEditor
                 return;
             }
 
-            Animation animation = e.Node.Tag as Animation;
+            AnimationTypeDescriptor animation = e.Node.Tag as AnimationTypeDescriptor;
             if (animation != null)
             {
                 m_selectedAnimation = animation;

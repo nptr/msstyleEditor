@@ -476,6 +476,16 @@ namespace libmsstyle
             { 3, "UnknownState(3)" },
             { 4, "UnknownState(4)" }
         })
+    },
+    { 94, new AnimationStates("WindowMinimizeWin11", new Dictionary<int, string>
+        {
+            { 1, "Target" },
+        })
+    },
+    { 95, new AnimationStates("WindowRestoreWin11", new Dictionary<int, string>
+        {
+            { 1, "Target" },
+        })
     }
         };
         public Animation(byte[] data, ref int start, PropertyHeader header)
@@ -505,8 +515,20 @@ namespace libmsstyle
                 Transforms.Add(t);
                 start += GetPaddingForSize(t.StructureSize);
             }
-
-
+        }
+        /// <summary>
+        /// Create a new animation
+        /// </summary>
+        /// <param name="animationsHeader">Header of the animations class</param>
+        /// <param name="part">Animation part</param>
+        /// <param name="state">Animation state</param>
+        public Animation(PropertyHeader animationsHeader, int part, int state)
+        {
+            PropertiesIndex = 16;
+            TransformsIndex = 56;
+            Header = new PropertyHeader(20000, animationsHeader.typeID);
+            Header.stateID = state;
+            Header.partID = part;
         }
 
         int GetPaddingForSize(int size)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -39,6 +40,18 @@ namespace libmsstyle
 {64 , "AppLaunchRotateBounceDelayed"},
 {65 , "DesktopWithPop"},
         };
+        /// <summary>
+        /// Create a new timing function
+        /// </summary>
+        /// <param name="animationsHeader">Header of the timingfunctions class</param>
+        /// <param name="partId">the part ID of the timing function</param>
+        public TimingFunction(PropertyHeader timingFunctionHeader, int partId)
+        {
+            this.Header = new PropertyHeader(20100, timingFunctionHeader.typeID);
+            Header.classID = 333; //id of TimingFunction class
+            Header.partID = partId;
+            CubicBezier = new CubicBezierTimingFunction();
+        }
         public TimingFunction(byte[] data, int start, PropertyHeader header)
         {
             this.Header = header;
@@ -56,13 +69,18 @@ namespace libmsstyle
         }
         public void Write(BinaryWriter bw)
         {
+            if (Type == TimingFunctionType.Undefined)
+                Header.sizeInBytes = 4;
+            else if (Type == TimingFunctionType.CubicBezier)
+                Header.sizeInBytes = 4 + 16;
+
             bw.Write(Header.Serialize());
             WriteData(bw);
         }
         public void WriteData(BinaryWriter w)
         {
             w.Write((int)Type);
-            if(Type == TimingFunctionType.CubicBezier)
+            if (Type == TimingFunctionType.CubicBezier)
             {
                 CubicBezier.Write(w);
             }

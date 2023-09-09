@@ -23,6 +23,11 @@ namespace libmsstyle
             RY1 = BitConverter.ToSingle(data, start + 12);
         }
 
+        public CubicBezierTimingFunction()
+        {
+
+        }
+
         internal void Write(BinaryWriter w)
         {
             w.Write(RX0);
