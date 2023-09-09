@@ -1,4 +1,5 @@
 ﻿using libmsstyle;
+using msstyleEditor.PropView;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -65,6 +66,7 @@ namespace msstyleEditor.Dialogs
 
                             TreeNode partNode;
                             bool exists = false;
+                            
                             if (nodes.ContainsKey(animation.Header.partID))
                             {
                                 exists = true;
@@ -72,7 +74,7 @@ namespace msstyleEditor.Dialogs
                             }
                             else
                             {
-                                //check if the name is known
+                                //Create a new state node
                                 if (Animation.AnimationNameMap.ContainsKey(animation.Header.partID))
                                 {
                                     partNode = new TreeNode(Animation.AnimationNameMap[animation.Header.partID].AnimationName);
@@ -81,6 +83,7 @@ namespace msstyleEditor.Dialogs
                                 {
                                     partNode = new TreeNode("Unknown part " + animation.Header.partID);
                                 }
+                                partNode.Tag = new AnimationTypeDescriptor(animation);
                             }
 
                             //Add the state
@@ -91,7 +94,7 @@ namespace msstyleEditor.Dialogs
 
                             if (Animation.AnimationNameMap.ContainsKey(animation.Header.partID))
                             {
-                                if(Animation.AnimationNameMap[animation.Header.partID].AnimationStateDict.ContainsKey(animation.Header.stateID))
+                                if (Animation.AnimationNameMap[animation.Header.partID].AnimationStateDict.ContainsKey(animation.Header.stateID))
                                 {
                                     stateName = Animation.AnimationNameMap[animation.Header.partID].AnimationStateDict[animation.Header.stateID];
                                 }
@@ -102,12 +105,14 @@ namespace msstyleEditor.Dialogs
                             }
                             else
                             {
-                                stateName = "Unknown state: "+ animation.Header.stateID;
+                                stateName = "Unknown state: " + animation.Header.stateID;
                             }
-                            //add the state
-                            var stateNode = new TreeNode(stateName);
-                            stateNode.Tag = animation;
-                            partNode.Nodes.Add(stateNode);
+
+                            //add the new state if there is another state
+                            if (exists)
+                            {
+                                ((AnimationTypeDescriptor)partNode.Tag).AddState(animation);
+                            }
 
                             //add the part node if it wasnt added
                             if (!exists)

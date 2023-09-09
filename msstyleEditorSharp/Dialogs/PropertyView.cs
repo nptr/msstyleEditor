@@ -1,6 +1,7 @@
 ﻿using libmsstyle;
 using msstyleEditor.PropView;
 using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace msstyleEditor.Dialogs
@@ -25,13 +26,13 @@ namespace msstyleEditor.Dialogs
             InitializeComponent();
         }
 
-        public void SetAnimation(Animation anim)
+        public void SetAnimation(AnimationTypeDescriptor anim)
         {
             m_viewMode = PropertyViewMode.AnimationMode;
             newPropertyToolStripMenuItem.Enabled = false;
             deleteToolStripMenuItem.Enabled = false;
 
-            propertyView.SelectedObject = new AnimationWrapper(anim);
+            propertyView.SelectedObject = anim;
         }
 
         public void SetTimingFunction(TimingFunction timing)
@@ -71,6 +72,13 @@ namespace msstyleEditor.Dialogs
 
         private void OnPropertyAdd(object sender, EventArgs e)
         {
+            if (m_style != null && m_class != null)
+            {
+                if (m_class.ClassName == "animations")
+                {
+
+                }
+            }
             if(m_style == null 
                 || m_class == null 
                 || m_part == null 
