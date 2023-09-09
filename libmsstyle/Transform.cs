@@ -58,6 +58,7 @@ namespace libmsstyle
             Transform2DStructure = new Transform2D();
             TransformOpacity = new TransformOpacity();
         }
+
         public Transform(byte[] data, ref int start)
         {
             Type = (TransformType)BitConverter.ToInt32(data, start + 0);
@@ -129,6 +130,7 @@ namespace libmsstyle
         Scale3D = 259,
         Roatate3D = 260,
     }
+
     [Flags]
     public enum TransformFlag
     {

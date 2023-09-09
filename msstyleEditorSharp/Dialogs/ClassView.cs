@@ -43,15 +43,12 @@ namespace msstyleEditor.Dialogs
                     {
                         foreach (TimingFunction timingFunction in m_style.TimingFunctions)
                         {
-                            string name;
-                            if (TimingFunction.TimingFunctionNameMap.ContainsKey(timingFunction.Header.partID))
-                            {
-                                name = TimingFunction.TimingFunctionNameMap[timingFunction.Header.partID];
-                            }
-                            else
+                            string name = VisualStyleAnimations.FindTimingFuncName(timingFunction.Header.partID);
+                            if(name == null)
                             {
                                 name = "Unknown part:" + timingFunction.Header.partID;
                             }
+
                             var partNode = new TreeNode(name);
                             partNode.Tag = timingFunction;
                             clsNode.Nodes.Add(partNode);
@@ -59,25 +56,20 @@ namespace msstyleEditor.Dialogs
                     }
                     else if (cls.Value.ClassName == "animations")
                     {
-                        //contains <PartID, partid node>
+                        // Contains <PartID, partid node>
                         Dictionary<int, TreeNode> nodes = new Dictionary<int, TreeNode>();
                         foreach (Animation animation in m_style.Animations)
                         {
+                            var anim = VisualStyleAnimations.FindAnimStates(animation.Header.partID);
 
                             TreeNode partNode;
-                            bool exists = false;
-                            
-                            if (nodes.ContainsKey(animation.Header.partID))
+                            bool exists = nodes.TryGetValue(animation.Header.partID, out partNode);
+                            if(!exists)
                             {
-                                exists = true;
-                                partNode = nodes[animation.Header.partID];
-                            }
-                            else
-                            {
-                                //Create a new state node
-                                if (Animation.AnimationNameMap.ContainsKey(animation.Header.partID))
+                                // Check if the animations name is known
+                                if (anim != null)
                                 {
-                                    partNode = new TreeNode(Animation.AnimationNameMap[animation.Header.partID].AnimationName);
+                                    partNode = new TreeNode(anim.AnimationName);
                                 }
                                 else
                                 {
@@ -86,19 +78,11 @@ namespace msstyleEditor.Dialogs
                                 partNode.Tag = new AnimationTypeDescriptor(animation);
                             }
 
-                            //Add the state
-
-
+                            // Find the animation states name
                             string stateName;
-
-
-                            if (Animation.AnimationNameMap.ContainsKey(animation.Header.partID))
+                            if(anim != null)
                             {
-                                if (Animation.AnimationNameMap[animation.Header.partID].AnimationStateDict.ContainsKey(animation.Header.stateID))
-                                {
-                                    stateName = Animation.AnimationNameMap[animation.Header.partID].AnimationStateDict[animation.Header.stateID];
-                                }
-                                else
+                                if(!anim.AnimationStateDict.TryGetValue(animation.Header.stateID, out stateName))
                                 {
                                     stateName = "Unknown state: " + animation.Header.stateID;
                                 }
@@ -114,7 +98,7 @@ namespace msstyleEditor.Dialogs
                                 ((AnimationTypeDescriptor)partNode.Tag).AddState(animation);
                             }
 
-                            //add the part node if it wasnt added
+                            // Add the part node if it wasn't added
                             if (!exists)
                             {
                                 nodes.Add(animation.Header.partID, partNode);
