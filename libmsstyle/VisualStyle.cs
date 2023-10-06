@@ -277,7 +277,7 @@ namespace libmsstyle
                 // This allows us to apply the style from anywhere, not restricted to its folder and the
                 // accompanying mui resources.
 
-                // Disadvantage: The style will might work for only one script, because the string
+                // Disadvantage: The style might work for only one script, because the string
                 // table defines (among other unimportant things) the fonts. If a latin user creates a theme
                 // this way, it might not work for on a chinese windows because the visual style might reference
                 // latin-only fonts, so chinese texts won't render.
@@ -354,15 +354,23 @@ namespace libmsstyle
 
             LoadClassmap(cmap);
 
-            byte[] amap = ResourceAccess.GetResource(m_moduleHandle, "AMAP", "AMAP");
-            if (amap == null)
+            // With the class map in place, we can reason about the platform.
+            m_platform = DeterminePlatform();
+
+
+            // There is no AMAP before Win8
+            if (m_platform > Platform.Win7)
             {
-                throw new Exception("Style contains no animation map!");
+                byte[] amap = ResourceAccess.GetResource(m_moduleHandle, "AMAP", "AMAP");
+                if (amap == null)
+                {
+                    throw new Exception("Style contains no animation map!");
+                }
+
+                LoadAMap(amap);
             }
 
-            LoadAMap(amap);
 
-            m_platform = DeterminePlatform();
             BuildPropertyTree(m_platform);
 
             m_resourceLanguage = ResourceAccess.GetFirstLanguageId(m_moduleHandle, "VARIANT", "NORMAL");
@@ -496,20 +504,18 @@ namespace libmsstyle
                 PropertyHeader header = new PropertyHeader(amap, cursor);
 
                 cursor += 32;
-                if (header.nameID == 20100)
+                if (header.nameID == (int)IDENTIFIER.TIMINGFUNCTION)
                 {
-                    //timing function
                     m_timingFunctions.Add(new TimingFunction(amap, cursor, header));
-                    cursor += 24; //The 4 bytes are added as there is a 4 byte padding
+                    cursor += 24; // 20 bytes struct size, 4 bytes padding (= aligns to 8 byte?)
                 }
-                else if (header.nameID == 20000)
+                else if (header.nameID == (int)IDENTIFIER.ANIMATION)
                 {
-                    //animation
                     m_animations.Add(new Animation(amap, ref cursor, header));
                 }
                 else
                 {
-                    throw new Exception("unknown amap name ID");
+                    throw new Exception($"Unknown AMAP name ID: {header.nameID}");
                 }
             }
         }

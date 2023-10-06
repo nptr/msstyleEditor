@@ -126,7 +126,10 @@ namespace msstyleEditor.Dialogs
 
         public void SetActiveTabIndex(int activeIndex)
         {
-            if (toolStrip.Items.Count < activeIndex)
+            if (activeIndex >= toolStrip.Items.Count)
+                return;
+
+            if (activeIndex < 0)
                 return;
 
             if (!toolStrip.Items[activeIndex].Visible)

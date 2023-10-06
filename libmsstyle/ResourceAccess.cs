@@ -189,7 +189,7 @@ namespace libmsstyle
                     previousBucketIndex = currentBucketIndex;
                 }
 
-                if(previousBucketIndex != -1) // bucket needs filling
+                if (previousBucketIndex != -1) // bucket needs filling
                 {
                     // fill in empty entries at the end if required
                     int toFill2 = (BUCKET_SIZE - 1) - previousBucketIndex;
@@ -211,18 +211,31 @@ namespace libmsstyle
                     bucketsTouched.Add(previousBucket);
                 }
 
-                var ctx = new DeleteStringsCallbackContext();
-                ctx.stringTable = table;
-                ctx.bucketsUsed = bucketsTouched;
-                ctx.updateHandle = updateHandle;
 
-                // remove all buckets we haven't touched
-                Win32Api.EnumResourceNamesEx(moduleHandle, 
-                    Win32Api.RT_STRING,
-                    ctx.Callback, 
-                    IntPtr.Zero, 
-                    Win32Api.EnumResourceFlags.RESOURCE_ENUM_LN,
-                    Win32Api.LANG_NEUTRAL);
+                // remove all buckets we haven't touched and thus must have been deleted. Unfortunately we
+                // don't know which that are and have to enumerate them. EnumResourceNamesEx() is useless
+                // here, because its language filter only selects the .mui, but we need an LN language filter.
+                // So we just check the most common buckets in a brute-force manner.
+                for (int b = 7; b <= 100; ++b)
+                {
+                    var resHandle = Win32Api.FindResourceEx(moduleHandle, Win32Api.RT_STRING, (uint)b, langId);
+                    if (resHandle != IntPtr.Zero)
+                    {
+                        if (!bucketsTouched.Contains(b))
+                        {
+                            if (Win32Api.UpdateResource(updateHandle,
+                                Win32Api.RT_STRING,
+                                (uint)b,
+                                langId,
+                                null,
+                                0) == false)
+                            {
+                                int err = Marshal.GetLastWin32Error();
+                                throw new Exception($"Deleting string resource with id '{b}' failed with error '{err}'!");
+                            }
+                        }
+                    }
+                }
 
                 return true;
             }
@@ -261,34 +274,6 @@ namespace libmsstyle
                             }
                         }
                     }
-                    return true;
-                }
-            }
-
-            class DeleteStringsCallbackContext
-            {
-                public Dictionary<int, string> stringTable = new Dictionary<int, string>();
-                public List<int> bucketsUsed = new List<int>();
-                public IntPtr updateHandle = IntPtr.Zero;
-
-                public bool Callback(IntPtr hModule, IntPtr lpType, IntPtr lpName, IntPtr lParam)
-                {
-                    int bucket = lpName.ToInt32();
-
-                    if (!bucketsUsed.Contains(bucket))
-                    {
-                        if (Win32Api.UpdateResource(updateHandle,
-                            Win32Api.RT_STRING,
-                            (uint)bucket,
-                            Win32Api.LANG_NEUTRAL,
-                            null,
-                            0) == false)
-                        {
-                            // should not happend
-                            throw new Exception("DeleteStringsCallbackContext");
-                        }
-                    }
-
                     return true;
                 }
             }

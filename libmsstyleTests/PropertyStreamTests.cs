@@ -138,7 +138,7 @@ namespace libmsstyleTests
             prop.Header.classID = 38;
             prop.Header.partID = 1;
             prop.Header.stateID = 0;
-            prop.SetValue(new Margins(6, 6, 5, 5));
+            prop.SetValue(new Margins(6, 5, 6, 5));
             var expected = new byte[] {
                 0x11, 0x0E, 0x00, 0x00, 0xCD, 0x00, 0x00, 0x00, 
                 0x26, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 
@@ -351,7 +351,7 @@ namespace libmsstyleTests
             Assert.AreEqual(38, prop.Header.classID);
             Assert.AreEqual(1, prop.Header.partID);
             Assert.AreEqual(0, prop.Header.stateID);
-            Assert.AreEqual(new Margins(6, 6, 5, 5), prop.GetValue());
+            Assert.AreEqual(new Margins(6, 5, 6, 5), prop.GetValue());
         }
 
         [TestMethod]

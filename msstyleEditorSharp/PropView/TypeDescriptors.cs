@@ -133,7 +133,7 @@ namespace msstyleEditor.PropView
         }
         #endregion
     }
-    public class AnimationTypeDescriptor :ICustomTypeDescriptor
+    public class AnimationTypeDescriptor : ICustomTypeDescriptor
     {
         public List<Animation> Animations = new List<Animation>();
         public AnimationTypeDescriptor(Animation animation)
@@ -214,7 +214,7 @@ namespace msstyleEditor.PropView
             List<PropertyDescriptor> propDesc = new List<PropertyDescriptor>();
             foreach (var state in Animations)
             {
-                foreach(var item in state.GetType().GetProperties())
+                foreach (var item in state.GetType().GetProperties())
                 {
                     propDesc.Add(new AnimationPropertyDescriptior(item, state, attributes));
                 }
@@ -399,13 +399,12 @@ namespace msstyleEditor.PropView
             this.m_fi = fi;
             this.m_animation = animation;
 
-            //check if the state ID is known
-            if(Animation.AnimationNameMap.ContainsKey(animation.Header.partID))
+            AnimationStates map = VisualStyleAnimations.FindAnimStates(animation.Header.partID);
+            if (map != null)
             {
-                var map = Animation.AnimationNameMap[animation.Header.partID];
-                if (map.AnimationStateDict.ContainsKey(animation.Header.stateID))
+                string state;
+                if (map.AnimationStateDict.TryGetValue(animation.Header.stateID, out state))
                 {
-                    var state = map.AnimationStateDict[animation.Header.stateID];
                     this.m_category = $"{animation.Header.stateID} - {state}";
                 }
                 else
@@ -431,7 +430,6 @@ namespace msstyleEditor.PropView
 
         public override void ResetValue(object component)
         {
-            
         }
 
         public override void SetValue(object component, object value)

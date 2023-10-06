@@ -81,6 +81,7 @@
     <Compile Include="Transform3D.cs" />
     <Compile Include="TransformOpacity.cs" />
     <Compile Include="VisualStyle.cs" />
+    <Compile Include="VisualStyleAnimationMap.cs" />
     <Compile Include="VisualStyleDefinitions.cs" />
     <Compile Include="VisualStyleEnumMap.cs" />
     <Compile Include="VisualStylePartMap.cs" />

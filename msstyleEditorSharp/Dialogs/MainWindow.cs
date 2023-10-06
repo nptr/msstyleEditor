@@ -49,7 +49,6 @@ namespace msstyleEditor
             m_classView.Show(dockPanel, DockState.DockLeft);
             m_classView.CloseButtonVisible = false;
             m_classView.OnSelectionChanged += OnTreeItemSelected;
-            m_classView.Controls[0].KeyPress += OnTreeKeyPress; // very hacky
 
             m_imageView = new ImageView();
             m_imageView.SelectedIndexChanged += OnImageSelectIndex;
@@ -476,14 +475,6 @@ namespace msstyleEditor
             m_propertyView.SetStylePart(null, null, null);
         }
 
-        private void OnTreeKeyPress(object sender, KeyPressEventArgs e)
-        {
-            if (e.KeyChar >= '1' && e.KeyChar <= '9')
-            {
-                m_imageView.SetActiveTabIndex(e.KeyChar - 0x30 - 1);
-            }
-        }
-
         private void OnTreeExpandClick(object sender, EventArgs e)
         {
             m_classView.ExpandAll();
@@ -848,6 +839,11 @@ namespace msstyleEditor
             {
                 OnSearchClicked(this, null);
                 return true;
+            }
+            else if (keyData >= (Keys.Control | Keys.D1) && keyData <= (Keys.Control | Keys.D9))
+            {
+                Keys numberKey = keyData & ~Keys.Control;
+                m_imageView.SetActiveTabIndex((int)numberKey - 0x30 - 1);
             }
 
             return base.ProcessDialogKey(keyData);
