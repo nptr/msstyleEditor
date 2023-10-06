@@ -124,7 +124,14 @@ namespace msstyleEditor.Dialogs
             }
             classView.EndUpdate();
         }
+        public void Refresh()
+        {
+            classView.BeginUpdate();
+            classView.Nodes.Clear();
+            classView.EndUpdate();
 
+            SetVisualStyle(m_style);
+        }
         bool m_endReached = false;
         public void FindNextNode(SearchDialog.SearchMode mode, IDENTIFIER type, string searchString, object searchObject)
         {

@@ -131,8 +131,8 @@ namespace libmsstyle
 
             if (nameID == 20000) //Animation
                 return true;
-            
-			// Basic range check
+
+            // Basic range check
             if (typeID < (int)IDENTIFIER.ENUM || typeID >= (int)IDENTIFIER.COLORSCHEMES)
 				return false;
 

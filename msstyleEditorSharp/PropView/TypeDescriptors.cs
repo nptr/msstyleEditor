@@ -391,7 +391,7 @@ namespace msstyleEditor.PropView
 
         public override Type PropertyType => m_fi.PropertyType;
         private System.Reflection.PropertyInfo m_fi;
-        private Animation m_animation;
+        public Animation m_animation;
         private string m_category;
         public override string Category => m_category;
 

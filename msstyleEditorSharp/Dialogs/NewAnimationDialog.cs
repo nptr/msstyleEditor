@@ -30,7 +30,7 @@ namespace msstyleEditor.Dialogs
 
             this.PartID = PartID;
 
-            if (!int.TryParse(txtPartId.Text, out int StateID))
+            if (!int.TryParse(txtStateId.Text, out int StateID))
             {
                 MessageBox.Show("State ID must be a number", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
