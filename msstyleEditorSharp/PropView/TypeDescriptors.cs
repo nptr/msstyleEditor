@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing.Design;
 using System.Text;
 
 namespace msstyleEditor.PropView
@@ -393,6 +394,7 @@ namespace msstyleEditor.PropView
         private Animation m_animation;
         private string m_category;
         public override string Category => m_category;
+
         public AnimationPropertyDescriptior(System.Reflection.PropertyInfo fi, Animation animation, Attribute[] attrs)
           : base(fi.Name, attrs)
         {
@@ -416,6 +418,21 @@ namespace msstyleEditor.PropView
             {
                 this.m_category = "State " + animation.Header.stateID;
             }
+            List<Attribute> newAtribs = new List<Attribute>();
+            if (fi.Name == "AnimationFlags")
+            {
+                newAtribs.Add(new EditorAttribute(typeof(EnumFlagUIEditor), typeof(UITypeEditor)));
+            }
+            //add description
+            var desc = fi.GetCustomAttributes(false);
+            foreach (var item in desc)
+            {
+                if(item is DescriptionAttribute)
+                {
+                    newAtribs.Add(item as DescriptionAttribute);
+                }
+            }
+            this.AttributeArray = newAtribs.ToArray();
         }
 
         public override bool CanResetValue(object component)
@@ -430,6 +447,7 @@ namespace msstyleEditor.PropView
 
         public override void ResetValue(object component)
         {
+
         }
 
         public override void SetValue(object component, object value)

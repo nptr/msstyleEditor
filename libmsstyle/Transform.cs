@@ -17,7 +17,7 @@ namespace libmsstyle
         public int DurationTime { get; set; }
         public TransformFlag Flags { get; set; }
         [TypeConverter(typeof(ExpandableObjectConverter))]
-
+        [Description("3D animation. No longer working in Windows 10+")]
         public Transform3D Transform3DStructure { get; set; }
         [TypeConverter(typeof(ExpandableObjectConverter))]
 
@@ -129,6 +129,7 @@ namespace libmsstyle
         Scale3D = 259,
         Roatate3D = 260,
     }
+
     [Flags]
     public enum TransformFlag
     {

@@ -129,8 +129,11 @@ namespace libmsstyle
 				classID > 500) // guessing here to be stateless
 				return false;
 
+            if (nameID == 20000) //Animation
+                return true;
+            
 			// Basic range check
-			if (typeID < (int)IDENTIFIER.ENUM || typeID >= (int)IDENTIFIER.COLORSCHEMES)
+            if (typeID < (int)IDENTIFIER.ENUM || typeID >= (int)IDENTIFIER.COLORSCHEMES)
 				return false;
 
 			// Some color and font props use an type id as name id.

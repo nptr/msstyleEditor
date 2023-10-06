@@ -112,9 +112,6 @@
     <Compile Include="Dialogs\ClassView.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Dialogs\ClassView.cs">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="Dialogs\ClassView.Designer.cs">
       <DependentUpon>ClassView.cs</DependentUpon>
     </Compile>
@@ -135,6 +132,12 @@
     </Compile>
     <Compile Include="Dialogs\LicenseDialog.Designer.cs">
       <DependentUpon>LicenseDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\NewAnimationDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\NewAnimationDialog.Designer.cs">
+      <DependentUpon>NewAnimationDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\PropertyView.cs">
       <SubType>Form</SubType>
@@ -169,7 +172,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="PropView\AnimationWrapper.cs" />
     <Compile Include="PropView\ColorEditor.cs" />
     <Compile Include="PropView\EnumFlagCheckedListBox.cs">
       <SubType>Component</SubType>
@@ -219,6 +221,9 @@
     <EmbeddedResource Include="Dialogs\MainWindow.resx">
       <DependentUpon>MainWindow.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\NewAnimationDialog.resx">
+      <DependentUpon>NewAnimationDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\PropertyView.resx">
       <DependentUpon>PropertyView.cs</DependentUpon>

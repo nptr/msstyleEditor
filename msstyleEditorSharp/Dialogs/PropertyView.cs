@@ -17,7 +17,7 @@ namespace msstyleEditor.Dialogs
 
         private PropertyViewMode m_viewMode;
 
-        public delegate void PropertyChangedHandler(StyleProperty prop);
+        public delegate void PropertyChangedHandler(object prop);
         public event PropertyChangedHandler OnPropertyAdded;
         public event PropertyChangedHandler OnPropertyRemoved;
 
@@ -76,7 +76,19 @@ namespace msstyleEditor.Dialogs
             {
                 if (m_class.ClassName == "animations")
                 {
-
+                    var dlg2 = new NewAnimationDialog();
+                    //typeid is the same for all animations
+                    var anim = dlg2.ShowDialog(new PropertyHeader(20000, m_style.Animations[0].Header.typeID) {  classID = m_class.ClassId});
+                    if (anim != null)
+                    {
+                        m_style.Animations.Add(anim);
+                        if (OnPropertyAdded != null)
+                        {
+                            OnPropertyAdded(anim);
+                        }
+                        propertyView.Refresh();
+                    }
+                    return;
                 }
             }
             if(m_style == null 

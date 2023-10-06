@@ -696,12 +696,21 @@ namespace msstyleEditor
             m_propertyView.ShowPropertyAddDialog();
         }
 
-        private void OnPropertyAdded(StyleProperty prop)
+        private void OnPropertyAdded(object prop)
         {
-            // refresh gui to account for new image property
-            if (prop.IsImageProperty())
+            if (prop is StyleProperty styleProp)
             {
-                DisplayPart(m_selection.Class, m_selection.Part);
+                // refresh gui to account for new image property
+                if (styleProp.IsImageProperty())
+                {
+                    DisplayPart(m_selection.Class, m_selection.Part);
+                }
+            }
+
+            if (prop is Animation animation)
+            {
+                m_selectedAnimation = new AnimationTypeDescriptor(animation);
+                m_propertyView.SetAnimation(m_selectedAnimation);
             }
         }
 
@@ -710,12 +719,15 @@ namespace msstyleEditor
             m_propertyView.RemoveSelectedProperty();
         }
 
-        private void OnPropertyRemoved(StyleProperty prop)
+        private void OnPropertyRemoved(object prop)
         {
-            // refresh gui to account for removed image property
-            if (prop.IsImageProperty())
+            if(prop is StyleProperty styleProp)
             {
-                DisplayPart(m_selection.Class, m_selection.Part);
+                // refresh gui to account for removed image property
+                if (styleProp.IsImageProperty())
+                {
+                    DisplayPart(m_selection.Class, m_selection.Part);
+                }
             }
         }
 
