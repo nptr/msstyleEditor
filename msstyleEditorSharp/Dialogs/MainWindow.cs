@@ -710,7 +710,8 @@ namespace msstyleEditor
             if (prop is Animation animation)
             {
                 m_selectedAnimation = new AnimationTypeDescriptor(animation);
-                m_propertyView.SetAnimation(m_style, m_selectedAnimation);
+                m_classView.Refresh();
+                m_propertyView.SetStylePart(null, null, null);
             }
         }
 

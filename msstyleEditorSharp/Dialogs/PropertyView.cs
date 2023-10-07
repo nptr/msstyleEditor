@@ -85,10 +85,30 @@ namespace msstyleEditor.Dialogs
                 {
                     var dlg2 = new NewAnimationDialog();
                     //typeid is the same for all animations
-                    var anim = dlg2.ShowDialog(new PropertyHeader(20000, m_style.Animations[0].Header.typeID) {  classID = m_class.ClassId});
+                    var anim = dlg2.ShowDialog(new PropertyHeader((int)IDENTIFIER.ANIMATION, m_style.Animations[0].Header.typeID) {  classID = m_class.ClassId});
                     if (anim != null)
                     {
-                        m_style.Animations.Add(anim);
+                        //check if there are any animations with same part id. it is important that all animations are sorted correctly
+                        int idx = 0;
+                        int latest_idx = -1;
+                        foreach (var item in m_style.Animations)
+                        {
+                            if(item.Header.partID == anim.Header.partID)
+                            {
+                                latest_idx = idx;
+                            }
+                            idx++;
+                        }
+
+                        if (latest_idx == -1)
+                        {
+                            m_style.Animations.Add(anim);
+                        }
+                        else
+                        {
+                            m_style.Animations.Insert(latest_idx + 1, anim);
+                        }
+
                         if (OnPropertyAdded != null)
                         {
                             OnPropertyAdded(anim);

@@ -67,6 +67,7 @@ namespace libmsstyle
             Header = header;
             Header.stateID = state;
             Header.partID = part;
+            CalculateTotalSize();
         }
 
         int GetPaddingForSize(int size)
@@ -76,7 +77,7 @@ namespace libmsstyle
             return ((size + 39) & -8) - sizeOfRecordHeader - size;
         }
 
-        public void Write(BinaryWriter bw)
+        private void CalculateTotalSize()
         {
             // Update the total size
             int total_size = 56;
@@ -84,9 +85,12 @@ namespace libmsstyle
             {
                 total_size += item.StructureSize + GetPaddingForSize(item.StructureSize);
             }
-
             Header.sizeInBytes = total_size;
+        }
 
+        public void Write(BinaryWriter bw)
+        {
+            CalculateTotalSize();
             bw.Write(Header.Serialize());
             WriteData(bw);
         }
