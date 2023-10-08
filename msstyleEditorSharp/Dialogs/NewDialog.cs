@@ -11,18 +11,19 @@ using System.Windows.Forms;
 
 namespace msstyleEditor.Dialogs
 {
-    public partial class NewAnimationDialog : Form
+    public partial class NewDialog : Form
     {
         public int PartID { get; private set; }
         public int StateID { get; private set; }
-        public NewAnimationDialog()
+        private bool HasState { get; set; }
+        public NewDialog()
         {
             InitializeComponent();
         }
 
         private void btnCreate_Click(object sender, EventArgs e)
         {
-            if(!int.TryParse(txtPartId.Text, out int PartID))
+            if (!int.TryParse(txtPartId.Text, out int PartID))
             {
                 MessageBox.Show("Part ID must be a number", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
@@ -30,7 +31,7 @@ namespace msstyleEditor.Dialogs
 
             this.PartID = PartID;
 
-            if (!int.TryParse(txtStateId.Text, out int StateID))
+            if (!int.TryParse(txtStateId.Text, out int StateID) && HasState)
             {
                 MessageBox.Show("State ID must be a number", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
@@ -41,11 +42,30 @@ namespace msstyleEditor.Dialogs
             DialogResult = DialogResult.OK;
         }
 
-        public new Animation ShowDialog(PropertyHeader header)
+        public Animation ShowDialogAnimation(PropertyHeader header)
         {
-            if(base.ShowDialog() == DialogResult.OK)
+            Text = "New animation";
+            HasState = true;
+            txtStateId.Enabled = true;
+            if (base.ShowDialog() == DialogResult.OK)
             {
                 return new Animation(header, PartID, StateID);
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public TimingFunction ShowDialogTimingFunction(PropertyHeader header)
+        {
+            Text = "New timing function";
+            HasState = false;
+            txtStateId.Enabled = false;
+            label2.Enabled = false;
+            if (base.ShowDialog() == DialogResult.OK)
+            {
+                return new TimingFunction(header, PartID);
             }
             else
             {

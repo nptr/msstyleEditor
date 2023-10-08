@@ -133,11 +133,11 @@
     <Compile Include="Dialogs\LicenseDialog.Designer.cs">
       <DependentUpon>LicenseDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\NewAnimationDialog.cs">
+    <Compile Include="Dialogs\NewDialog.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Dialogs\NewAnimationDialog.Designer.cs">
-      <DependentUpon>NewAnimationDialog.cs</DependentUpon>
+    <Compile Include="Dialogs\NewDialog.Designer.cs">
+      <DependentUpon>NewDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\PropertyView.cs">
       <SubType>Form</SubType>
@@ -222,8 +222,8 @@
       <DependentUpon>MainWindow.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\NewAnimationDialog.resx">
-      <DependentUpon>NewAnimationDialog.cs</DependentUpon>
+    <EmbeddedResource Include="Dialogs\NewDialog.resx">
+      <DependentUpon>NewDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\PropertyView.resx">
       <DependentUpon>PropertyView.cs</DependentUpon>

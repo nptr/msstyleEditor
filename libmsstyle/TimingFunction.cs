@@ -32,6 +32,12 @@ namespace libmsstyle
                 throw new Exception("Unknown timing function type: " + Type);
             }
         }
+        public TimingFunction(PropertyHeader header, int partid)
+        {
+            CubicBezier = new CubicBezierTimingFunction();
+            Header = header;
+            Header.partID = partid;
+        }
         public void Write(BinaryWriter bw)
         {
             if (Type == TimingFunctionType.Undefined)

@@ -83,9 +83,9 @@ namespace msstyleEditor.Dialogs
             {
                 if (m_class.ClassName == "animations")
                 {
-                    var dlg2 = new NewAnimationDialog();
+                    var dlg2 = new NewDialog();
                     //typeid is the same for all animations
-                    var anim = dlg2.ShowDialog(new PropertyHeader((int)IDENTIFIER.ANIMATION, m_style.Animations[0].Header.typeID) {  classID = m_class.ClassId});
+                    var anim = dlg2.ShowDialogAnimation(new PropertyHeader((int)IDENTIFIER.ANIMATION, m_style.Animations[0].Header.typeID) {  classID = m_class.ClassId});
                     if (anim != null)
                     {
                         //check if there are any animations with same part id. it is important that all animations are sorted correctly
@@ -115,6 +115,20 @@ namespace msstyleEditor.Dialogs
                         }
                         propertyView.Refresh();
                     }
+                    return;
+                }
+                else if (m_class.ClassName == "timingfunction")
+                {
+                    var dlg2 = new NewDialog();
+                    var timingfunc = dlg2.ShowDialogTimingFunction(new PropertyHeader((int)IDENTIFIER.TIMINGFUNCTION, m_style.TimingFunctions[0].Header.typeID) { classID = m_class.ClassId });
+                    if(timingfunc != null)
+                        m_style.TimingFunctions.Add(timingfunc);
+
+                    if (OnPropertyAdded != null)
+                    {
+                        OnPropertyAdded(timingfunc);
+                    }
+                    propertyView.Refresh();
                     return;
                 }
             }

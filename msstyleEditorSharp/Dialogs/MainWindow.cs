@@ -713,6 +713,13 @@ namespace msstyleEditor
                 m_classView.Refresh();
                 m_propertyView.SetStylePart(null, null, null);
             }
+
+            if (prop is TimingFunction timingFunc)
+            {
+                m_selectedTimingFunction = timingFunc;
+                m_classView.Refresh();
+                m_propertyView.SetStylePart(null, null, null);
+            }
         }
 
         private void OnPropertyRemove(object sender, EventArgs e)

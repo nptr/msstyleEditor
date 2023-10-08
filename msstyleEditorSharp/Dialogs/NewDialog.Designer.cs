@@ -1,6 +1,6 @@
 ﻿namespace msstyleEditor.Dialogs
 {
-    partial class NewAnimationDialog
+    partial class NewDialog
     {
         /// <summary>
         /// Required designer variable.
