@@ -768,6 +768,8 @@ namespace msstyleEditor
                 switch (type)
                 {
                     case IDENTIFIER.SIZE:
+                    case IDENTIFIER.FILENAME:
+                    case IDENTIFIER.FONT:
                         {
                             if (components.Length != 1) return null;
                             return Convert.ToInt32(components[0]);

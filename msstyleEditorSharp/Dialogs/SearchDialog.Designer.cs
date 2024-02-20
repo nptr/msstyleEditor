@@ -60,7 +60,10 @@ namespace msstyleEditor
             "MARGINS",
             "SIZE",
             "POSITION",
-            "RECTANGLE"});
+            "RECTANGLE",
+            "FILENAME",
+            "FONT"
+	    });
             this.cbDataType.Location = new System.Drawing.Point(104, 12);
             this.cbDataType.Name = "cbDataType";
             this.cbDataType.Size = new System.Drawing.Size(94, 21);

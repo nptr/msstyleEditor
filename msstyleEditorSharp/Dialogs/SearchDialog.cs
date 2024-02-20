@@ -25,7 +25,9 @@ namespace msstyleEditor
             libmsstyle.IDENTIFIER.MARGINS,
             libmsstyle.IDENTIFIER.SIZE,
             libmsstyle.IDENTIFIER.POSITION,
-            libmsstyle.IDENTIFIER.RECTTYPE
+            libmsstyle.IDENTIFIER.RECTTYPE,
+            libmsstyle.IDENTIFIER.FILENAME,
+            libmsstyle.IDENTIFIER.FONT,
         };
 
         private readonly string[] SEARCH_HINTS = new string[]
@@ -34,7 +36,9 @@ namespace msstyleEditor
             "l; t; r; b",
             "size",
             "x; y",
-            "l; t; r; b"
+            "l; t; r; b",
+            "id",
+            "id"
         };
 
         public enum SearchMode
