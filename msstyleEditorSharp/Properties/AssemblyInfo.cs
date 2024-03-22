@@ -7,12 +7,12 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("msstyleEditor")]
-[assembly: AssemblyCopyright("Copyright © Jakob K. 2015-2023")]
+[assembly: AssemblyCopyright("Copyright © Jakob K. 2015-2024")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
 [assembly: ComVisible(false)]
 [assembly: Guid("752c3bd1-8014-4d07-a198-823d0c394736")]
 
-[assembly: AssemblyVersion("2.0.0.8")]
-[assembly: AssemblyFileVersion("2.0.0.8")]
+[assembly: AssemblyVersion("2.0.1.0")]
+[assembly: AssemblyFileVersion("2.0.1.0")]
