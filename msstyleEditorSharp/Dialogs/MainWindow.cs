@@ -29,7 +29,7 @@ namespace msstyleEditor
 
         private TimingFunction m_selectedTimingFunction;
         private AnimationTypeDescriptor m_selectedAnimation;
-        public MainWindow()
+        public MainWindow(String[] args)
         {
             InitializeComponent();
 
@@ -87,6 +87,11 @@ namespace msstyleEditor
 
             m_searchDialog.StartPosition = FormStartPosition.CenterParent;
             m_searchDialog.OnSearch += this.OnSearchNextItem;
+
+            if (args.Length > 0)
+            {
+                OpenStyle(args[0]);
+            }
         }
 
         #region State Management & Helper
