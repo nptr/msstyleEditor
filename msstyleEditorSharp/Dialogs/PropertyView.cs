@@ -2,6 +2,7 @@
 using msstyleEditor.PropView;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Windows.Forms;
 
 namespace msstyleEditor.Dialogs
@@ -15,19 +16,24 @@ namespace msstyleEditor.Dialogs
         private StyleState m_state;
         private StyleProperty m_prop;
 
+        private AnimationTypeDescriptor m_SelectedAnimation;
+        private Animation m_SelectedAnimationPart;
+
         private PropertyViewMode m_viewMode;
 
-        public delegate void PropertyChangedHandler(StyleProperty prop);
+        public delegate void PropertyChangedHandler(object prop);
         public event PropertyChangedHandler OnPropertyAdded;
         public event PropertyChangedHandler OnPropertyRemoved;
+
 
         public PropertyViewWindow()
         {
             InitializeComponent();
         }
 
-        public void SetAnimation(AnimationTypeDescriptor anim)
+        public void SetAnimation(VisualStyle style, AnimationTypeDescriptor anim)
         {
+            m_style = style;
             m_viewMode = PropertyViewMode.AnimationMode;
             newPropertyToolStripMenuItem.Enabled = false;
             deleteToolStripMenuItem.Enabled = false;
@@ -35,8 +41,9 @@ namespace msstyleEditor.Dialogs
             propertyView.SelectedObject = anim;
         }
 
-        public void SetTimingFunction(TimingFunction timing)
+        public void SetTimingFunction(VisualStyle style, TimingFunction timing)
         {
+            m_style = style;
             m_viewMode = PropertyViewMode.TimingFunction;
             newPropertyToolStripMenuItem.Enabled = false;
             deleteToolStripMenuItem.Enabled = false;
@@ -76,7 +83,53 @@ namespace msstyleEditor.Dialogs
             {
                 if (m_class.ClassName == "animations")
                 {
+                    var dlg2 = new NewDialog();
+                    //typeid is the same for all animations
+                    var anim = dlg2.ShowDialogAnimation(new PropertyHeader((int)IDENTIFIER.ANIMATION, m_style.Animations[0].Header.typeID) {  classID = m_class.ClassId});
+                    if (anim != null)
+                    {
+                        //check if there are any animations with same part id. it is important that all animations are sorted correctly
+                        int idx = 0;
+                        int latest_idx = -1;
+                        foreach (var item in m_style.Animations)
+                        {
+                            if(item.Header.partID == anim.Header.partID)
+                            {
+                                latest_idx = idx;
+                            }
+                            idx++;
+                        }
 
+                        if (latest_idx == -1)
+                        {
+                            m_style.Animations.Add(anim);
+                        }
+                        else
+                        {
+                            m_style.Animations.Insert(latest_idx + 1, anim);
+                        }
+
+                        if (OnPropertyAdded != null)
+                        {
+                            OnPropertyAdded(anim);
+                        }
+                        propertyView.Refresh();
+                    }
+                    return;
+                }
+                else if (m_class.ClassName == "timingfunction")
+                {
+                    var dlg2 = new NewDialog();
+                    var timingfunc = dlg2.ShowDialogTimingFunction(new PropertyHeader((int)IDENTIFIER.TIMINGFUNCTION, m_style.TimingFunctions[0].Header.typeID) { classID = m_class.ClassId });
+                    if(timingfunc != null)
+                        m_style.TimingFunctions.Add(timingfunc);
+
+                    if (OnPropertyAdded != null)
+                    {
+                        OnPropertyAdded(timingfunc);
+                    }
+                    propertyView.Refresh();
+                    return;
                 }
             }
             if(m_style == null 
@@ -110,67 +163,127 @@ namespace msstyleEditor.Dialogs
 
         private void OnPropertyRemove(object sender, EventArgs e)
         {
-            if (m_viewMode != PropertyViewMode.ClassMode)
-                return;
-            if (m_state == null ||
-                m_prop == null)
+            if (m_viewMode == PropertyViewMode.ClassMode)
             {
-                return;
-            }
+                if (m_state == null || m_prop == null)
+                {
+                    return;
+                }
 
-            m_state.Properties.Remove(m_prop);
-            if (OnPropertyRemoved != null)
-            {
-                OnPropertyRemoved(m_prop);
+                m_state.Properties.Remove(m_prop);
+                if (OnPropertyRemoved != null)
+                {
+                    OnPropertyRemoved(m_prop);
+                }
+                propertyView.Refresh();
             }
-            propertyView.Refresh();
+            else if (m_viewMode == PropertyViewMode.TimingFunction)
+            {
+                var func = (TimingFunction)propertyView.SelectedObject;
+                if(func != null)
+                {
+                    m_style.TimingFunctions.Remove(func);
+                    if (OnPropertyRemoved != null)
+                    {
+                        OnPropertyRemoved(m_prop);
+                    }
+                    propertyView.Refresh();
+                }
+            }
+            else if (m_viewMode == PropertyViewMode.AnimationMode)
+            {
+                var anim = (AnimationTypeDescriptor)propertyView.SelectedObject;
+                if(anim != null && m_SelectedAnimationPart == null)
+                {
+                    //remove all animations
+                    foreach (var item in anim.Animations)
+                    {
+                        m_style.Animations.Remove(item);
+                    }
+                }
+                if (m_SelectedAnimationPart != null)
+                {
+                    m_style.Animations.Remove(m_SelectedAnimationPart);
+                }
+
+                if (OnPropertyRemoved != null)
+                {
+                    if (m_prop != null)
+                        OnPropertyRemoved(m_prop);
+                    else if (m_SelectedAnimationPart != null)
+                        OnPropertyRemoved(m_SelectedAnimationPart);
+                }
+                propertyView.Refresh();
+            }
         }
 
         private void OnPropertySelected(object sender, SelectedGridItemChangedEventArgs e)
         {
-            if (m_viewMode != PropertyViewMode.ClassMode)
-                return;
-            const int CTX_ADD = 0;
-            const int CTX_REM = 1;
-
-            bool haveSelection = e.NewSelection != null;
-            propViewContextMenu.Items[CTX_ADD].Enabled = haveSelection;
-            propViewContextMenu.Items[CTX_REM].Enabled = haveSelection;
-            if (!haveSelection)
-                return;
-
-            var propDesc = e.NewSelection.PropertyDescriptor as StylePropertyDescriptor;
-            if (propDesc != null)
+            if (m_viewMode == PropertyViewMode.ClassMode)
             {
-                propViewContextMenu.Items[CTX_ADD].Text = "Add Property to [" + propDesc.Category + "]";
-                propViewContextMenu.Items[CTX_REM].Text = "Remove " + propDesc.Name;
+                const int CTX_ADD = 0;
+                const int CTX_REM = 1;
 
-                m_state = propDesc.StyleState;
-                m_prop = propDesc.StyleProperty;
-                return;
+                bool haveSelection = e.NewSelection != null;
+                propViewContextMenu.Items[CTX_ADD].Enabled = haveSelection;
+                propViewContextMenu.Items[CTX_REM].Enabled = haveSelection;
+                if (!haveSelection)
+                    return;
+
+                var propDesc = e.NewSelection.PropertyDescriptor as StylePropertyDescriptor;
+                if (propDesc != null)
+                {
+                    propViewContextMenu.Items[CTX_ADD].Text = "Add Property to [" + propDesc.Category + "]";
+                    propViewContextMenu.Items[CTX_REM].Text = "Remove " + propDesc.Name;
+
+                    m_state = propDesc.StyleState;
+                    m_prop = propDesc.StyleProperty;
+                    return;
+                }
+
+                var dummyDesc = e.NewSelection.PropertyDescriptor as PlaceHolderPropertyDescriptor;
+                if (dummyDesc != null)
+                {
+                    propViewContextMenu.Items[CTX_ADD].Enabled = true;
+                    propViewContextMenu.Items[CTX_ADD].Text = "Add Property to [" + dummyDesc.Category + "]";
+                    propViewContextMenu.Items[CTX_REM].Enabled = false;
+                    propViewContextMenu.Items[CTX_REM].Text = "Remove";
+                    m_state = dummyDesc.StyleState;
+                    return;
+                }
+
+                if (e.NewSelection.GridItemType == GridItemType.Category)
+                {
+                    OnPropertySelected(sender, new SelectedGridItemChangedEventArgs(null, e.NewSelection.GridItems[0])); // select child
+                    return;
+                }
+
+                if (e.NewSelection.GridItemType == GridItemType.Property)
+                {
+                    OnPropertySelected(sender, new SelectedGridItemChangedEventArgs(null, e.NewSelection.Parent)); // select parent
+                    return;
+                }
             }
-
-            var dummyDesc = e.NewSelection.PropertyDescriptor as PlaceHolderPropertyDescriptor;
-            if (dummyDesc != null)
+            else if (m_viewMode == PropertyViewMode.AnimationMode)
             {
-                propViewContextMenu.Items[CTX_ADD].Enabled = true;
-                propViewContextMenu.Items[CTX_ADD].Text = "Add Property to [" + dummyDesc.Category + "]";
-                propViewContextMenu.Items[CTX_REM].Enabled = false;
-                propViewContextMenu.Items[CTX_REM].Text = "Remove";
-                m_state = dummyDesc.StyleState;
-                return;
-            }
+                if (e.NewSelection == null)
+                    return;
 
-            if (e.NewSelection.GridItemType == GridItemType.Category)
-            {
-                OnPropertySelected(sender, new SelectedGridItemChangedEventArgs(null, e.NewSelection.GridItems[0])); // select child
-                return;
-            }
+                var prop = e.NewSelection.PropertyDescriptor as AnimationPropertyDescriptior;
+                if(prop != null)
+                {
+                    Debug.WriteLine("selected property descriptor");
+                }
 
-            if (e.NewSelection.GridItemType == GridItemType.Property)
-            {
-                OnPropertySelected(sender, new SelectedGridItemChangedEventArgs(null, e.NewSelection.Parent)); // select parent
-                return;
+                if (e.NewSelection.GridItemType == GridItemType.Category)
+                {
+                    m_SelectedAnimationPart = (e.NewSelection.GridItems[0].PropertyDescriptor as AnimationPropertyDescriptior).m_animation;
+                }
+
+                if (e.NewSelection.GridItemType == GridItemType.Property)
+                {
+                    Debug.WriteLine("selected prop " + e.NewSelection.Parent.Label);
+                }
             }
         }
     }
