@@ -89,12 +89,13 @@ namespace msstyleEditor.PropView
         {
             if (value is string s)
             {
+		var found = -1;
+		Int32.TryParse(s.Substring(0, s.IndexOf(" - ")), out found);
                 foreach (var kvp in m_enumInfo)
                 {
-                    if (kvp.Value == s) return kvp.Key;
+                    if (kvp.Key == found) return kvp.Key;
                 }
-
-                return "INVALID";
+                return $"{found} - INVALID";
             }
             else return base.ConvertFrom(context, culture, value);
         }
@@ -106,7 +107,7 @@ namespace msstyleEditor.PropView
                 string result;
                 if(m_enumInfo.TryGetValue(i, out result))
                 {
-                    return result;
+                    return $"{i} - {result}";
                 }
                 else return value.ToString();
             }
