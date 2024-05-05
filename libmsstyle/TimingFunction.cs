@@ -17,7 +17,6 @@ namespace libmsstyle
         public CubicBezierTimingFunction CubicBezier { get; set; }
 
         public PropertyHeader Header;
-
         public TimingFunction(byte[] data, int start, PropertyHeader header)
         {
             this.Header = header;
@@ -33,7 +32,12 @@ namespace libmsstyle
                 throw new Exception("Unknown timing function type: " + Type);
             }
         }
-
+        public TimingFunction(PropertyHeader header, int partid)
+        {
+            CubicBezier = new CubicBezierTimingFunction();
+            Header = header;
+            Header.partID = partid;
+        }
         public void Write(BinaryWriter bw)
         {
             if (Type == TimingFunctionType.Undefined)
@@ -44,7 +48,6 @@ namespace libmsstyle
             bw.Write(Header.Serialize());
             WriteData(bw);
         }
-
         public void WriteData(BinaryWriter w)
         {
             w.Write((int)Type);
@@ -54,7 +57,6 @@ namespace libmsstyle
             }
             w.Write(0); //Write padding
         }
-
         public override string ToString()
         {
             return "Timing function";
