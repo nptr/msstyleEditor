@@ -86,6 +86,7 @@
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Design" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -172,6 +173,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="PropView\EnumFlagUIEditor.cs" />
+    <Compile Include="PropView\NotifyingCollectionEditor.cs" />
     <Compile Include="PropView\TypeDescriptors.cs" />
     <Compile Include="PropView\TypeConverters.cs" />
     <Compile Include="RegistrySettings.cs" />

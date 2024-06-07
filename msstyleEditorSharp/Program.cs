@@ -1,5 +1,6 @@
 ﻿using msstyleEditor.PropView;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Design;
@@ -19,6 +20,8 @@ namespace msstyleEditor
         {
             TypeDescriptor.AddAttributes(typeof(Color), new EditorAttribute(typeof(ColorEditor), typeof(UITypeEditor)));
             TypeDescriptor.AddAttributes(typeof(Color), new TypeConverterAttribute(typeof(NoStandardColorConverter)));
+            TypeDescriptor.AddAttributes(typeof(List<Color>), new EditorAttribute(typeof(NotifyingCollectionEditor), typeof(UITypeEditor)));
+            TypeDescriptor.AddAttributes(typeof(List<Int32>), new EditorAttribute(typeof(NotifyingCollectionEditor), typeof(UITypeEditor)));
 
             if (Environment.OSVersion.Version.Major >= 6)
             {
