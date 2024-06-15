@@ -2,12 +2,6 @@
 using msstyleEditor.PropView;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace msstyleEditor.Dialogs
@@ -126,7 +120,7 @@ namespace msstyleEditor.Dialogs
         }
 
         bool m_endReached = false;
-        public void FindNextNode(SearchDialog.SearchMode mode, IDENTIFIER type, string searchString, object searchObject)
+        public TreeNode FindNextNode(bool includeSelectedNode, Predicate<TreeNode> predicate)
         {
             var startItem = classView.SelectedNode;
             if (startItem == null || m_endReached)
@@ -136,46 +130,24 @@ namespace msstyleEditor.Dialogs
                 {
                     startItem = classView.Nodes[0];
                 }
-                else return;
+                else return null;
             }
 
-            var node = TreeViewSearch.FindNextNode(classView, startItem, (_node) =>
-            {
-                switch (mode)
-                {
-                    case SearchDialog.SearchMode.Name:
-                        return _node.Text.ToUpper().Contains(searchString.ToUpper());
-                    case SearchDialog.SearchMode.Property:
-                        {
-                            StylePart part = _node.Tag as StylePart;
-                            if (part != null)
-                            {
-                                return part.States.Any((kvp) =>
-                                {
-                                    return kvp.Value.Properties.Any((p) =>
-                                    {
-                                        return p.Header.typeID == (int)type &&
-                                               p.GetValue().Equals(searchObject);
-                                    });
-                                });
-                            }
-                        }
-                        return false;
-                    default: return false;
-                }
-            });
-
+            var node = TreeViewSearch.FindNextNode(classView, startItem, includeSelectedNode, predicate);
             if (node != null)
             {
+                // Because we may visit a class/part node multiple times AND change some properties there, we
+                // have to force the `OnSelectionChanged` event to implicitly update the property view.
+                bool forceUpdate = classView.SelectedNode == node;
                 classView.SelectedNode = node;
+                if (forceUpdate)
+                {
+                    OnTreeItemSelected(this, new TreeViewEventArgs(node));
+                }
             }
-            else
-            {
-                MessageBox.Show($"No further match for \"{searchString}\" !\nSearch will begin from top again.", ""
-                    , MessageBoxButtons.OK
-                    , MessageBoxIcon.Information);
-                m_endReached = true;
-            }
+            else m_endReached = true;
+
+            return node;
         }
 
         public void ExpandAll()

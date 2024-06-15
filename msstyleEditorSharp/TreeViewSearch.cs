@@ -9,13 +9,13 @@ namespace msstyleEditor
 {
     class TreeViewSearch
     {
-        public static TreeNode FindNextNode(TreeView tree, TreeNode node, Predicate<TreeNode> predicate)
+        public static TreeNode FindNextNode(TreeView tree, TreeNode node, bool includeCurrentNode, Predicate<TreeNode> predicate)
         {
             TreeNode originalNode = node;
             while (node != null)
             {
                 // skip the first node to not get stuck.
-                if (node != originalNode)
+                if (node != originalNode || includeCurrentNode)
                 {
                     if (predicate(node))
                         return node;

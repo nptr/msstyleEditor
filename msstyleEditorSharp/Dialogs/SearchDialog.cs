@@ -47,9 +47,17 @@ namespace msstyleEditor
             Property = 1
         }
 
-        public delegate void SearchDelegate(SearchMode searchType, libmsstyle.IDENTIFIER dataType, string search);
+        public enum ReplaceMode
+        {
+            Next = 0,
+            All = 1
+        }
 
+        public delegate void SearchDelegate(SearchMode searchType, libmsstyle.IDENTIFIER dataType, string search);
         public event SearchDelegate OnSearch;
+
+        public delegate void ReplaceDelegate(ReplaceMode replaceMode, libmsstyle.IDENTIFIER dataType, string search, string replace);
+        public event ReplaceDelegate OnReplace;
 
         public SearchDialog()
         {
@@ -58,12 +66,18 @@ namespace msstyleEditor
             cbItemType.SelectedIndex = 0;
             cbDataType.SelectedIndex = 0;
 
+            SendMessage(tbReplaceText.Handle, EM_SETCUEBANNER, 0, "Replace...");
+
             tbSearchText.Select();
         }
 
         private void OnItemTypeChanged(object sender, EventArgs e)
         {
-            cbDataType.Enabled = cbItemType.SelectedIndex == 1;
+            bool searchForProperty = cbItemType.SelectedIndex == 1;
+            cbDataType.Enabled = searchForProperty;
+            tbReplaceText.Enabled = searchForProperty;
+            btReplaceNext.Enabled = searchForProperty;
+            btReplaceAll.Enabled = searchForProperty;
         }
 
         private void OnDataTypeChanged(object sender, EventArgs e)
@@ -80,6 +94,30 @@ namespace msstyleEditor
                 {
                     OnSearch((SearchMode)cbItemType.SelectedIndex,
                         TYPE_IDS[cbDataType.SelectedIndex], tbSearchText.Text);
+                }
+            }
+        }
+
+        private void OnReplaceNextClicked(object sender, EventArgs e)
+        {
+            if (OnReplace != null)
+            {
+                if (!String.IsNullOrEmpty(tbSearchText.Text) &&
+                    !String.IsNullOrEmpty(tbReplaceText.Text))
+                {
+                    OnReplace(ReplaceMode.Next, TYPE_IDS[cbDataType.SelectedIndex], tbSearchText.Text, tbReplaceText.Text);
+                }
+            }
+        }
+
+        private void OnReplaceAllClicked(object sender, EventArgs e)
+        {
+            if (OnReplace != null)
+            {
+                if (!String.IsNullOrEmpty(tbSearchText.Text) &&
+                    !String.IsNullOrEmpty(tbReplaceText.Text))
+                {
+                    OnReplace(ReplaceMode.All, TYPE_IDS[cbDataType.SelectedIndex], tbSearchText.Text, tbReplaceText.Text);
                 }
             }
         }
