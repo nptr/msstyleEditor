@@ -261,9 +261,13 @@ namespace msstyleEditor
             {
                 imagePropToShow = imgProps[0];
             }
-            else if (imagePropToShow == null && cls.Parts[0] != part)
+            else
             {
-                imagePropToShow = cls.Parts[0].GetImageProperties().FirstOrDefault();
+                StylePart commonPart;
+                if(cls.Parts.TryGetValue(0, out commonPart))
+                {
+                    imagePropToShow = commonPart.GetImageProperties().FirstOrDefault();
+                }
             }
 
             // reset image view
