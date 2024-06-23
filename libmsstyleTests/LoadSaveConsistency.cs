@@ -46,6 +46,7 @@ namespace libmsstyleTests
         [DataTestMethod]
         [DataRow(@"..\..\..\styles\w10_2004_aero\aero.msstyles", true)]
         [DataRow(@"..\..\..\styles\w10_21h2_aero\aero.msstyles", true)]
+        [DataRow(@"..\..\..\styles\w11_luna_mod\Luna.msstyles", true)]
         [DataRow(@"..\..\..\styles\w11_pre_aero.msstyles", false)]
         public void VerifyConsecutiveLoadSave(string file, bool standalone = true)
         {

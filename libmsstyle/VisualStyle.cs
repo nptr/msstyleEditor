@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace libmsstyle
 {
@@ -382,20 +378,16 @@ namespace libmsstyle
             LoadProperties(pmap);
 
 
-            // Get an overview of language resources.
-            // Type: Version Info, Name: 1
-            var l1 = ResourceAccess.GetAllLanguageIds(m_moduleHandle, "#" + Win32Api.RT_VERSION, 1,
-                Win32Api.EnumResourceFlags.RESOURCE_ENUM_MUI |
-                Win32Api.EnumResourceFlags.RESOURCE_ENUM_LN);
+            // Try to get an overview of language resources.
             // Type: String Table, Name: 7 (typically style name & copyright)
-            var l2 = ResourceAccess.GetAllLanguageIds(m_moduleHandle, "#" + Win32Api.RT_STRING, 7,
+            var l1 = ResourceAccess.GetAllLanguageIds(m_moduleHandle, "#" + Win32Api.RT_STRING, 7,
                 Win32Api.EnumResourceFlags.RESOURCE_ENUM_MUI |
                 Win32Api.EnumResourceFlags.RESOURCE_ENUM_LN);
             // Type: String Table, Name: 32 (typically font definitions)
-            var l3 = ResourceAccess.GetAllLanguageIds(m_moduleHandle, "#" + Win32Api.RT_STRING, 32,
+            var l2 = ResourceAccess.GetAllLanguageIds(m_moduleHandle, "#" + Win32Api.RT_STRING, 32,
                 Win32Api.EnumResourceFlags.RESOURCE_ENUM_MUI |
                 Win32Api.EnumResourceFlags.RESOURCE_ENUM_LN);
-            var langs = l1.Union(l2).Union(l3);
+            var langs = l1.Union(l2);
 
             // Load all tables for internal purposes.
             foreach (var lang in langs)
