@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("libmsstyle")]
-[assembly: AssemblyCopyright("Copyright © Jakob K. 2015-2022")]
+[assembly: AssemblyCopyright("Copyright © Jakob K. 2015-2024")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

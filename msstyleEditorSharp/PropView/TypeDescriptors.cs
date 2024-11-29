@@ -252,7 +252,13 @@ namespace msstyleEditor.PropView
         }
 
         public override Type ComponentType => null;
-        public override string Description => m_info.Description;
+        public override string Description
+        {
+            get
+            {
+                return $"{m_info.Description} ID {m_property.Header.nameID}.".TrimStart();
+            }
+        }
         public override string Category => m_category;
         public override string DisplayName => m_info.Name;
         public override bool IsReadOnly => false;
