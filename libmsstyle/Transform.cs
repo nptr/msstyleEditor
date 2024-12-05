@@ -17,7 +17,7 @@ namespace libmsstyle
         public int DurationTime { get; set; }
         public TransformFlag Flags { get; set; }
         [TypeConverter(typeof(ExpandableObjectConverter))]
-
+        [Description("3D animation. No longer working in Windows 10+")]
         public Transform3D Transform3DStructure { get; set; }
         [TypeConverter(typeof(ExpandableObjectConverter))]
 
@@ -58,7 +58,6 @@ namespace libmsstyle
             Transform2DStructure = new Transform2D();
             TransformOpacity = new TransformOpacity();
         }
-
         public Transform(byte[] data, ref int start)
         {
             Type = (TransformType)BitConverter.ToInt32(data, start + 0);
