@@ -1,4 +1,4 @@
-﻿using libmsstyle;
+using libmsstyle;
 using msstyleEditor.Dialogs;
 using msstyleEditor.Properties;
 using msstyleEditor.PropView;
@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -657,9 +658,28 @@ namespace msstyleEditor
 
                 try
                 {
-                    using (var fs = File.Create(sfd.FileName))
+                    if(m_selectedImage.Type == StyleResourceType.Image)
+                    {
+                        // The IMAGE resources are non-standard PNGs images. The color channels
+                        // are premultiplied by alpha already even though the PNG spec dictates
+                        // straight alpha. We have to correct this, otherwise image viewers will
+                        // be confused and results will be off. PREMUL -> STRAIGHT.
+                        using (var ms = new MemoryStream(m_selectedImage.Data))
+                        {
+                            Bitmap bmp;
+                            libmsstyle.ImageConverter.PremulToStraightAlpha(ms, out bmp);
+                            bmp.Save(sfd.FileName);
+                        }
+                    }
+                    else
+                    {
+                        // The images in the ATLAS resource are standard, straight-alpha, PNG images.
+                        // This makes sense insofar, as those are used in the DWM classes which seem
+                        // to be a bit more special. KEEP AS-IS.
+                        using (var fs = File.Create(sfd.FileName + "asis.png"))
                     {
                         fs.Write(m_selectedImage.Data, 0, m_selectedImage.Data.Length);
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -696,7 +716,29 @@ namespace msstyleEditor
                     return;
                 }
 
-                m_style.QueueResourceUpdate(m_selectedImage.ResourceId, m_selectedImage.Type, ofd.FileName);
+
+                var fname = Path.GetRandomFileName() + Path.GetExtension(ofd.FileName);
+                var tempFolder = Path.Combine(Path.GetTempPath(), "msstyleEditor");
+                Directory.CreateDirectory(tempFolder);
+                var tempFile = Path.Combine(tempFolder, fname);
+                if (m_selectedImage.Type == StyleResourceType.Image)
+                {
+                    // IMAGE resources must be saved with premultiplied alpha channel.
+                    using (var ifs = File.OpenRead(ofd.FileName))
+                    using (var ofs = File.Create(tempFile))
+                    {
+                        Bitmap bmp;
+                        libmsstyle.ImageConverter.PremultiplyAlpha(ifs, out bmp);
+                        bmp.Save(ofs, ImageFormat.Png);
+                    }
+                }
+                else
+                {
+                    // STREAM resources must be saved with straight alpha channel.
+                    File.Copy(ofd.FileName, tempFile, true);
+                }
+
+                m_style.QueueResourceUpdate(m_selectedImage.ResourceId, m_selectedImage.Type, tempFile);
                 // TODO: update image view?
             }
         }

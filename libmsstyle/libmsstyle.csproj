@@ -64,6 +64,7 @@
   <ItemGroup>
     <Compile Include="Animation.cs" />
     <Compile Include="CubicBezierTimingFunction.cs" />
+    <Compile Include="ImageConverter.cs" />
     <Compile Include="Margins.cs" />
     <Compile Include="Platform.cs" />
     <Compile Include="PropertyStream.cs" />
