@@ -59,6 +59,7 @@ namespace msstyleEditor
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.textBox3 = new System.Windows.Forms.TextBox();
+            this.textBox4 = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.comboBox2 = new System.Windows.Forms.ComboBox();
@@ -286,6 +287,15 @@ namespace msstyleEditor
             this.textBox3.Text = "password";
             this.textBox3.UseSystemPasswordChar = true;
             // 
+            // textBox4
+            // 
+            this.textBox4.Location = new System.Drawing.Point(380, 108);
+            this.textBox4.Name = "textBox4";
+            this.textBox4.ReadOnly = true;
+            this.textBox4.Size = new System.Drawing.Size(100, 20);
+            this.textBox4.TabIndex = 45;
+            this.textBox4.Text = "readonly";
+            // 
             // label5
             // 
             this.label5.AutoSize = true;
@@ -365,7 +375,7 @@ namespace msstyleEditor
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(377, 127);
+            this.label7.Location = new System.Drawing.Point(377, 143);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(30, 13);
             this.label7.TabIndex = 23;
@@ -374,7 +384,7 @@ namespace msstyleEditor
             // linkLabel1
             // 
             this.linkLabel1.AutoSize = true;
-            this.linkLabel1.Location = new System.Drawing.Point(377, 145);
+            this.linkLabel1.Location = new System.Drawing.Point(377, 161);
             this.linkLabel1.Name = "linkLabel1";
             this.linkLabel1.Size = new System.Drawing.Size(69, 13);
             this.linkLabel1.TabIndex = 24;
@@ -666,6 +676,7 @@ namespace msstyleEditor
             this.Controls.Add(this.comboBox2);
             this.Controls.Add(this.comboBox1);
             this.Controls.Add(this.label5);
+            this.Controls.Add(this.textBox4);
             this.Controls.Add(this.textBox3);
             this.Controls.Add(this.textBox2);
             this.Controls.Add(this.textBox1);
@@ -717,6 +728,7 @@ namespace msstyleEditor
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.TextBox textBox2;
         private System.Windows.Forms.TextBox textBox3;
+        private System.Windows.Forms.TextBox textBox4;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.ComboBox comboBox1;
         private System.Windows.Forms.ComboBox comboBox2;
