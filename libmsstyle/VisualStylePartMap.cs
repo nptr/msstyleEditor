@@ -420,8 +420,8 @@ namespace libmsstyle
             new VisualStylePartEntry(8, "INDIRECTTOUCH", VisualStyleStates.STATES_COMMON_DEFAULT ),
         };
 
-        // Definitive parts for Win 7, using the real names from a PDB of Win8 build 7762, where
-        // DWM is identical.
+        // Definitive parts for Win 7, using the real names from a PDB of Win 8 build 7762, where
+        // DWM is identical to Win 7's.
         public static readonly List<VisualStylePartEntry> PARTS_DWMWINDOW_WIN7 = new List<VisualStylePartEntry>()
         {
             new VisualStylePartEntry(0, "Common Properties", VisualStyleStates.STATES_COMMON_DEFAULT ),
