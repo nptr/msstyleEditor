@@ -13,9 +13,8 @@ namespace libmsstyle
         public int SizeInBytes;
         public int PropertiesIndex;
         public int TransformsIndex;
-
         public AnimationFlags AnimationFlags { get; set; }
-        public int TransformCount { get; set; }
+        private int TransformCount;
         public int StaggerDelay { get; set; }
         public int StaggerDelayCap { get; set; }
         public float StaggerDelayFactor { get; set; }
@@ -24,9 +23,9 @@ namespace libmsstyle
         public int TuningLevel { get; set; }
         public float Perspective { get; set; }
         private List<Transform> _transforms = new List<Transform>();
+        [Description("The list of animations to play at the same time.")]
         public List<Transform> Transforms { get { return _transforms; } }
         public PropertyHeader Header;
-
         public Animation(byte[] data, ref int start, PropertyHeader header)
         {
             this.Header = header;
@@ -61,13 +60,14 @@ namespace libmsstyle
         /// <param name="animationsHeader">Header of the animations class</param>
         /// <param name="part">Animation part</param>
         /// <param name="state">Animation state</param>
-        public Animation(PropertyHeader animationsHeader, int part, int state)
+        public Animation(PropertyHeader header, int part, int state)
         {
             PropertiesIndex = 16;
             TransformsIndex = 56;
-            Header = new PropertyHeader(20000, animationsHeader.typeID);
+            Header = header;
             Header.stateID = state;
             Header.partID = part;
+            CalculateTotalSize();
         }
 
         int GetPaddingForSize(int size)
@@ -77,7 +77,7 @@ namespace libmsstyle
             return ((size + 39) & -8) - sizeOfRecordHeader - size;
         }
 
-        public void Write(BinaryWriter bw)
+        private void CalculateTotalSize()
         {
             // Update the total size
             int total_size = 56;
@@ -85,9 +85,12 @@ namespace libmsstyle
             {
                 total_size += item.StructureSize + GetPaddingForSize(item.StructureSize);
             }
-
             Header.sizeInBytes = total_size;
+        }
 
+        public void Write(BinaryWriter bw)
+        {
+            CalculateTotalSize();
             bw.Write(Header.Serialize());
             WriteData(bw);
         }

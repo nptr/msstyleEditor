@@ -470,7 +470,7 @@ namespace msstyleEditor
             if (func != null)
             {
                 m_selectedTimingFunction = func;
-                m_propertyView.SetTimingFunction(func);
+                m_propertyView.SetTimingFunction(m_style, func);
                 return;
             }
 
@@ -478,7 +478,7 @@ namespace msstyleEditor
             if (animation != null)
             {
                 m_selectedAnimation = animation;
-                m_propertyView.SetAnimation(animation);
+                m_propertyView.SetAnimation(m_style, animation);
                 return;
             }
 
@@ -748,12 +748,29 @@ namespace msstyleEditor
             m_propertyView.ShowPropertyAddDialog();
         }
 
-        private void OnPropertyAdded(StyleProperty prop)
+        private void OnPropertyAdded(object prop)
         {
-            // refresh gui to account for new image property
-            if (prop.IsImageProperty())
+            if (prop is StyleProperty styleProp)
             {
-                DisplayPart(m_selection.Class, m_selection.Part);
+                // refresh gui to account for new image property
+                if (styleProp.IsImageProperty())
+                {
+                    DisplayPart(m_selection.Class, m_selection.Part);
+                }
+            }
+
+            if (prop is Animation animation)
+            {
+                m_selectedAnimation = new AnimationTypeDescriptor(animation);
+                m_classView.Refresh();
+                m_propertyView.SetStylePart(null, null, null);
+            }
+
+            if (prop is TimingFunction timingFunc)
+            {
+                m_selectedTimingFunction = timingFunc;
+                m_classView.Refresh();
+                m_propertyView.SetStylePart(null, null, null);
             }
         }
 
@@ -762,12 +779,20 @@ namespace msstyleEditor
             m_propertyView.RemoveSelectedProperty();
         }
 
-        private void OnPropertyRemoved(StyleProperty prop)
+        private void OnPropertyRemoved(object prop)
         {
-            // refresh gui to account for removed image property
-            if (prop.IsImageProperty())
+            if(prop is StyleProperty styleProp)
             {
-                DisplayPart(m_selection.Class, m_selection.Part);
+                // refresh gui to account for removed image property
+                if (styleProp.IsImageProperty())
+                {
+                    DisplayPart(m_selection.Class, m_selection.Part);
+                }
+            }
+            else if (prop is Animation || prop is TimingFunction)
+            {
+                m_classView.Refresh();
+                m_propertyView.SetStylePart(null, null, null);
             }
         }
 

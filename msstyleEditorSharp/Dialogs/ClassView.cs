@@ -118,7 +118,14 @@ namespace msstyleEditor.Dialogs
             }
             classView.EndUpdate();
         }
+        public void Refresh()
+        {
+            classView.BeginUpdate();
+            classView.Nodes.Clear();
+            classView.EndUpdate();
 
+            SetVisualStyle(m_style);
+        }
         bool m_endReached = false;
         public TreeNode FindNextNode(bool includeSelectedNode, Predicate<TreeNode> predicate)
         {

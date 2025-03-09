@@ -315,7 +315,7 @@ namespace libmsstyle
 
             MemoryStream ms = new MemoryStream();
             BinaryWriter bw = new BinaryWriter(ms);
-
+            m_timingFunctions.OrderBy(t => t.Header.partID);
             foreach (var item in m_timingFunctions)
             {
                 item.Write(bw);
