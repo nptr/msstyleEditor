@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace libmsstyle
@@ -620,6 +621,69 @@ namespace libmsstyle
         {
             var key = new StyleResource(null, nameId, type);
             m_resourceUpdates[key] = pathToNew;
+        }
+
+        public string GetImageHash(StyleProperty prop)
+        {
+            // determine type for resource update
+            StyleResourceType resType = StyleResourceType.None;
+            if (prop.Header.typeID == (int)IDENTIFIER.FILENAME ||
+               prop.Header.typeID == (int)IDENTIFIER.FILENAME_LITE)
+            {
+                resType = StyleResourceType.Image;
+            }
+            else if (prop.Header.typeID == (int)IDENTIFIER.DISKSTREAM)
+            {
+                resType = StyleResourceType.Atlas;
+            }
+            else return string.Empty;
+
+            byte[] data = null;
+
+            // see if there is a pending update to the resource
+            string file = GetQueuedResourceUpdate(prop.Header.shortFlag, resType);
+            if (!String.IsNullOrEmpty(file) && File.Exists(file))
+            {
+                try
+                {
+                    data = File.ReadAllBytes(file);
+                }
+                catch (Exception)
+                {
+                    return string.Empty;
+                }
+            }
+            else
+            {
+                var resource = GetResourceFromProperty(prop);
+                if (resource?.Data != null)
+                {
+                    data = resource.Data;
+                }
+            }
+
+            if (data != null)
+            {
+                using (var hashAlgorithm = HashAlgorithm.Create("SHA256"))
+                {
+                    if (hashAlgorithm == null)
+                        return string.Empty;
+
+                    byte[] hashBytes = hashAlgorithm.ComputeHash(data);
+
+                    if (hashBytes != null)
+                    {
+                        // Convert hash bytes to hex string
+                        StringBuilder sb = new StringBuilder(hashBytes.Length * 2);
+                        foreach (byte b in hashBytes)
+                            sb.AppendFormat("{0:x2}", b);
+
+                        return sb.ToString();
+                    }
+                }
+            }
+
+            return string.Empty;
         }
     }
 }

@@ -42,19 +42,28 @@ namespace msstyleEditor
 							PropertyInfo typeInfo;
 							bool ht = VisualStyleProperties.PROPERTY_INFO_MAP.TryGetValue(prop.Header.typeID, out typeInfo);
 
+							string hash = string.Empty;
+
+							if (prop.IsImageProperty())
+							{
+								hash = String.Format(" Hash ({0})", style.GetImageHash(prop));
+							}
+
 							if (!hp || !ht)
-                            {
-								txt.AppendFormat("\t\t\tProp {0} ({1}) ({2})\n"
+							{
+								txt.AppendFormat("\t\t\tProp {0} ({1}) ({2}){3}\n"
 								, prop.Header.nameID
 								, prop.Header.typeID
-								, prop.GetValueAsString());
+								, prop.GetValueAsString()
+								, hash);
 								continue;
 							}
 
-							txt.AppendFormat("\t\t\tProp {0} ({1}) ({2})\n"
+							txt.AppendFormat("\t\t\tProp {0} ({1}) ({2}){3}\n"
 								, propInfo.Name
 								, typeInfo.Name
-								, prop.GetValueAsString());
+								, prop.GetValueAsString()
+								, hash);
 						}
 					}
 					txt.Append("\n");
